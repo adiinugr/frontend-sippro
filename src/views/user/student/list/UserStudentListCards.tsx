@@ -47,7 +47,7 @@ const data: UserDataType[] = [
   }
 ]
 
-const UserListCards = () => {
+const UserStudentListCards = () => {
   return (
     <Grid container spacing={6}>
       {data.map((item, i) => (
@@ -59,4 +59,4 @@ const UserListCards = () => {
   )
 }
 
-export default UserListCards
+export default UserStudentListCards

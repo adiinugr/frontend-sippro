@@ -2,20 +2,20 @@
 import Grid from '@mui/material/Grid'
 
 // Type Imports
-import type { UsersType } from '@/types/userTypes'
+import type { StudentType } from '@/types/usersTypes'
 
 // Component Imports
-import UserListTable from './UserListTable'
-import UserListCards from './UserListCards'
+import UserStudentListTable from './UserStudentListTable'
+import UserStudentListCards from './UserStudentListCards'
 
-const UserStudentList = ({ userData }: { userData?: UsersType[] }) => {
+const UserStudentList = ({ userStudentData }: { userStudentData?: StudentType[] }) => {
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
-        <UserListCards />
+        <UserStudentListCards />
       </Grid>
       <Grid item xs={12}>
-        <UserListTable tableData={userData} />
+        <UserStudentListTable tableData={userStudentData} />
       </Grid>
     </Grid>
   )

@@ -8,7 +8,7 @@ import PerfectScrollbar from 'react-perfect-scrollbar'
 import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Menu'
 
 // Component Imports
-import { Menu, MenuItem, SubMenu } from '@menu/vertical-menu'
+import { Menu, MenuItem, MenuSection, SubMenu } from '@menu/vertical-menu'
 
 // Hook Imports
 import useVerticalNav from '@menu/hooks/useVerticalNav'
@@ -68,20 +68,28 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         renderExpandedMenuItemIcon={{ icon: <i className='tabler-circle text-xs' /> }}
         menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
       >
-        <SubMenu label='Setting' icon={<i className='tabler-file-settings' />}>
-          <MenuItem href='/setting/subject'>Mapel</MenuItem>
-          <MenuItem href='/setting/study-year'>Tahun Pelajaran</MenuItem>
-          <SubMenu label='Kelompok Mapel'>
-            <MenuItem href='/setting/subject-group/list'>List</MenuItem>
-            <MenuItem href='/setting/subject-group/add'>Tambah</MenuItem>
+        <MenuSection label='Admin'>
+          <SubMenu label='Setting' icon={<i className='tabler-file-settings' />}>
+            <MenuItem href='/setting/subject'>Mapel</MenuItem>
+            <MenuItem href='/setting/study-year'>Tahun Pelajaran</MenuItem>
+            <SubMenu label='Kelompok Mapel'>
+              <MenuItem href='/setting/subject-group/list'>List</MenuItem>
+              <MenuItem href='/setting/subject-group/add'>Tambah</MenuItem>
+            </SubMenu>
           </SubMenu>
-        </SubMenu>
-        <SubMenu label='Kampus' icon={<i className='tabler-school' />}>
-          <MenuItem href='/campus/passing-grade'>Passing Grade</MenuItem>
-        </SubMenu>
-        <SubMenu label='User' icon={<i className='tabler-users' />}>
-          <MenuItem href='/user/student'>Siswa</MenuItem>
-        </SubMenu>
+          <SubMenu label='Kampus' icon={<i className='tabler-school' />}>
+            <MenuItem href='/campus/passing-grade'>Passing Grade</MenuItem>
+          </SubMenu>
+          <SubMenu label='User' icon={<i className='tabler-users' />}>
+            <MenuItem href='/user/student'>Siswa</MenuItem>
+          </SubMenu>
+        </MenuSection>
+        <MenuSection label='Siswa'>
+          <SubMenu label='Nilai Raport' icon={<i className='tabler-school' />}>
+            <MenuItem href='/user/student/report'>Input Nilai</MenuItem>
+            <MenuItem href='/user/student/overview'>Gambaran Umum</MenuItem>
+          </SubMenu>
+        </MenuSection>
       </Menu>
       {/* <Menu
         popoutMenuOffset={{ mainAxis: 23 }}

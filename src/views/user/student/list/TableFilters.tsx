@@ -7,28 +7,32 @@ import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 
 // Type Imports
-import type { UsersType } from '@/types/userTypes'
+import type { StudentType } from '@/types/usersTypes'
 
 // Component Imports
 import CustomTextField from '@core/components/mui/TextField'
 
-const TableFilters = ({ setData, tableData }: { setData: (data: UsersType[]) => void; tableData?: UsersType[] }) => {
+const TableFilters = ({
+  setData,
+  tableData
+}: {
+  setData: (data: StudentType[]) => void
+  tableData?: StudentType[]
+}) => {
   // States
-  const [role, setRole] = useState<UsersType['role']>('')
-  const [plan, setPlan] = useState<UsersType['currentPlan']>('')
-  const [status, setStatus] = useState<UsersType['status']>('')
+  const [classroom, setClassroom] = useState<StudentType['classroom']>('')
+  const [nominationStatus, setNominationStatus] = useState<StudentType['nominationStatus']>('')
 
   useEffect(() => {
-    const filteredData = tableData?.filter(user => {
-      if (role && user.role !== role) return false
-      if (plan && user.currentPlan !== plan) return false
-      if (status && user.status !== status) return false
+    const filteredData = tableData?.filter(student => {
+      if (classroom && student.classroom !== classroom) return false
+      if (nominationStatus && student.nominationStatus !== nominationStatus) return false
 
       return true
     })
 
     setData(filteredData || [])
-  }, [role, plan, status, tableData, setData])
+  }, [classroom, nominationStatus, tableData, setData])
 
   return (
     <CardContent>
@@ -37,48 +41,30 @@ const TableFilters = ({ setData, tableData }: { setData: (data: UsersType[]) => 
           <CustomTextField
             select
             fullWidth
-            id='select-role'
-            value={role}
-            onChange={e => setRole(e.target.value)}
+            id='select-classroom'
+            value={classroom}
+            onChange={e => setClassroom(e.target.value)}
             SelectProps={{ displayEmpty: true }}
           >
-            <MenuItem value=''>Select Role</MenuItem>
-            <MenuItem value='admin'>Admin</MenuItem>
-            <MenuItem value='author'>Author</MenuItem>
-            <MenuItem value='editor'>Editor</MenuItem>
-            <MenuItem value='maintainer'>Maintainer</MenuItem>
-            <MenuItem value='subscriber'>Subscriber</MenuItem>
+            <MenuItem value=''>Pilih Kelas</MenuItem>
+            <MenuItem value='XII-A'>XII-A</MenuItem>
+            <MenuItem value='XII-B'>XII-B</MenuItem>
+            <MenuItem value='XII-C'>XII-C</MenuItem>
           </CustomTextField>
         </Grid>
         <Grid item xs={12} sm={4}>
           <CustomTextField
             select
             fullWidth
-            id='select-plan'
-            value={plan}
-            onChange={e => setPlan(e.target.value)}
+            id='select-nomination-status'
+            value={nominationStatus}
+            onChange={e => setNominationStatus(e.target.value)}
             SelectProps={{ displayEmpty: true }}
           >
-            <MenuItem value=''>Select Plan</MenuItem>
-            <MenuItem value='basic'>Basic</MenuItem>
-            <MenuItem value='company'>Company</MenuItem>
-            <MenuItem value='enterprise'>Enterprise</MenuItem>
-            <MenuItem value='team'>Team</MenuItem>
-          </CustomTextField>
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <CustomTextField
-            select
-            fullWidth
-            id='select-status'
-            value={status}
-            onChange={e => setStatus(e.target.value)}
-            SelectProps={{ displayEmpty: true }}
-          >
-            <MenuItem value=''>Select Status</MenuItem>
-            <MenuItem value='pending'>Pending</MenuItem>
-            <MenuItem value='active'>Active</MenuItem>
-            <MenuItem value='inactive'>Inactive</MenuItem>
+            <MenuItem value=''>Pilih Status Nominasi</MenuItem>
+            <MenuItem value='Initiating'>Initiating</MenuItem>
+            <MenuItem value='Waiting for Validation'>Waiting for Validation</MenuItem>
+            <MenuItem value='Validated'>Validated</MenuItem>
           </CustomTextField>
         </Grid>
       </Grid>

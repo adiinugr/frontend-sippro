@@ -11,7 +11,6 @@ import Typography from '@mui/material/Typography'
 import Chip from '@mui/material/Chip'
 import Checkbox from '@mui/material/Checkbox'
 import IconButton from '@mui/material/IconButton'
-import { styled } from '@mui/material/styles'
 import TablePagination from '@mui/material/TablePagination'
 import type { TextFieldProps } from '@mui/material/TextField'
 import MenuItem from '@mui/material/MenuItem'
@@ -37,11 +36,12 @@ import type { RankingInfo } from '@tanstack/match-sorter-utils'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 
 import type { ThemeColor } from '@core/types'
-import type { UsersType } from '@/types/userTypes'
+import type { StudentType } from '@/types/usersTypes'
 
 // Component Imports
 import TableFilters from './TableFilters'
-import AddUserDrawer from './AddUserDrawer'
+
+// import AddUserDrawer from './AddUserDrawer'
 import OptionMenu from '@core/components/option-menu'
 
 import CustomTextField from '@core/components/mui/TextField'
@@ -62,20 +62,13 @@ declare module '@tanstack/table-core' {
   }
 }
 
-type UsersTypeWithAction = UsersType & {
+type UsersStudentTypeWithAction = StudentType & {
   action?: string
 }
 
-type UserRoleType = {
-  [key: string]: { icon: string; color: string }
-}
-
-type UserStatusType = {
+type UserStudentStatusType = {
   [key: string]: ThemeColor
 }
-
-// Styled Components
-const Icon = styled('i')({})
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   // Rank the item
@@ -120,24 +113,17 @@ const DebouncedInput = ({
 }
 
 // Vars
-const userRoleObj: UserRoleType = {
-  admin: { icon: 'tabler-crown', color: 'error' },
-  author: { icon: 'tabler-device-desktop', color: 'warning' },
-  editor: { icon: 'tabler-edit', color: 'info' },
-  maintainer: { icon: 'tabler-chart-pie', color: 'success' },
-  subscriber: { icon: 'tabler-user', color: 'primary' }
-}
 
-const userStatusObj: UserStatusType = {
-  active: 'success',
-  pending: 'warning',
-  inactive: 'secondary'
+const userStudentStatusObj: UserStudentStatusType = {
+  Validated: 'success',
+  'Waiting for Validation': 'warning',
+  Initiating: 'secondary'
 }
 
 // Column Definitions
-const columnHelper = createColumnHelper<UsersTypeWithAction>()
+const columnHelper = createColumnHelper<UsersStudentTypeWithAction>()
 
-const UserListTable = ({ tableData }: { tableData?: UsersType[] }) => {
+const UserStudentListTable = ({ tableData }: { tableData?: StudentType[] }) => {
   // States
   const [addUserOpen, setAddUserOpen] = useState(false)
   const [rowSelection, setRowSelection] = useState({})
@@ -145,7 +131,7 @@ const UserListTable = ({ tableData }: { tableData?: UsersType[] }) => {
   const [filteredData, setFilteredData] = useState(data)
   const [globalFilter, setGlobalFilter] = useState('')
 
-  const columns = useMemo<ColumnDef<UsersTypeWithAction, any>[]>(
+  const columns = useMemo<ColumnDef<UsersStudentTypeWithAction, any>[]>(
     () => [
       {
         id: 'select',
@@ -170,7 +156,7 @@ const UserListTable = ({ tableData }: { tableData?: UsersType[] }) => {
         )
       },
       columnHelper.accessor('fullName', {
-        header: 'User',
+        header: 'Siswa',
         cell: ({ row }) => (
           <div className='flex items-center gap-4'>
             {getAvatar({ avatar: row.original.avatar, fullName: row.original.fullName })}
@@ -178,46 +164,45 @@ const UserListTable = ({ tableData }: { tableData?: UsersType[] }) => {
               <Typography color='text.primary' className='font-medium'>
                 {row.original.fullName}
               </Typography>
-              <Typography variant='body2'>{row.original.username}</Typography>
+              <Typography variant='body2'>{row.original.email}</Typography>
             </div>
           </div>
         )
       }),
-      columnHelper.accessor('role', {
-        header: 'Role',
-        cell: ({ row }) => (
-          <div className='flex items-center gap-2'>
-            <Icon
-              className={userRoleObj[row.original.role].icon}
-              sx={{ color: `var(--mui-palette-${userRoleObj[row.original.role].color}-main)` }}
-            />
-            <Typography className='capitalize' color='text.primary'>
-              {row.original.role}
-            </Typography>
-          </div>
-        )
-      }),
-      columnHelper.accessor('currentPlan', {
-        header: 'Plan',
+      columnHelper.accessor('nis', {
+        header: 'NIS',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
-            {row.original.currentPlan}
+            {row.original.nis}
           </Typography>
         )
       }),
-      columnHelper.accessor('billing', {
-        header: 'Billing',
-        cell: ({ row }) => <Typography>{row.original.billing}</Typography>
+      columnHelper.accessor('nisn', {
+        header: 'NISN',
+        cell: ({ row }) => (
+          <Typography className='capitalize' color='text.primary'>
+            {row.original.nisn}
+          </Typography>
+        )
       }),
-      columnHelper.accessor('status', {
-        header: 'Status',
+      columnHelper.accessor('classroom', {
+        header: 'Kelas',
+        cell: ({ row }) => (
+          <Typography className='capitalize' color='text.primary'>
+            {row.original.classroom}
+          </Typography>
+        )
+      }),
+
+      columnHelper.accessor('nominationStatus', {
+        header: 'Status Nominasi',
         cell: ({ row }) => (
           <div className='flex items-center gap-3'>
             <Chip
               variant='tonal'
-              label={row.original.status}
+              label={row.original.nominationStatus}
               size='small'
-              color={userStatusObj[row.original.status]}
+              color={userStudentStatusObj[row.original.nominationStatus]}
               className='capitalize'
             />
           </div>
@@ -227,8 +212,11 @@ const UserListTable = ({ tableData }: { tableData?: UsersType[] }) => {
         header: 'Action',
         cell: ({ row }) => (
           <div className='flex items-center'>
-            <IconButton onClick={() => setData(data?.filter(product => product.id !== row.original.id))}>
-              <i className='tabler-trash text-textSecondary' />
+            <IconButton onClick={() => setData(data?.filter(product => product.id !== row.original.id))} color='error'>
+              <i className='tabler-trash' />
+            </IconButton>
+            <IconButton color='info'>
+              <i className='tabler-eye' />
             </IconButton>
 
             <OptionMenu
@@ -257,7 +245,7 @@ const UserListTable = ({ tableData }: { tableData?: UsersType[] }) => {
   )
 
   const table = useReactTable({
-    data: filteredData as UsersType[],
+    data: filteredData as StudentType[],
     columns,
     filterFns: {
       fuzzy: fuzzyFilter
@@ -285,7 +273,7 @@ const UserListTable = ({ tableData }: { tableData?: UsersType[] }) => {
     getFacetedMinMaxValues: getFacetedMinMaxValues()
   })
 
-  const getAvatar = (params: Pick<UsersType, 'avatar' | 'fullName'>) => {
+  const getAvatar = (params: Pick<StudentType, 'avatar' | 'fullName'>) => {
     const { avatar, fullName } = params
 
     if (avatar) {
@@ -401,14 +389,14 @@ const UserListTable = ({ tableData }: { tableData?: UsersType[] }) => {
           }}
         />
       </Card>
-      <AddUserDrawer
+      {/* <AddUserDrawer
         open={addUserOpen}
         handleClose={() => setAddUserOpen(!addUserOpen)}
         userData={data}
         setData={setData}
-      />
+      /> */}
     </>
   )
 }
 
-export default UserListTable
+export default UserStudentListTable

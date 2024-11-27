@@ -2,7 +2,7 @@
 import UserStudentList from '@/views/user/student/list'
 
 // Data Imports
-import { userList } from '@/data/dummy/userList'
+import { studentList } from '@/data/dummy/studentList'
 
 /* const getUserData = async () => {
   // Vars
@@ -17,9 +17,9 @@ import { userList } from '@/data/dummy/userList'
 
 const UserStudentListPage = () => {
   // Vars
-  const data = userList
+  const data = studentList
 
-  return <UserStudentList userData={data} />
+  return <UserStudentList userStudentData={data} />
 }
 
 export default UserStudentListPage
