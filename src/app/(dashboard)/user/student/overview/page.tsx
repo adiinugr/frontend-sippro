@@ -27,7 +27,7 @@ const OverviewPage = () => {
       <Grid item xs={12}>
         <Grid container spacing={6}>
           {subjectProgresData.map(data => (
-            <Grid key={data.subjectCode} item xs={12} sm={6} md={3} xl={6}>
+            <Grid key={data.subjectCode} item xs={12} sm={6} md={3}>
               <SubjectLineChart data={data} />
             </Grid>
           ))}

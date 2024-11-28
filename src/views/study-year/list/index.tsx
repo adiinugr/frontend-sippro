@@ -7,7 +7,7 @@ import type { StudyYearType } from '@/types/studyYearTypes'
 // Component Imports
 import StudyYearListTable from './StudyYearListTable'
 
-const StudyYearList = ({ studyYearData }: { studyYearData?: StudyYearType[] }) => {
+const StudyYearList = async ({ studyYearData }: { studyYearData?: StudyYearType[] }) => {
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>

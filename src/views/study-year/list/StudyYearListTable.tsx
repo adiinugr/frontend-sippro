@@ -15,7 +15,7 @@ import { IconButton } from '@mui/material'
 
 // Third-party Imports
 import classnames from 'classnames'
-
+import { toast } from 'react-toastify'
 import {
   createColumnHelper,
   flexRender,
@@ -41,6 +41,9 @@ import type { StudyYearType } from '@/types/studyYearTypes'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
+import { createLessonYear, deleteLessonYearById, getLessonYearById, updateLessonYear } from '@/libs/actions/lessonYears'
+import DeleteDialog from '@/components/other/DeleteDialog'
+import UpdateStudyYearDrawer from '@/views/study-year/list/UpdateStudyYearDrawer'
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -51,7 +54,9 @@ declare module '@tanstack/table-core' {
   }
 }
 
-type StudyYearTypeWithAction = StudyYearType & {
+type StudyYearTypeWithAction = {
+  id: number
+  name: string
   action?: string
 }
 
@@ -102,10 +107,111 @@ const columnHelper = createColumnHelper<StudyYearTypeWithAction>()
 
 const StudyYearListTable = ({ tableData }: { tableData?: StudyYearType[] }) => {
   // States
-  const [addStudyYearOpen, setAddStudyYearOpen] = useState(false)
   const [rowSelection, setRowSelection] = useState({})
-  const [data, setData] = useState(...[tableData])
   const [globalFilter, setGlobalFilter] = useState('')
+
+  // Crud State
+  const [addStudyYearOpen, setAddStudyYearOpen] = useState(false)
+  const [updateStudyYearOpen, setUpdateStudyYearOpen] = useState(false)
+
+  const [selectedDataById, setSelectedDataById] = useState<{ id: number | null; name: string }>({
+    id: null,
+    name: ''
+  })
+
+  // Delete Actions
+  const [openDialog, setOpenDialog] = useState<boolean>(false)
+  const [selectedId, setSelectedId] = useState<number>(0)
+
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  const handleOpenDialog = (id: number) => {
+    setSelectedId(id)
+    setOpenDialog(true)
+  }
+
+  // Crud Operations
+  const handleDeleteData = async () => {
+    setIsLoading(true)
+
+    try {
+      const res = await deleteLessonYearById(selectedId)
+
+      setIsLoading(false)
+      setOpenDialog(false)
+
+      if (res.statusCode === 200) {
+        toast.success(`Berhasil menghapus data!`)
+
+        return
+      }
+
+      toast.error(`Gagal menghapus data!`)
+    } catch (error) {
+      setIsLoading(false)
+      setOpenDialog(false)
+
+      toast.error(`Gagal menghapus data!`)
+    }
+  }
+
+  const handleUpdate = async (val: StudyYearType, id: number) => {
+    setIsLoading(true)
+
+    try {
+      const res = await updateLessonYear({ name: val.name }, id)
+
+      setIsLoading(false)
+      setOpenDialog(false)
+
+      if (res.statusCode === 200) {
+        toast.success(`Berhasil mengupdate data!`)
+
+        return
+      }
+
+      toast.error(`Gagal mengupdate data! ${res.result.response.message[0]}`)
+    } catch (error) {
+      setIsLoading(false)
+      setOpenDialog(false)
+
+      toast.error(`Gagal mengupdate data!`)
+    }
+  }
+
+  const handleOpenUpdateDrawer = async (id: number) => {
+    const selectedData = await getLessonYearById(id)
+
+    setSelectedDataById(selectedData.result)
+
+    setUpdateStudyYearOpen(true)
+  }
+
+  const handleCreate = async (val: StudyYearType) => {
+    setIsLoading(true)
+
+    try {
+      const res = await createLessonYear(val)
+
+      setIsLoading(false)
+      setOpenDialog(false)
+
+      if (res.statusCode === 201) {
+        toast.success(`Berhasil menambah data!`)
+
+        return
+      }
+
+      toast.error(`Gagal menambah data! ${res.result.response.message[0]}`)
+    } catch (error) {
+      setIsLoading(false)
+      setOpenDialog(false)
+
+      toast.error(`Gagal menambah data!`)
+    }
+  }
+
+  // End Crud
 
   const columns = useMemo<ColumnDef<StudyYearTypeWithAction, any>[]>(
     () => [
@@ -121,10 +227,10 @@ const StudyYearListTable = ({ tableData }: { tableData?: StudyYearType[] }) => {
         header: 'Action',
         cell: ({ row }) => (
           <div className='flex items-center'>
-            <IconButton onClick={() => setData(data?.filter(product => product.id !== row.original.id))}>
+            <IconButton onClick={() => handleOpenDialog(row.original.id)}>
               <i className='tabler-trash text-textSecondary' />
             </IconButton>
-            <IconButton>
+            <IconButton onClick={() => handleOpenUpdateDrawer(row.original.id)}>
               <i className='tabler-edit text-textSecondary' />
             </IconButton>
           </div>
@@ -134,11 +240,11 @@ const StudyYearListTable = ({ tableData }: { tableData?: StudyYearType[] }) => {
     ],
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [data]
+    [tableData]
   )
 
   const table = useReactTable({
-    data: data as StudyYearType[],
+    data: tableData as StudyYearType[],
     columns,
     filterFns: {
       fuzzy: fuzzyFilter
@@ -265,9 +371,22 @@ const StudyYearListTable = ({ tableData }: { tableData?: StudyYearType[] }) => {
       </Card>
       <AddStudyYearDrawer
         open={addStudyYearOpen}
+        isLoading={isLoading}
         handleClose={() => setAddStudyYearOpen(!addStudyYearOpen)}
-        studyYearData={data}
-        setData={setData}
+        handleCreate={handleCreate}
+      />
+      <UpdateStudyYearDrawer
+        open={updateStudyYearOpen}
+        selectedData={selectedDataById}
+        isLoading={isLoading}
+        handleClose={() => setUpdateStudyYearOpen(!updateStudyYearOpen)}
+        handleUpdate={(val, id) => handleUpdate(val, id)}
+      />
+      <DeleteDialog
+        open={openDialog}
+        isLoading={isLoading}
+        handleClose={() => setOpenDialog(false)}
+        handleSubmit={handleDeleteData}
       />
     </>
   )

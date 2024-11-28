@@ -70,8 +70,8 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
       >
         <MenuSection label='Admin'>
           <SubMenu label='Setting' icon={<i className='tabler-file-settings' />}>
-            <MenuItem href='/setting/subject'>Mapel</MenuItem>
             <MenuItem href='/setting/study-year'>Tahun Pelajaran</MenuItem>
+            <MenuItem href='/setting/subject'>Mapel</MenuItem>
             <SubMenu label='Kelompok Mapel'>
               <MenuItem href='/setting/subject-group/list'>List</MenuItem>
               <MenuItem href='/setting/subject-group/add'>Tambah</MenuItem>

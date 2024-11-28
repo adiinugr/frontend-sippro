@@ -1,4 +1,6 @@
 // MUI Imports
+import { useEffect } from 'react'
+
 import Button from '@mui/material/Button'
 import Drawer from '@mui/material/Drawer'
 import IconButton from '@mui/material/IconButton'
@@ -17,19 +19,18 @@ import CustomTextField from '@core/components/mui/TextField'
 type Props = {
   open: boolean
   isLoading: boolean
+  selectedData: { id: number | null; name: string }
   handleClose: () => void
-
-  // studyYearData?: StudyYearType[]
-  handleCreate: (data: StudyYearType) => void
+  handleUpdate: (data: StudyYearType, id: number) => void
 }
 
 type FormValidateType = {
   name: string
 }
 
-const AddStudyYearDrawer = (props: Props) => {
+const UpdateStudyYearDrawer = (props: Props) => {
   // Props
-  const { open, isLoading, handleClose, handleCreate } = props
+  const { open, isLoading, selectedData, handleClose, handleUpdate } = props
 
   // Hooks
   const {
@@ -39,14 +40,17 @@ const AddStudyYearDrawer = (props: Props) => {
     formState: { errors }
   } = useForm<FormValidateType>({
     defaultValues: {
-      name: ''
+      name: selectedData.name
     }
   })
 
+  useEffect(() => {
+    resetForm(selectedData)
+  }, [resetForm, selectedData])
+
   const onSubmit = (data: StudyYearType) => {
-    handleCreate(data)
+    handleUpdate(data, selectedData.id as number)
     handleClose()
-    resetForm({ name: '' })
   }
 
   const handleReset = () => {
@@ -63,7 +67,7 @@ const AddStudyYearDrawer = (props: Props) => {
       sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } } }}
     >
       <div className='flex items-center justify-between plb-5 pli-6'>
-        <Typography variant='h5'>Tambah Tahun Pelajaran Baru</Typography>
+        <Typography variant='h5'>Update Tahun Pelajaran</Typography>
         <IconButton size='small' onClick={handleReset}>
           <i className='tabler-x text-2xl text-textPrimary' />
         </IconButton>
@@ -99,4 +103,4 @@ const AddStudyYearDrawer = (props: Props) => {
   )
 }
 
-export default AddStudyYearDrawer
+export default UpdateStudyYearDrawer

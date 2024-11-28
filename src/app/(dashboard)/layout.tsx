@@ -2,6 +2,8 @@
 import Button from '@mui/material/Button'
 
 // Type Imports
+import { ToastContainer } from 'react-toastify'
+
 import type { ChildrenType } from '@core/types'
 
 // Layout Imports
@@ -21,6 +23,8 @@ import ScrollToTop from '@core/components/scroll-to-top'
 // Util Imports
 import { getMode, getSystemMode } from '@core/utils/serverHelpers'
 
+import 'react-toastify/dist/ReactToastify.css'
+
 const Layout = async ({ children }: ChildrenType) => {
   // Vars
   const direction = 'ltr'
@@ -29,6 +33,7 @@ const Layout = async ({ children }: ChildrenType) => {
 
   return (
     <Providers direction={direction}>
+      <ToastContainer />
       <LayoutWrapper
         systemMode={systemMode}
         verticalLayout={
