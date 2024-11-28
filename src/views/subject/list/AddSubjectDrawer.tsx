@@ -16,9 +16,9 @@ import CustomTextField from '@core/components/mui/TextField'
 
 type Props = {
   open: boolean
+  isLoading: boolean
   handleClose: () => void
-  subjectData?: SubjectType[]
-  setData: (data: SubjectType[]) => void
+  handleCreate: (data: SubjectType) => void
 }
 
 type FormValidateType = {
@@ -26,9 +26,9 @@ type FormValidateType = {
   name: string
 }
 
-const AddStudyYearDrawer = (props: Props) => {
+const AddSubjectDrawer = (props: Props) => {
   // Props
-  const { open, handleClose, subjectData, setData } = props
+  const { open, isLoading, handleClose, handleCreate } = props
 
   // Hooks
   const {
@@ -44,13 +44,7 @@ const AddStudyYearDrawer = (props: Props) => {
   })
 
   const onSubmit = (data: FormValidateType) => {
-    const newSubject: SubjectType = {
-      id: (subjectData?.length && subjectData?.length + 1) || 1,
-      code: data.code,
-      name: data.name
-    }
-
-    setData([...(subjectData ?? []), newSubject])
+    handleCreate(data)
     handleClose()
     resetForm({ code: '', name: '' })
   }
@@ -106,8 +100,8 @@ const AddStudyYearDrawer = (props: Props) => {
             )}
           />
           <div className='flex items-center gap-4'>
-            <Button variant='contained' type='submit'>
-              Submit
+            <Button disabled={isLoading} variant='contained' type='submit'>
+              {isLoading ? 'Loading...' : 'Submit'}
             </Button>
             <Button variant='tonal' color='error' type='reset' onClick={() => handleReset()}>
               Cancel
@@ -119,4 +113,4 @@ const AddStudyYearDrawer = (props: Props) => {
   )
 }
 
-export default AddStudyYearDrawer
+export default AddSubjectDrawer

@@ -1,4 +1,6 @@
 // MUI Imports
+import { useEffect } from 'react'
+
 import Button from '@mui/material/Button'
 import Drawer from '@mui/material/Drawer'
 import IconButton from '@mui/material/IconButton'
@@ -9,7 +11,7 @@ import Divider from '@mui/material/Divider'
 import { useForm, Controller } from 'react-hook-form'
 
 // Types Imports
-import type { StudyYearType } from '@/types/studyYearTypes'
+import type { SubjectType } from '@/types/subjectTypes'
 
 // Component Imports
 import CustomTextField from '@core/components/mui/TextField'
@@ -17,17 +19,19 @@ import CustomTextField from '@core/components/mui/TextField'
 type Props = {
   open: boolean
   isLoading: boolean
+  selectedData: { id: number | null; code: string; name: string }
   handleClose: () => void
-  handleCreate: (data: StudyYearType) => void
+  handleUpdate: (data: SubjectType, id: number) => void
 }
 
 type FormValidateType = {
+  code: string
   name: string
 }
 
-const AddStudyYearDrawer = (props: Props) => {
+const UpdateSubjectDrawer = (props: Props) => {
   // Props
-  const { open, isLoading, handleClose, handleCreate } = props
+  const { open, isLoading, selectedData, handleClose, handleUpdate } = props
 
   // Hooks
   const {
@@ -36,15 +40,16 @@ const AddStudyYearDrawer = (props: Props) => {
     handleSubmit,
     formState: { errors }
   } = useForm<FormValidateType>({
-    defaultValues: {
-      name: ''
-    }
+    defaultValues: selectedData
   })
 
-  const onSubmit = (data: StudyYearType) => {
-    handleCreate(data)
+  useEffect(() => {
+    resetForm(selectedData)
+  }, [resetForm, selectedData])
+
+  const onSubmit = (data: SubjectType) => {
+    handleUpdate(data, selectedData.id as number)
     handleClose()
-    resetForm({ name: '' })
   }
 
   const handleReset = () => {
@@ -61,7 +66,7 @@ const AddStudyYearDrawer = (props: Props) => {
       sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } } }}
     >
       <div className='flex items-center justify-between plb-5 pli-6'>
-        <Typography variant='h5'>Tambah Tahun Pelajaran Baru</Typography>
+        <Typography variant='h5'>Tambah Mapel Baru</Typography>
         <IconButton size='small' onClick={handleReset}>
           <i className='tabler-x text-2xl text-textPrimary' />
         </IconButton>
@@ -70,6 +75,20 @@ const AddStudyYearDrawer = (props: Props) => {
       <div>
         <form onSubmit={handleSubmit(data => onSubmit(data))} className='flex flex-col gap-6 p-6'>
           <Controller
+            name='code'
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <CustomTextField
+                {...field}
+                fullWidth
+                label='Kode'
+                placeholder='MAT'
+                {...(errors.code && { error: true, helperText: 'This field is required.' })}
+              />
+            )}
+          />
+          <Controller
             name='name'
             control={control}
             rules={{ required: true }}
@@ -77,8 +96,8 @@ const AddStudyYearDrawer = (props: Props) => {
               <CustomTextField
                 {...field}
                 fullWidth
-                label='Tahun Pelajaran'
-                placeholder='2023-2024'
+                label='Nama Mapel'
+                placeholder='Matematika'
                 {...(errors.name && { error: true, helperText: 'This field is required.' })}
               />
             )}
@@ -97,4 +116,4 @@ const AddStudyYearDrawer = (props: Props) => {
   )
 }
 
-export default AddStudyYearDrawer
+export default UpdateSubjectDrawer

@@ -29,17 +29,23 @@ import {
 } from '@tanstack/react-table'
 import type { ColumnDef, FilterFn } from '@tanstack/react-table'
 import { rankItem, type RankingInfo } from '@tanstack/match-sorter-utils'
+import { toast } from 'react-toastify'
 
 // Component Imports
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import AddSubjectDrawer from './AddSubjectDrawer'
 import CustomTextField from '@core/components/mui/TextField'
 
+// Actions
+import { createSubject, deleteSubjectById, getSubjectById, updateSubject } from '@/libs/actions/subjects'
+
 // Type Imports
 import type { SubjectType } from '@/types/subjectTypes'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
+import DeleteDialog from '@/components/other/DeleteDialog'
+import UpdateSubjectDrawer from '@/views/subject/list/UpdateSubjectDrawer'
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -50,7 +56,10 @@ declare module '@tanstack/table-core' {
   }
 }
 
-type SubjectTypeWithAction = SubjectType & {
+type SubjectTypeWithAction = {
+  id: number
+  code: string
+  name: string
   action?: string
 }
 
@@ -101,10 +110,115 @@ const columnHelper = createColumnHelper<SubjectTypeWithAction>()
 
 const SubjectListTable = ({ tableData }: { tableData?: SubjectType[] }) => {
   // States
-  const [addSubjectOpen, setAddSubjectOpen] = useState(false)
   const [rowSelection, setRowSelection] = useState({})
-  const [data, setData] = useState(...[tableData])
   const [globalFilter, setGlobalFilter] = useState('')
+
+  // Crud State
+
+  const [addSubjectOpen, setAddSubjectOpen] = useState(false)
+  const [updateStudyYearOpen, setUpdateStudyYearOpen] = useState(false)
+
+  const [selectedDataById, setSelectedDataById] = useState<{ id: number | null; code: string; name: string }>({
+    id: null,
+    code: '',
+    name: ''
+  })
+
+  // Delete Actions
+  const [openDialog, setOpenDialog] = useState<boolean>(false)
+  const [selectedId, setSelectedId] = useState<number>(0)
+
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  const handleOpenDialog = (id: number) => {
+    setSelectedId(id)
+    setOpenDialog(true)
+  }
+
+  // Crud Operations
+  const handleDeleteData = async () => {
+    setIsLoading(true)
+
+    try {
+      const res = await deleteSubjectById(selectedId)
+
+      setIsLoading(false)
+      setOpenDialog(false)
+
+      if (res.statusCode === 200) {
+        toast.success(`Berhasil menghapus data!`)
+
+        return
+      }
+
+      console.log(res)
+
+      toast.error(`Gagal menghapus data!`)
+    } catch (error) {
+      setIsLoading(false)
+      setOpenDialog(false)
+
+      toast.error(`Gagal menghapus data!`)
+    }
+  }
+
+  const handleUpdate = async (val: SubjectType, id: number) => {
+    setIsLoading(true)
+
+    try {
+      const res = await updateSubject({ code: val.code, name: val.name }, id)
+
+      setIsLoading(false)
+      setOpenDialog(false)
+
+      if (res.statusCode === 200) {
+        toast.success(`Berhasil mengupdate data!`)
+
+        return
+      }
+
+      toast.error(`Gagal mengupdate data! ${res.result.response.message[0]}`)
+    } catch (error) {
+      setIsLoading(false)
+      setOpenDialog(false)
+
+      toast.error(`Gagal mengupdate data!`)
+    }
+  }
+
+  const handleOpenUpdateDrawer = async (id: number) => {
+    const selectedData = await getSubjectById(id)
+
+    setSelectedDataById(selectedData.result)
+
+    setUpdateStudyYearOpen(true)
+  }
+
+  const handleCreate = async (val: SubjectType) => {
+    setIsLoading(true)
+
+    try {
+      const res = await createSubject(val)
+
+      setIsLoading(false)
+      setOpenDialog(false)
+
+      if (res.statusCode === 201) {
+        toast.success(`Berhasil menambah data!`)
+
+        return
+      }
+
+      toast.error(`Gagal menambah data! ${res.result.response.message[0]}`)
+    } catch (error) {
+      setIsLoading(false)
+      setOpenDialog(false)
+
+      toast.error(`Gagal menambah data!`)
+    }
+  }
+
+  // End Crud
 
   const columns = useMemo<ColumnDef<SubjectTypeWithAction, any>[]>(
     () => [
@@ -128,10 +242,10 @@ const SubjectListTable = ({ tableData }: { tableData?: SubjectType[] }) => {
         header: 'Action',
         cell: ({ row }) => (
           <div className='flex items-center'>
-            <IconButton onClick={() => setData(data?.filter(product => product.id !== row.original.id))}>
+            <IconButton onClick={() => handleOpenDialog(row.original.id)}>
               <i className='tabler-trash text-textSecondary' />
             </IconButton>
-            <IconButton>
+            <IconButton onClick={() => handleOpenUpdateDrawer(row.original.id)}>
               <i className='tabler-edit text-textSecondary' />
             </IconButton>
           </div>
@@ -141,11 +255,11 @@ const SubjectListTable = ({ tableData }: { tableData?: SubjectType[] }) => {
     ],
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [data]
+    [tableData]
   )
 
   const table = useReactTable({
-    data: data as SubjectType[],
+    data: tableData as SubjectType[],
     columns,
     filterFns: {
       fuzzy: fuzzyFilter
@@ -272,9 +386,24 @@ const SubjectListTable = ({ tableData }: { tableData?: SubjectType[] }) => {
       </Card>
       <AddSubjectDrawer
         open={addSubjectOpen}
+        isLoading={isLoading}
         handleClose={() => setAddSubjectOpen(!addSubjectOpen)}
-        subjectData={data}
-        setData={setData}
+        handleCreate={handleCreate}
+      />
+
+      <UpdateSubjectDrawer
+        open={updateStudyYearOpen}
+        selectedData={selectedDataById}
+        isLoading={isLoading}
+        handleClose={() => setUpdateStudyYearOpen(!updateStudyYearOpen)}
+        handleUpdate={(val, id) => handleUpdate(val, id)}
+      />
+
+      <DeleteDialog
+        open={openDialog}
+        isLoading={isLoading}
+        handleClose={() => setOpenDialog(false)}
+        handleSubmit={handleDeleteData}
       />
     </>
   )

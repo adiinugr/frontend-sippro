@@ -2,24 +2,14 @@
 import SubjectList from '@/views/subject/list'
 
 // Data Imports
-import { subjectList } from '@/data/dummy/subjectList'
 
-/* const getUserData = async () => {
+import { fetchSubjects } from '@/libs/actions/subjects'
+
+const SubjectListPage = async () => {
   // Vars
-  const res = await fetch(`${process.env.API_URL}/apps/user-list`)
+  const subjectData = await fetchSubjects()
 
-  if (!res.ok) {
-    throw new Error('Failed to fetch userData')
-  }
-
-  return res.json()
-} */
-
-const SubjectListPage = () => {
-  // Vars
-  const data = subjectList
-
-  return <SubjectList subjectData={data} />
+  return <SubjectList subjectData={subjectData.result} />
 }
 
 export default SubjectListPage
