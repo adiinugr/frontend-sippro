@@ -6,7 +6,6 @@ export type SubjectGroupType = {
 }
 
 export type SubjectGroupListType = {
-  id: number
-  subjectOrder: string
+  subjectOrder: number
   name: string
 }

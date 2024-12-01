@@ -4,22 +4,18 @@
 import { useEffect, useState, useMemo } from 'react'
 
 // MUI Imports
-import Link from 'next/link'
-
-import { useRouter } from 'next/navigation'
-
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
-import IconButton from '@mui/material/IconButton'
 import TablePagination from '@mui/material/TablePagination'
 import type { TextFieldProps } from '@mui/material/TextField'
 import MenuItem from '@mui/material/MenuItem'
+import { IconButton } from '@mui/material'
 
 // Third-party Imports
 import classnames from 'classnames'
-import { rankItem } from '@tanstack/match-sorter-utils'
+import { toast } from 'react-toastify'
 import {
   createColumnHelper,
   flexRender,
@@ -33,22 +29,21 @@ import {
   getSortedRowModel
 } from '@tanstack/react-table'
 import type { ColumnDef, FilterFn } from '@tanstack/react-table'
-import type { RankingInfo } from '@tanstack/match-sorter-utils'
+import { rankItem, type RankingInfo } from '@tanstack/match-sorter-utils'
 
 // Component Imports
-import { toast } from 'react-toastify'
-
 import TablePaginationComponent from '@components/TablePaginationComponent'
-import TableFilters from './TableFilters'
+import AddGradeDrawer from './AddGradeDrawer'
 import CustomTextField from '@core/components/mui/TextField'
 
 // Type Imports
-import type { SubjectGroupType } from '@/types/subjectGroupTypes'
+import type { GradeType } from '@/types/gradeTypes'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
-import { deleteSubjectGroupById } from '@/libs/actions/subjectGroups'
+import { createGrade, deleteGradeById, getGradeById, updateGrade } from '@/libs/actions/grades'
 import DeleteDialog from '@/components/other/DeleteDialog'
+import UpdateGradeDrawer from '@/views/grade/list/UpdateGradeDrawer'
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -59,7 +54,9 @@ declare module '@tanstack/table-core' {
   }
 }
 
-type SubjectGroupTypeWithAction = SubjectGroupType & {
+type GradeTypeWithAction = {
+  id: number
+  name: string
   action?: string
 }
 
@@ -106,29 +103,26 @@ const DebouncedInput = ({
 }
 
 // Column Definitions
-const columnHelper = createColumnHelper<SubjectGroupTypeWithAction>()
+const columnHelper = createColumnHelper<GradeTypeWithAction>()
 
-const SubjectGroupListTable = ({
-  tableData,
-  lessonYearData,
-  gradeData
-}: {
-  tableData?: SubjectGroupType[]
-  lessonYearData: { id: number; name: string }[]
-  gradeData: { id: number; name: string }[]
-}) => {
-  const { push } = useRouter()
-
+const GradeListTable = ({ tableData }: { tableData?: GradeType[] }) => {
   // States
   const [rowSelection, setRowSelection] = useState({})
-
-  // const [data, setData] = useState(...[tableData])
-  const [filteredData, setFilteredData] = useState(tableData)
   const [globalFilter, setGlobalFilter] = useState('')
+
+  // Crud State
+  const [addGradeOpen, setAddGradeOpen] = useState(false)
+  const [updateGradeOpen, setUpdateGradeOpen] = useState(false)
+
+  const [selectedDataById, setSelectedDataById] = useState<{ id: number | null; name: string }>({
+    id: null,
+    name: ''
+  })
 
   // Delete Actions
   const [openDialog, setOpenDialog] = useState<boolean>(false)
   const [selectedId, setSelectedId] = useState<number>(0)
+
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const handleOpenDialog = (id: number) => {
@@ -141,7 +135,7 @@ const SubjectGroupListTable = ({
     setIsLoading(true)
 
     try {
-      const res = await deleteSubjectGroupById(selectedId)
+      const res = await deleteGradeById(selectedId)
 
       setIsLoading(false)
       setOpenDialog(false)
@@ -152,8 +146,6 @@ const SubjectGroupListTable = ({
         return
       }
 
-      console.log(res)
-
       toast.error(`Gagal menghapus data!`)
     } catch (error) {
       setIsLoading(false)
@@ -163,33 +155,74 @@ const SubjectGroupListTable = ({
     }
   }
 
-  const columns = useMemo<ColumnDef<SubjectGroupTypeWithAction, any>[]>(
+  const handleUpdate = async (val: GradeType, id: number) => {
+    setIsLoading(true)
+
+    try {
+      const res = await updateGrade({ name: val.name }, id)
+
+      setIsLoading(false)
+      setOpenDialog(false)
+
+      if (res.statusCode === 200) {
+        toast.success(`Berhasil mengupdate data!`)
+
+        return
+      }
+
+      toast.error(`Gagal mengupdate data! ${res.result.response.message[0]}`)
+    } catch (error) {
+      setIsLoading(false)
+      setOpenDialog(false)
+
+      toast.error(`Gagal mengupdate data!`)
+    }
+  }
+
+  const handleOpenUpdateDrawer = async (id: number) => {
+    const selectedData = await getGradeById(id)
+
+    setSelectedDataById(selectedData.result)
+
+    setUpdateGradeOpen(true)
+  }
+
+  const handleCreate = async (val: GradeType) => {
+    setIsLoading(true)
+
+    try {
+      const res = await createGrade(val)
+
+      setIsLoading(false)
+      setOpenDialog(false)
+
+      if (res.statusCode === 201) {
+        toast.success(`Berhasil menambah data!`)
+
+        return
+      }
+
+      toast.error(`Gagal menambah data! ${res.result.response.message[0]}`)
+    } catch (error) {
+      setIsLoading(false)
+      setOpenDialog(false)
+
+      toast.error(`Gagal menambah data!`)
+    }
+  }
+
+  // End Crud
+
+  const columns = useMemo<ColumnDef<GradeTypeWithAction, any>[]>(
     () => [
-      columnHelper.accessor('studyYear', {
-        header: 'Tahun Pelajaran',
-        cell: ({ row }) => (
-          <Typography className='capitalize' color='text.primary'>
-            {row.original.studyYear}
-          </Typography>
-        )
-      }),
-      columnHelper.accessor('grade', {
-        header: 'Kelas',
-        cell: ({ row }) => (
-          <Typography className='capitalize' color='text.primary'>
-            {row.original.grade}
-          </Typography>
-        )
-      }),
       columnHelper.accessor('name', {
-        header: 'Kelompok Mapel',
+        header: 'Jenjang',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
             {row.original.name}
           </Typography>
         )
       }),
-
       columnHelper.accessor('action', {
         header: 'Action',
         cell: ({ row }) => (
@@ -197,7 +230,7 @@ const SubjectGroupListTable = ({
             <IconButton onClick={() => handleOpenDialog(row.original.id)}>
               <i className='tabler-trash text-textSecondary' />
             </IconButton>
-            <IconButton onClick={() => push(`/setting/subject-group/edit/${row.original.id}`)}>
+            <IconButton onClick={() => handleOpenUpdateDrawer(row.original.id)}>
               <i className='tabler-edit text-textSecondary' />
             </IconButton>
           </div>
@@ -205,12 +238,13 @@ const SubjectGroupListTable = ({
         enableSorting: false
       })
     ],
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [tableData, filteredData]
+    [tableData]
   )
 
   const table = useReactTable({
-    data: filteredData as SubjectGroupType[],
+    data: tableData as GradeType[],
     columns,
     filterFns: {
       fuzzy: fuzzyFilter
@@ -241,13 +275,7 @@ const SubjectGroupListTable = ({
   return (
     <>
       <Card>
-        <CardHeader title='Data Kelompok Mapel' className='pbe-4' />
-        <TableFilters
-          setData={setFilteredData}
-          tableData={tableData}
-          lessonYearData={lessonYearData}
-          gradeData={gradeData}
-        />
+        <CardHeader title='Data Jenjang' className='pbe-4' />
         <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
           <CustomTextField
             select
@@ -263,17 +291,16 @@ const SubjectGroupListTable = ({
             <DebouncedInput
               value={globalFilter ?? ''}
               onChange={value => setGlobalFilter(String(value))}
-              placeholder='Cari'
+              placeholder='Cari Jenjang'
               className='max-sm:is-full'
             />
             <Button
               variant='contained'
-              component={Link}
               startIcon={<i className='tabler-plus' />}
-              href='/setting/subject-group/add'
+              onClick={() => setAddGradeOpen(!addGradeOpen)}
               className='max-sm:is-full'
             >
-              Tambah Kelompok Baru
+              Tambah Jenjang
             </Button>
           </div>
         </div>
@@ -342,6 +369,19 @@ const SubjectGroupListTable = ({
           }}
         />
       </Card>
+      <AddGradeDrawer
+        open={addGradeOpen}
+        isLoading={isLoading}
+        handleClose={() => setAddGradeOpen(!addGradeOpen)}
+        handleCreate={handleCreate}
+      />
+      <UpdateGradeDrawer
+        open={updateGradeOpen}
+        selectedData={selectedDataById}
+        isLoading={isLoading}
+        handleClose={() => setUpdateGradeOpen(!updateGradeOpen)}
+        handleUpdate={(val, id) => handleUpdate(val, id)}
+      />
       <DeleteDialog
         open={openDialog}
         isLoading={isLoading}
@@ -352,4 +392,4 @@ const SubjectGroupListTable = ({
   )
 }
 
-export default SubjectGroupListTable
+export default GradeListTable

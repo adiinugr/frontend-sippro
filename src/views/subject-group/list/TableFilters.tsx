@@ -14,10 +14,14 @@ import CustomTextField from '@core/components/mui/TextField'
 
 const TableFilters = ({
   setData,
-  tableData
+  tableData,
+  lessonYearData,
+  gradeData
 }: {
   setData: (data: SubjectGroupType[]) => void
   tableData?: SubjectGroupType[]
+  lessonYearData: { id: number; name: string }[]
+  gradeData: { id: number; name: string }[]
 }) => {
   // States
   const [studyYear, setStudyYear] = useState<SubjectGroupType['studyYear']>('')
@@ -47,9 +51,11 @@ const TableFilters = ({
             SelectProps={{ displayEmpty: true }}
           >
             <MenuItem value=''>Pilih Tahun Pelajaran</MenuItem>
-            <MenuItem value='2022-2023'>2022-2023</MenuItem>
-            <MenuItem value='2023-2024'>2023-2024</MenuItem>
-            <MenuItem value='2024-2025'>2024-2025</MenuItem>
+            {lessonYearData.map((data: { id: number; name: string }) => (
+              <MenuItem key={data.id} value={data.name}>
+                {data.name}
+              </MenuItem>
+            ))}
           </CustomTextField>
         </Grid>
         <Grid item xs={12} sm={4}>
@@ -62,9 +68,11 @@ const TableFilters = ({
             SelectProps={{ displayEmpty: true }}
           >
             <MenuItem value=''>Pilih Jenjang</MenuItem>
-            <MenuItem value='X'>X</MenuItem>
-            <MenuItem value='XI'>XI</MenuItem>
-            <MenuItem value='XII'>XII</MenuItem>
+            {gradeData.map((data: { id: number; name: string }) => (
+              <MenuItem key={data.id} value={data.name}>
+                {data.name}
+              </MenuItem>
+            ))}
           </CustomTextField>
         </Grid>
       </Grid>

@@ -151,8 +151,6 @@ const SubjectListTable = ({ tableData }: { tableData?: SubjectType[] }) => {
         return
       }
 
-      console.log(res)
-
       toast.error(`Gagal menghapus data!`)
     } catch (error) {
       setIsLoading(false)

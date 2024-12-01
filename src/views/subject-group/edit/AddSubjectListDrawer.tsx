@@ -63,7 +63,7 @@ const AddSubjectListDrawer = (props: Props) => {
   const onSubmit = (data: FormValidateType) => {
     const newSubject: SubjectGroupListType = {
       // id: (selectedSubjects?.length && selectedSubjects?.length + 1) || 1,
-      subjectOrder: data.subjectOrder as number,
+      subjectOrder: Number(data.subjectOrder) as number,
       name: data.name
     }
 

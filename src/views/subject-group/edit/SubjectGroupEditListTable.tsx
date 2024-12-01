@@ -4,22 +4,18 @@
 import { useEffect, useState, useMemo } from 'react'
 
 // MUI Imports
-import Link from 'next/link'
-
-import { useRouter } from 'next/navigation'
-
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
-import IconButton from '@mui/material/IconButton'
 import TablePagination from '@mui/material/TablePagination'
 import type { TextFieldProps } from '@mui/material/TextField'
 import MenuItem from '@mui/material/MenuItem'
+import { FormHelperText, IconButton } from '@mui/material'
 
 // Third-party Imports
 import classnames from 'classnames'
-import { rankItem } from '@tanstack/match-sorter-utils'
+
 import {
   createColumnHelper,
   flexRender,
@@ -33,22 +29,19 @@ import {
   getSortedRowModel
 } from '@tanstack/react-table'
 import type { ColumnDef, FilterFn } from '@tanstack/react-table'
-import type { RankingInfo } from '@tanstack/match-sorter-utils'
-
-// Component Imports
-import { toast } from 'react-toastify'
+import { rankItem, type RankingInfo } from '@tanstack/match-sorter-utils'
 
 import TablePaginationComponent from '@components/TablePaginationComponent'
-import TableFilters from './TableFilters'
+
+// Component Imports
+import AddSubjectListDrawer from './AddSubjectListDrawer'
 import CustomTextField from '@core/components/mui/TextField'
 
 // Type Imports
-import type { SubjectGroupType } from '@/types/subjectGroupTypes'
+import type { SubjectGroupListType } from '@/types/subjectGroupTypes'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
-import { deleteSubjectGroupById } from '@/libs/actions/subjectGroups'
-import DeleteDialog from '@/components/other/DeleteDialog'
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -59,7 +52,7 @@ declare module '@tanstack/table-core' {
   }
 }
 
-type SubjectGroupTypeWithAction = SubjectGroupType & {
+type SubjectGroupListTypeWithAction = SubjectGroupListType & {
   action?: string
 }
 
@@ -106,98 +99,69 @@ const DebouncedInput = ({
 }
 
 // Column Definitions
-const columnHelper = createColumnHelper<SubjectGroupTypeWithAction>()
+const columnHelper = createColumnHelper<SubjectGroupListTypeWithAction>()
 
-const SubjectGroupListTable = ({
-  tableData,
-  lessonYearData,
-  gradeData
+const SubjectGroupEditListTable = ({
+  data,
+  setData,
+  setError,
+  errors,
+  clearErrors
 }: {
-  tableData?: SubjectGroupType[]
-  lessonYearData: { id: number; name: string }[]
-  gradeData: { id: number; name: string }[]
+  data: any
+  setData: any
+  setError: any
+  errors: any
+  clearErrors: any
 }) => {
-  const { push } = useRouter()
-
   // States
+  const [addSubjectOpen, setAddSubjectOpen] = useState(false)
   const [rowSelection, setRowSelection] = useState({})
 
-  // const [data, setData] = useState(...[tableData])
-  const [filteredData, setFilteredData] = useState(tableData)
   const [globalFilter, setGlobalFilter] = useState('')
 
-  // Delete Actions
-  const [openDialog, setOpenDialog] = useState<boolean>(false)
-  const [selectedId, setSelectedId] = useState<number>(0)
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-
-  const handleOpenDialog = (id: number) => {
-    setSelectedId(id)
-    setOpenDialog(true)
-  }
-
-  // Crud Operations
-  const handleDeleteData = async () => {
-    setIsLoading(true)
-
-    try {
-      const res = await deleteSubjectGroupById(selectedId)
-
-      setIsLoading(false)
-      setOpenDialog(false)
-
-      if (res.statusCode === 200) {
-        toast.success(`Berhasil menghapus data!`)
-
-        return
-      }
-
-      console.log(res)
-
-      toast.error(`Gagal menghapus data!`)
-    } catch (error) {
-      setIsLoading(false)
-      setOpenDialog(false)
-
-      toast.error(`Gagal menghapus data!`)
+  useEffect(() => {
+    if (data.length === 0) {
+      setError('editTable', { type: 'custom', message: 'Mata pelajaran tidak boleh kosong!' })
+    } else {
+      clearErrors('editTable')
     }
-  }
+  }, [clearErrors, data.length, setError])
 
-  const columns = useMemo<ColumnDef<SubjectGroupTypeWithAction, any>[]>(
+  const columns = useMemo<ColumnDef<SubjectGroupListTypeWithAction, any>[]>(
     () => [
-      columnHelper.accessor('studyYear', {
-        header: 'Tahun Pelajaran',
+      columnHelper.accessor('subjectOrder', {
+        header: 'No Urut',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
-            {row.original.studyYear}
-          </Typography>
-        )
-      }),
-      columnHelper.accessor('grade', {
-        header: 'Kelas',
-        cell: ({ row }) => (
-          <Typography className='capitalize' color='text.primary'>
-            {row.original.grade}
+            {row.original.subjectOrder}
           </Typography>
         )
       }),
       columnHelper.accessor('name', {
-        header: 'Kelompok Mapel',
+        header: 'Nama Mapel',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
             {row.original.name}
           </Typography>
         )
       }),
-
       columnHelper.accessor('action', {
         header: 'Action',
         cell: ({ row }) => (
           <div className='flex items-center'>
-            <IconButton onClick={() => handleOpenDialog(row.original.id)}>
+            <IconButton
+              onClick={() =>
+                setData(
+                  data?.filter(
+                    (product: { subjectOrder: number }) => product.subjectOrder !== row.original.subjectOrder
+                  )
+                )
+              }
+            >
               <i className='tabler-trash text-textSecondary' />
             </IconButton>
-            <IconButton onClick={() => push(`/setting/subject-group/edit/${row.original.id}`)}>
+            <IconButton>
               <i className='tabler-edit text-textSecondary' />
             </IconButton>
           </div>
@@ -205,12 +169,13 @@ const SubjectGroupListTable = ({
         enableSorting: false
       })
     ],
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [tableData, filteredData]
+    [data]
   )
 
   const table = useReactTable({
-    data: filteredData as SubjectGroupType[],
+    data: data as SubjectGroupListType[],
     columns,
     filterFns: {
       fuzzy: fuzzyFilter
@@ -220,6 +185,13 @@ const SubjectGroupListTable = ({
       globalFilter
     },
     initialState: {
+      sorting: [
+        {
+          id: 'subjectOrder',
+          desc: false
+        }
+      ],
+
       pagination: {
         pageSize: 10
       }
@@ -241,13 +213,7 @@ const SubjectGroupListTable = ({
   return (
     <>
       <Card>
-        <CardHeader title='Data Kelompok Mapel' className='pbe-4' />
-        <TableFilters
-          setData={setFilteredData}
-          tableData={tableData}
-          lessonYearData={lessonYearData}
-          gradeData={gradeData}
-        />
+        <CardHeader title='Data Mata Pelajaran' className='pbe-4' />
         <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
           <CustomTextField
             select
@@ -263,17 +229,16 @@ const SubjectGroupListTable = ({
             <DebouncedInput
               value={globalFilter ?? ''}
               onChange={value => setGlobalFilter(String(value))}
-              placeholder='Cari'
+              placeholder='Cari Mapel'
               className='max-sm:is-full'
             />
             <Button
               variant='contained'
-              component={Link}
               startIcon={<i className='tabler-plus' />}
-              href='/setting/subject-group/add'
+              onClick={() => setAddSubjectOpen(!addSubjectOpen)}
               className='max-sm:is-full'
             >
-              Tambah Kelompok Baru
+              Tambah Mapel
             </Button>
           </div>
         </div>
@@ -332,6 +297,9 @@ const SubjectGroupListTable = ({
             )}
           </table>
         </div>
+        <div className='p-6'>
+          {errors.editTable && <FormHelperText error>{errors.editTable.message}</FormHelperText>}
+        </div>
         <TablePagination
           component={() => <TablePaginationComponent table={table} />}
           count={table.getFilteredRowModel().rows.length}
@@ -342,14 +310,14 @@ const SubjectGroupListTable = ({
           }}
         />
       </Card>
-      <DeleteDialog
-        open={openDialog}
-        isLoading={isLoading}
-        handleClose={() => setOpenDialog(false)}
-        handleSubmit={handleDeleteData}
+      <AddSubjectListDrawer
+        open={addSubjectOpen}
+        handleClose={() => setAddSubjectOpen(!addSubjectOpen)}
+        selectedSubjects={data}
+        setData={setData}
       />
     </>
   )
 }
 
-export default SubjectGroupListTable
+export default SubjectGroupEditListTable

@@ -12,32 +12,65 @@ import { toast } from 'react-toastify'
 import { useForm } from 'react-hook-form'
 
 // Component Imports
-import SubjectGroupAddListTable from './SubjectGroupAddListTable'
+
+import SubjectGroupEditListTable from './SubjectGroupEditListTable'
 import AddActions from './AddActions'
 import AddSubjectGroupForm from './AddSubjectGroupForm'
 import { fetchLessonYears } from '@/libs/actions/lessonYears'
 import { fetchGrades } from '@/libs/actions/grades'
 
-import { createSubjectGroup } from '@/libs/actions/subjectGroups'
+import { updateSubjectGroupById } from '@/libs/actions/subjectGroups'
 import { fetchSubjects } from '@/libs/actions/subjects'
-import { createSubjectsToSubjectGroup } from '@/libs/actions/subjectsToSubjectGroups'
+import { createSubjectsToSubjectGroup, deleteSubjectsToSubjectGroupById } from '@/libs/actions/subjectsToSubjectGroups'
+
+interface Props {
+  selectedData: {
+    id: number
+    name: string
+    lessonYearId: number
+    gradeId: number
+    lessonYear: {
+      name: string
+    }
+    grade: {
+      name: string
+    }
+    subjectsToSubjectGroups: {
+      subjectOrder(subjectOrder: number): number
+      subject: {
+        id: number
+        code: string
+        name: string
+      }
+    }[]
+  }
+}
 
 type FormValues = {
-  lessonYearId: number | string
-  gradeId: number | string
+  lessonYearId: number
+  gradeId: number
   name: string
 }
 
-const SubjectGroupAddList = () => {
+const SubjectGroupEditList = ({ selectedData }: Props) => {
   const { push } = useRouter()
 
   const [lessonYearData, setLessonYearData] = useState([])
   const [gradeData, setGradeData] = useState([])
   const [subjectData, setSubjectData] = useState([])
 
-  const [selectedSubjects, setSelectedSubjects] = useState([])
-
   const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  const mappedSubjectsData = selectedData.subjectsToSubjectGroups.map(subject => {
+    return {
+      subjectOrder: Number(subject.subjectOrder),
+      name: subject.subject.name
+    }
+  })
+
+  const [selectedSubjectData, setSelectedSubjectData] = useState(...[mappedSubjectsData])
+
+  // console.log(mappedSubjectsData)
 
   useEffect(() => {
     async function fetchData() {
@@ -47,6 +80,7 @@ const SubjectGroupAddList = () => {
 
       setLessonYearData(lessonYearRes.result)
       setGradeData(gradeRes.result)
+
       setSubjectData(subjectRes.result)
     }
 
@@ -56,25 +90,29 @@ const SubjectGroupAddList = () => {
   // Hooks
   const {
     control,
-    reset,
+    reset: resetForm,
     handleSubmit,
     setError,
     clearErrors,
     formState: { errors }
   } = useForm<FormValues>({
     defaultValues: {
-      lessonYearId: '',
-      gradeId: '',
-      name: ''
+      lessonYearId: selectedData.lessonYearId,
+      gradeId: selectedData.gradeId,
+      name: selectedData.name
     }
   })
 
+  useEffect(() => {
+    resetForm({ lessonYearId: selectedData.lessonYearId, gradeId: selectedData.gradeId, name: selectedData.name })
+  }, [resetForm, selectedData])
+
   const onSubmit = async (data: FormValues) => {
-    const mappedSubjectData = selectedSubjects.map((subject: { name: string; subjectOrder: number }) => {
+    const mappedSubjectData = selectedSubjectData.map((subject: { name: string; subjectOrder: number }) => {
       const filteredData: { id: number }[] = subjectData.filter((value: { name: string }) => value.name == subject.name)
 
       return {
-        subjectOrder: Number(subject.subjectOrder),
+        subjectOrder: subject.subjectOrder,
         id: filteredData[0].id
       }
     })
@@ -82,9 +120,11 @@ const SubjectGroupAddList = () => {
     setIsLoading(true)
 
     try {
-      const subjectGroupRes = await createSubjectGroup(data)
+      const subjectGroupRes = await updateSubjectGroupById(data, selectedData.id)
 
-      if (subjectGroupRes.statusCode === 201) {
+      if (subjectGroupRes.statusCode === 200) {
+        await deleteSubjectsToSubjectGroupById(selectedData.id)
+
         await Promise.all(
           mappedSubjectData.map(async data => {
             await createSubjectsToSubjectGroup({
@@ -133,9 +173,9 @@ const SubjectGroupAddList = () => {
               />
             </Grid>
             <Grid item xs={12}>
-              <SubjectGroupAddListTable
-                selectedSubjects={selectedSubjects}
-                setSelectedSubjects={setSelectedSubjects}
+              <SubjectGroupEditListTable
+                data={selectedSubjectData}
+                setData={setSelectedSubjectData}
                 setError={setError}
                 errors={errors}
                 clearErrors={clearErrors}
@@ -144,11 +184,11 @@ const SubjectGroupAddList = () => {
           </Grid>
         </Grid>
         <Grid item xs={12} md={3}>
-          <AddActions isLoading={isLoading} reset={reset} />
+          <AddActions isLoading={isLoading} reset={resetForm} />
         </Grid>
       </Grid>
     </form>
   )
 }
 
-export default SubjectGroupAddList
+export default SubjectGroupEditList

@@ -1,6 +1,4 @@
 // MUI Imports
-import { useEffect, useState } from 'react'
-
 import Button from '@mui/material/Button'
 import Drawer from '@mui/material/Drawer'
 import IconButton from '@mui/material/IconButton'
@@ -11,41 +9,26 @@ import Divider from '@mui/material/Divider'
 import { useForm, Controller } from 'react-hook-form'
 
 // Types Imports
-import { FormHelperText, MenuItem } from '@mui/material'
-
 import type { SubjectGroupListType } from '@/types/subjectGroupTypes'
 
 // Component Imports
 import CustomTextField from '@core/components/mui/TextField'
-import { fetchSubjects } from '@/libs/actions/subjects'
 
 type Props = {
   open: boolean
   handleClose: () => void
-  selectedSubjects?: SubjectGroupListType[]
+  subjectData?: SubjectGroupListType[]
   setData: (data: SubjectGroupListType[]) => void
 }
 
 type FormValidateType = {
-  subjectOrder: number | string
+  subjectOrder: string
   name: string
 }
 
 const AddSubjectListDrawer = (props: Props) => {
   // Props
-  const { open, handleClose, selectedSubjects, setData } = props
-
-  const [subjectList, setSubjectList] = useState([])
-
-  useEffect(() => {
-    async function fetchData() {
-      const subjectRes = await fetchSubjects()
-
-      setSubjectList(subjectRes.result)
-    }
-
-    fetchData()
-  }, [])
+  const { open, handleClose, subjectData, setData } = props
 
   // Hooks
   const {
@@ -62,12 +45,12 @@ const AddSubjectListDrawer = (props: Props) => {
 
   const onSubmit = (data: FormValidateType) => {
     const newSubject: SubjectGroupListType = {
-      // id: (selectedSubjects?.length && selectedSubjects?.length + 1) || 1,
-      subjectOrder: data.subjectOrder as number,
+      id: (subjectData?.length && subjectData?.length + 1) || 1,
+      subjectOrder: data.subjectOrder,
       name: data.name
     }
 
-    setData([...(selectedSubjects ?? []), newSubject])
+    setData([...(subjectData ?? []), newSubject])
     handleClose()
     resetForm({ subjectOrder: '', name: '' })
   }
@@ -104,8 +87,7 @@ const AddSubjectListDrawer = (props: Props) => {
                 fullWidth
                 label='No Urut'
                 placeholder='1'
-                type='number'
-                {...(errors.subjectOrder && { error: true, helperText: 'No Urut harus diisi!' })}
+                {...(errors.subjectOrder && { error: true, helperText: 'This field is required.' })}
               />
             )}
           />
@@ -115,23 +97,14 @@ const AddSubjectListDrawer = (props: Props) => {
             rules={{ required: true }}
             render={({ field }) => (
               <CustomTextField
-                select
-                fullWidth
-                label='Mata Pelajaran'
                 {...field}
-                error={Boolean(errors.name)}
-                SelectProps={{ displayEmpty: true }}
-              >
-                <MenuItem value=''>Pilih Mata Pelajaran</MenuItem>
-                {subjectList.map((data: { id: number; name: string }) => (
-                  <MenuItem key={data.id} value={data.name}>
-                    {data.name}
-                  </MenuItem>
-                ))}
-              </CustomTextField>
+                fullWidth
+                label='Nama Mapel'
+                placeholder='Matematika'
+                {...(errors.name && { error: true, helperText: 'This field is required.' })}
+              />
             )}
           />
-          {errors.name && <FormHelperText error>Mata Pelajaran harus diisi!</FormHelperText>}
           <div className='flex items-center gap-4'>
             <Button type='button' variant='contained' onClick={handleSubmit(data => onSubmit(data))}>
               Save

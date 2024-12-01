@@ -102,12 +102,14 @@ const DebouncedInput = ({
 const columnHelper = createColumnHelper<SubjectGroupListTypeWithAction>()
 
 const SubjectListTable = ({
-  tableData,
+  selectedSubjects,
+  setSelectedSubjects,
   setError,
   errors,
   clearErrors
 }: {
-  tableData?: SubjectGroupListType[]
+  selectedSubjects: any
+  setSelectedSubjects: (value: any) => void
   setError: any
   errors: any
   clearErrors: any
@@ -115,16 +117,16 @@ const SubjectListTable = ({
   // States
   const [addSubjectOpen, setAddSubjectOpen] = useState(false)
   const [rowSelection, setRowSelection] = useState({})
-  const [data, setData] = useState(...[tableData])
+
   const [globalFilter, setGlobalFilter] = useState('')
 
   useEffect(() => {
-    if (data?.length == 0) {
-      setError('table', { type: 'custom', message: 'This table cannot be empty.' })
+    if (selectedSubjects?.length == 0) {
+      setError('table', { type: 'custom', message: 'Mata pelajaran tidak boleh kosong!' })
     } else {
       clearErrors('table')
     }
-  }, [clearErrors, data?.length, setError])
+  }, [clearErrors, selectedSubjects?.length, setError])
 
   const columns = useMemo<ColumnDef<SubjectGroupListTypeWithAction, any>[]>(
     () => [
@@ -148,7 +150,15 @@ const SubjectListTable = ({
         header: 'Action',
         cell: ({ row }) => (
           <div className='flex items-center'>
-            <IconButton onClick={() => setData(data?.filter(product => product.id !== row.original.id))}>
+            <IconButton
+              onClick={() =>
+                setSelectedSubjects(
+                  selectedSubjects?.filter(
+                    (product: { subjectOrder: number }) => product.subjectOrder !== row.original.subjectOrder
+                  )
+                )
+              }
+            >
               <i className='tabler-trash text-textSecondary' />
             </IconButton>
             <IconButton>
@@ -161,11 +171,11 @@ const SubjectListTable = ({
     ],
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [data]
+    [selectedSubjects]
   )
 
   const table = useReactTable({
-    data: data as SubjectGroupListType[],
+    data: selectedSubjects as SubjectGroupListType[],
     columns,
     filterFns: {
       fuzzy: fuzzyFilter
@@ -301,8 +311,8 @@ const SubjectListTable = ({
       <AddSubjectListDrawer
         open={addSubjectOpen}
         handleClose={() => setAddSubjectOpen(!addSubjectOpen)}
-        subjectData={data}
-        setData={setData}
+        selectedSubjects={selectedSubjects}
+        setData={setSelectedSubjects}
       />
     </>
   )

@@ -1,38 +1,42 @@
 // MUI Imports
 import Grid from '@mui/material/Grid'
 
+import { fetchSubjectGroups } from '@/libs/actions/subjectGroups'
+
 // Component Imports
 import SubjectGroupList from '@views/subject-group/list'
 
-// Data Imports
-import { subjectGroupData } from '@/data/dummy/subjectGroupList'
+const SubjectGroupListPage = async () => {
+  const subjectGroupRes = await fetchSubjectGroups()
 
-/**
- * ! If you need data using an API call, uncomment the below API code, update the `process.env.API_URL` variable in the
- * ! `.env` file found at root of your project and also update the API endpoints like `/apps/invoice` in below example.
- * ! Also, remove the above server action import and the action itself from the `src/app/server/actions.ts` file to clean up unused code
- * ! because we've used the server action for getting our static data.
- */
-
-/* const getInvoiceData = async () => {
-  // Vars
-  const res = await fetch(`${process.env.API_URL}/apps/invoice`)
-
-  if (!res.ok) {
-    throw new Error('Failed to fetch invoice data')
-  }
-
-  return res.json()
-} */
-
-const SubjectGroupListPage = () => {
-  // Vars
-  const data = subjectGroupData
+  const mappedSubjectGroup = subjectGroupRes.result.map(
+    (subjectGroup: {
+      id: number
+      name: string
+      lessonYear: { name: string }
+      grade: { name: string }
+      subjectsToSubjectGroups: {
+        subject: {
+          id: number
+          code: string
+          name: string
+        }
+      }[]
+    }) => {
+      return {
+        id: subjectGroup.id,
+        name: subjectGroup.name,
+        studyYear: subjectGroup.lessonYear.name,
+        grade: subjectGroup.grade.name,
+        subjects: subjectGroup.subjectsToSubjectGroups
+      }
+    }
+  )
 
   return (
     <Grid container>
       <Grid item xs={12}>
-        <SubjectGroupList subjectGroupData={data} />
+        <SubjectGroupList subjectGroupData={mappedSubjectGroup} />
       </Grid>
     </Grid>
   )

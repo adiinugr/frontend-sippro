@@ -6,12 +6,21 @@ import type { SubjectGroupType } from '@/types/subjectGroupTypes'
 
 // Component Imports
 import SubjectGroupListTable from './SubjectGroupListTable'
+import { fetchLessonYears } from '@/libs/actions/lessonYears'
+import { fetchGrades } from '@/libs/actions/grades'
 
-const SubjectGroupList = ({ subjectGroupData }: { subjectGroupData?: SubjectGroupType[] }) => {
+const SubjectGroupList = async ({ subjectGroupData }: { subjectGroupData?: SubjectGroupType[] }) => {
+  const lessonYearRes = await fetchLessonYears()
+  const gradeRes = await fetchGrades()
+
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
-        <SubjectGroupListTable tableData={subjectGroupData} />
+        <SubjectGroupListTable
+          lessonYearData={lessonYearRes.result}
+          gradeData={gradeRes.result}
+          tableData={subjectGroupData}
+        />
       </Grid>
     </Grid>
   )

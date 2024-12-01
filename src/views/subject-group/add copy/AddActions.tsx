@@ -9,25 +9,23 @@ import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 
 interface Props {
-  isLoading: boolean
   reset: () => void
 }
 
-const AddActions = ({ isLoading, reset }: Props) => {
+const AddActions = ({ reset }: Props) => {
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
         <Card>
           <CardContent className='flex flex-col gap-4'>
             <Button
-              disabled={isLoading}
               type='submit'
               fullWidth
               variant='contained'
               className='capitalize'
               startIcon={<i className='tabler-device-floppy' />}
             >
-              {isLoading ? 'Loading...' : 'Simpan'}
+              Simpan
             </Button>
             <Button fullWidth color='secondary' variant='tonal' className='capitalize' onClick={() => reset()}>
               Reset
