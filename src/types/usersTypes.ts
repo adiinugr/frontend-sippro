@@ -2,14 +2,18 @@
 
 export type StudentType = {
   id: number
-  fullName: string
+  name: string
   nis: string
   nisn: string
-  classroom: string
   email: string
   placeOfBirth: string
   dateOfBirth: string
-  role: string
-  nominationStatus: string
-  avatar: string
+  subjectGroupsToClassroomsToStudents: {
+    classroom: {
+      name: string
+    }
+  }[]
+  role?: string
+  nominationStatus?: string
+  avatar?: string
 }

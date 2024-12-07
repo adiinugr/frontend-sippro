@@ -1,7 +1,10 @@
+import { redirect } from 'next/navigation'
+
 import { Grid } from '@mui/material'
 
-import ReportBarChart from '@/views/user/student/overview/ReportBarChart'
-import SubjectLineChart from '@/views/user/student/overview/SubjectLineChart'
+import StudentLeft from '@/views/user/student/overview/student-left'
+import StudentRight from '@/views/user/student/overview/student-right'
+import { getStudentById } from '@/libs/actions/students'
 
 const subjectProgresData = [
   { subjectName: 'Pendidikan Agama Islam', subjectCode: 'PAI', data: [78, 82, 89, 90, 91, 93] },
@@ -16,25 +19,27 @@ const subjectProgresData = [
   { subjectName: 'Seni Budaya', subjectCode: 'SEN', data: [78, 81, 89, 89, 91, 95] }
 ]
 
-const OverviewPage = () => {
+const OverviewPage = async ({ params }: { params: { id: number } }) => {
   // Vars
 
-  return (
+  const data = await getStudentById(params.id)
+
+  if (data.statusCode === 404) {
+    redirect('/not-found')
+  }
+
+  console.log(data)
+
+  return data ? (
     <Grid container spacing={6}>
-      <Grid item xs={12}>
-        <ReportBarChart />
+      <Grid item xs={12} md={4}>
+        <StudentLeft studentData={data.result} />
       </Grid>
-      <Grid item xs={12}>
-        <Grid container spacing={6}>
-          {subjectProgresData.map(data => (
-            <Grid key={data.subjectCode} item xs={12} sm={6} md={3}>
-              <SubjectLineChart data={data} />
-            </Grid>
-          ))}
-        </Grid>
+      <Grid item xs={12} md={8}>
+        <StudentRight subjectProgresData={subjectProgresData} />
       </Grid>
     </Grid>
-  )
+  ) : null
 }
 
 export default OverviewPage

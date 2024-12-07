@@ -72,7 +72,8 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           <SubMenu label='Setting' icon={<i className='tabler-file-settings' />}>
             <MenuItem href='/setting/study-year'>Tahun Pelajaran</MenuItem>
             <MenuItem href='/setting/grade'>Jenjang</MenuItem>
-            <MenuItem href='/setting/subject'>Mapel</MenuItem>
+            <MenuItem href='/setting/classroom'>Kelas</MenuItem>
+            <MenuItem href='/setting/subject'>Mata Pelajaran</MenuItem>
             <SubMenu label='Kelompok Mapel'>
               <MenuItem href='/setting/subject-group/list'>List</MenuItem>
               <MenuItem href='/setting/subject-group/add'>Tambah</MenuItem>
@@ -82,7 +83,10 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             <MenuItem href='/campus/passing-grade'>Passing Grade</MenuItem>
           </SubMenu>
           <SubMenu label='User' icon={<i className='tabler-users' />}>
-            <MenuItem href='/user/student'>Siswa</MenuItem>
+            <SubMenu label='Siswa'>
+              <MenuItem href='/user/student/list'>List</MenuItem>
+              <MenuItem href='/user/student/add'>Tambah</MenuItem>
+            </SubMenu>
           </SubMenu>
         </MenuSection>
         <MenuSection label='Siswa'>

@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography'
 import TablePagination from '@mui/material/TablePagination'
 import type { TextFieldProps } from '@mui/material/TextField'
 import MenuItem from '@mui/material/MenuItem'
-import { IconButton } from '@mui/material'
+import { Chip, IconButton, Tooltip } from '@mui/material'
 
 // Third-party Imports
 import classnames from 'classnames'
@@ -57,6 +57,9 @@ declare module '@tanstack/table-core' {
 type GradeTypeWithAction = {
   id: number
   name: string
+  classrooms: {
+    name: string
+  }[]
   action?: string
 }
 
@@ -223,16 +226,32 @@ const GradeListTable = ({ tableData }: { tableData?: GradeType[] }) => {
           </Typography>
         )
       }),
+
+      columnHelper.accessor('classrooms', {
+        header: 'Kelas',
+        cell: ({ row }) => (
+          <div className='flex items-center gap-2'>
+            {row.original.classrooms.map(classroom => (
+              <Chip key={classroom.name} label={classroom.name} color='info' variant='tonal' size='small' />
+            ))}
+          </div>
+        )
+      }),
+
       columnHelper.accessor('action', {
         header: 'Action',
         cell: ({ row }) => (
           <div className='flex items-center'>
-            <IconButton onClick={() => handleOpenDialog(row.original.id)}>
-              <i className='tabler-trash text-textSecondary' />
-            </IconButton>
-            <IconButton onClick={() => handleOpenUpdateDrawer(row.original.id)}>
-              <i className='tabler-edit text-textSecondary' />
-            </IconButton>
+            <Tooltip title='Delete'>
+              <IconButton onClick={() => handleOpenDialog(row.original.id)}>
+                <i className='tabler-trash text-textSecondary' />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title='Edit'>
+              <IconButton onClick={() => handleOpenUpdateDrawer(row.original.id)}>
+                <i className='tabler-edit text-textSecondary' />
+              </IconButton>
+            </Tooltip>
           </div>
         ),
         enableSorting: false

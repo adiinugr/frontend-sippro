@@ -38,6 +38,8 @@ import type { RankingInfo } from '@tanstack/match-sorter-utils'
 // Component Imports
 import { toast } from 'react-toastify'
 
+import { Chip, Tooltip } from '@mui/material'
+
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import TableFilters from './TableFilters'
 import CustomTextField from '@core/components/mui/TextField'
@@ -60,6 +62,11 @@ declare module '@tanstack/table-core' {
 }
 
 type SubjectGroupTypeWithAction = SubjectGroupType & {
+  classrooms: {
+    classroom: string
+    data: any[]
+  }[]
+  stats?: string
   action?: string
 }
 
@@ -152,8 +159,6 @@ const SubjectGroupListTable = ({
         return
       }
 
-      console.log(res)
-
       toast.error(`Gagal menghapus data!`)
     } catch (error) {
       setIsLoading(false)
@@ -189,17 +194,38 @@ const SubjectGroupListTable = ({
           </Typography>
         )
       }),
-
+      columnHelper.accessor('stats', {
+        header: 'Statistik',
+        cell: ({ row }) => (
+          <div className='flex items-center gap-2 flex-wrap divide-x'>
+            {row.original.classrooms.map(val => (
+              <div key={val.classroom} className='p-2'>
+                <p className='font-bold text-sm text-teal-600'>{val.classroom}</p>
+                <p className='text-sm'>{`${val.data.length} Siswa`}</p>
+              </div>
+            ))}
+          </div>
+        )
+      }),
       columnHelper.accessor('action', {
         header: 'Action',
         cell: ({ row }) => (
           <div className='flex items-center'>
-            <IconButton onClick={() => handleOpenDialog(row.original.id)}>
-              <i className='tabler-trash text-textSecondary' />
-            </IconButton>
-            <IconButton onClick={() => push(`/setting/subject-group/edit/${row.original.id}`)}>
-              <i className='tabler-edit text-textSecondary' />
-            </IconButton>
+            <Tooltip title='Hapus'>
+              <IconButton onClick={() => handleOpenDialog(row.original.id)}>
+                <i className='tabler-trash' />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title='Edit'>
+              <IconButton onClick={() => push(`/setting/subject-group/edit/${row.original.id}`)}>
+                <i className='tabler-edit' />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title='Kelola Siswa'>
+              <IconButton onClick={() => push(`/setting/subject-group/manage/${row.original.id}`)}>
+                <i className='tabler-user-square-rounded' />
+              </IconButton>
+            </Tooltip>
           </div>
         ),
         enableSorting: false

@@ -5,9 +5,12 @@ import { fetchSubjectGroups } from '@/libs/actions/subjectGroups'
 
 // Component Imports
 import SubjectGroupList from '@views/subject-group/list'
+import { groupedDataByClassroom } from '@/utils/groupedDataByClassroom'
 
 const SubjectGroupListPage = async () => {
   const subjectGroupRes = await fetchSubjectGroups()
+
+  console.log(subjectGroupRes, 'subjectGroupRes')
 
   const mappedSubjectGroup = subjectGroupRes.result.map(
     (subjectGroup: {
@@ -22,13 +25,22 @@ const SubjectGroupListPage = async () => {
           name: string
         }
       }[]
+      subjectGroupsToClassroomsToStudents: {
+        classroom: {
+          name: string
+        }
+        student: {
+          name: string
+        }
+      }[]
     }) => {
       return {
         id: subjectGroup.id,
         name: subjectGroup.name,
         studyYear: subjectGroup.lessonYear.name,
         grade: subjectGroup.grade.name,
-        subjects: subjectGroup.subjectsToSubjectGroups
+        subjects: subjectGroup.subjectsToSubjectGroups,
+        classrooms: groupedDataByClassroom(subjectGroup.subjectGroupsToClassroomsToStudents)
       }
     }
   )

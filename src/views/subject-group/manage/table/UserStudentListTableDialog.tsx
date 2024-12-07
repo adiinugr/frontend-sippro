@@ -4,17 +4,14 @@
 import { useEffect, useState, useMemo } from 'react'
 
 // MUI Imports
-import Link from 'next/link'
-
-import { useRouter } from 'next/navigation'
 
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
-import Button from '@mui/material/Button'
+
 import Typography from '@mui/material/Typography'
-import Chip from '@mui/material/Chip'
+
 import Checkbox from '@mui/material/Checkbox'
-import IconButton from '@mui/material/IconButton'
+
 import TablePagination from '@mui/material/TablePagination'
 import type { TextFieldProps } from '@mui/material/TextField'
 import MenuItem from '@mui/material/MenuItem'
@@ -37,17 +34,10 @@ import {
 import type { ColumnDef, FilterFn } from '@tanstack/react-table'
 import type { RankingInfo } from '@tanstack/match-sorter-utils'
 
-import { toast } from 'react-toastify'
-
-import { Tooltip } from '@mui/material'
-
 import TablePaginationComponent from '@components/TablePaginationComponent'
 
 // import type { ThemeColor } from '@core/types'
 import type { StudentType } from '@/types/usersTypes'
-
-// Component Imports
-import TableFilters from './TableFilters'
 
 import CustomTextField from '@core/components/mui/TextField'
 import CustomAvatar from '@core/components/mui/Avatar'
@@ -57,8 +47,6 @@ import { getInitials } from '@/utils/getInitials'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
-import { deleteStudentById } from '@/libs/actions/students'
-import DeleteDialog from '@/components/other/DeleteDialog'
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -73,9 +61,10 @@ type UsersStudentTypeWithAction = StudentType & {
   action?: string
 }
 
-// type UserStudentStatusType = {
-//   [key: string]: ThemeColor
-// }
+type Props = {
+  rowSelection: any
+  setRowSelection: (val: any) => void
+}
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   // Rank the item
@@ -119,64 +108,17 @@ const DebouncedInput = ({
   return <CustomTextField {...props} value={value} onChange={e => setValue(e.target.value)} />
 }
 
-// Vars
-
-// const userStudentStatusObj: UserStudentStatusType = {
-//   Validated: 'success',
-//   'Waiting for Validation': 'warning',
-//   Initiating: 'secondary'
-// }
-
-const sortedClassroomArray = (array: any[]) => {
-  return array.sort((a, b) => a.classroom.name.localeCompare(b.classroom.name))
-}
-
 // Column Definitions
 const columnHelper = createColumnHelper<UsersStudentTypeWithAction>()
 
-const UserStudentListTable = ({ tableData }: { tableData?: StudentType[] }) => {
-  // Router
-  const { push } = useRouter()
-
+const UserStudentListTableDialog = ({
+  tableData,
+  rowSelection,
+  setRowSelection
+}: { tableData?: StudentType[] } & Props) => {
   // States
-  const [rowSelection, setRowSelection] = useState({})
-  const [filteredData, setFilteredData] = useState(tableData)
+
   const [globalFilter, setGlobalFilter] = useState('')
-
-  // Delete Actions
-  const [openDialog, setOpenDialog] = useState<boolean>(false)
-  const [selectedId, setSelectedId] = useState<number>(0)
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-
-  const handleOpenDialog = (id: number) => {
-    setSelectedId(id)
-    setOpenDialog(true)
-  }
-
-  // Crud Operations
-  const handleDeleteData = async () => {
-    setIsLoading(true)
-
-    try {
-      const res = await deleteStudentById(selectedId)
-
-      setIsLoading(false)
-      setOpenDialog(false)
-
-      if (res.statusCode === 200) {
-        toast.success(`Berhasil menghapus data!`)
-
-        return
-      }
-
-      toast.error(`Gagal menghapus data!`)
-    } catch (error) {
-      setIsLoading(false)
-      setOpenDialog(false)
-
-      toast.error(`Gagal menghapus data!`)
-    }
-  }
 
   const columns = useMemo<ColumnDef<UsersStudentTypeWithAction, any>[]>(
     () => [
@@ -231,66 +173,14 @@ const UserStudentListTable = ({ tableData }: { tableData?: StudentType[] }) => {
             {row.original.nisn}
           </Typography>
         )
-      }),
-      columnHelper.accessor('subjectGroupsToClassroomsToStudents', {
-        header: 'Kelas',
-        cell: ({ row }) => (
-          <div className='flex items-center gap-2'>
-            {row.original.subjectGroupsToClassroomsToStudents.length === 0 ? (
-              <Chip variant='tonal' color='warning' label='Belum Diatur' className='bg-orange-100 text-orange-700' />
-            ) : (
-              sortedClassroomArray(row.original.subjectGroupsToClassroomsToStudents).map(val => (
-                <Chip variant='tonal' key={val.classroom.name} label={val.classroom.name} />
-              ))
-            )}
-          </div>
-        )
-      }),
-
-      // columnHelper.accessor('nominationStatus', {
-      //   header: 'Status Nominasi',
-      //   cell: ({ row }) => (
-      //     <div className='flex items-center gap-3'>
-      //       <Chip
-      //         variant='tonal'
-      //         label={row.original.nominationStatus}
-      //         size='small'
-      //         color={userStudentStatusObj[row.original.nominationStatus]}
-      //         className='capitalize'
-      //       />
-      //     </div>
-      //   )
-      // }),
-      columnHelper.accessor('action', {
-        header: 'Action',
-        cell: ({ row }) => (
-          <div className='flex items-center'>
-            <Tooltip title='Hapus'>
-              <IconButton onClick={() => handleOpenDialog(row.original.id)} color='error'>
-                <i className='tabler-trash' />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title='Preview'>
-              <IconButton onClick={() => push(`/user/student/profile/${row.original.id}`)}>
-                <i className='tabler-eye text-textSecondary' />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title='Edit'>
-              <IconButton onClick={() => push(`/user/student/edit/${row.original.id}`)}>
-                <i className='tabler-edit text-textSecondary' />
-              </IconButton>
-            </Tooltip>
-          </div>
-        ),
-        enableSorting: false
       })
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [tableData, filteredData]
+    [tableData]
   )
 
   const table = useReactTable({
-    data: filteredData as StudentType[],
+    data: tableData as StudentType[],
     columns,
     filterFns: {
       fuzzy: fuzzyFilter
@@ -307,6 +197,7 @@ const UserStudentListTable = ({ tableData }: { tableData?: StudentType[] }) => {
     enableRowSelection: true, //enable row selection for all rows
     // enableRowSelection: row => row.original.age > 18, // or enable row selection conditionally per row
     globalFilterFn: fuzzyFilter,
+    getRowId: row => row.id,
     onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
     onGlobalFilterChange: setGlobalFilter,
@@ -330,9 +221,8 @@ const UserStudentListTable = ({ tableData }: { tableData?: StudentType[] }) => {
 
   return (
     <>
-      <Card>
+      <Card variant='outlined'>
         <CardHeader title='Data Siswa' className='pbe-4' />
-        <TableFilters setData={setFilteredData} tableData={tableData} />
         <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
           <CustomTextField
             select
@@ -351,23 +241,6 @@ const UserStudentListTable = ({ tableData }: { tableData?: StudentType[] }) => {
               placeholder='Cari Siswa'
               className='max-sm:is-full'
             />
-            <Button
-              color='secondary'
-              variant='tonal'
-              startIcon={<i className='tabler-upload' />}
-              className='max-sm:is-full'
-            >
-              Export
-            </Button>
-            <Button
-              variant='contained'
-              startIcon={<i className='tabler-plus' />}
-              href='/user/student/add'
-              component={Link}
-              className='max-sm:is-full'
-            >
-              Tambah Siswa
-            </Button>
           </div>
         </div>
         <div className='overflow-x-auto'>
@@ -435,14 +308,8 @@ const UserStudentListTable = ({ tableData }: { tableData?: StudentType[] }) => {
           }}
         />
       </Card>
-      <DeleteDialog
-        open={openDialog}
-        isLoading={isLoading}
-        handleClose={() => setOpenDialog(false)}
-        handleSubmit={handleDeleteData}
-      />
     </>
   )
 }
 
-export default UserStudentListTable
+export default UserStudentListTableDialog

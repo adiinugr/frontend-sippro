@@ -25,10 +25,12 @@
     "@tanstack/react-table": "^8.20.5",
     "apexcharts": "^3.49.0",
     "classnames": "2.5.1",
+    "date-fns": "^4.1.0",
     "next": "14.2.5",
     "react": "18.3.1",
     "react-apexcharts": "^1.4.1",
     "react-colorful": "5.6.1",
+    "react-datepicker": "^7.5.0",
     "react-dom": "18.3.1",
     "react-hook-form": "^7.53.2",
     "react-perfect-scrollbar": "1.5.8",
@@ -62,7 +64,7 @@
     "tailwindcss": "3.4.6",
     "tailwindcss-logical": "3.0.1",
     "tsx": "4.16.2",
-    "typescript": "5.5.4"
+    "typescript": "5.8.0-dev.20241203"
   },
   "resolutions": {
     "rimraf": "^5.0.7"

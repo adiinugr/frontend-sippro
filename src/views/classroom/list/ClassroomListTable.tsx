@@ -4,24 +4,18 @@
 import { useEffect, useState, useMemo } from 'react'
 
 // MUI Imports
-import Link from 'next/link'
-
-import { useRouter } from 'next/navigation'
-
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
-import Chip from '@mui/material/Chip'
-import Checkbox from '@mui/material/Checkbox'
-import IconButton from '@mui/material/IconButton'
 import TablePagination from '@mui/material/TablePagination'
 import type { TextFieldProps } from '@mui/material/TextField'
 import MenuItem from '@mui/material/MenuItem'
+import { IconButton } from '@mui/material'
 
 // Third-party Imports
 import classnames from 'classnames'
-import { rankItem } from '@tanstack/match-sorter-utils'
+import { toast } from 'react-toastify'
 import {
   createColumnHelper,
   flexRender,
@@ -35,30 +29,21 @@ import {
   getSortedRowModel
 } from '@tanstack/react-table'
 import type { ColumnDef, FilterFn } from '@tanstack/react-table'
-import type { RankingInfo } from '@tanstack/match-sorter-utils'
-
-import { toast } from 'react-toastify'
-
-import { Tooltip } from '@mui/material'
-
-import TablePaginationComponent from '@components/TablePaginationComponent'
-
-// import type { ThemeColor } from '@core/types'
-import type { StudentType } from '@/types/usersTypes'
+import { rankItem, type RankingInfo } from '@tanstack/match-sorter-utils'
 
 // Component Imports
-import TableFilters from './TableFilters'
-
+import TablePaginationComponent from '@components/TablePaginationComponent'
+import AddClassroomDrawer from './AddClassroomDrawer'
 import CustomTextField from '@core/components/mui/TextField'
-import CustomAvatar from '@core/components/mui/Avatar'
 
-// Util Imports
-import { getInitials } from '@/utils/getInitials'
+// Type Imports
+import type { ClassroomType } from '@/types/classroomTypes'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
-import { deleteStudentById } from '@/libs/actions/students'
 import DeleteDialog from '@/components/other/DeleteDialog'
+import UpdateClassroomDrawer from './UpdateClassroomDrawer'
+import { createClassroom, deleteClassroomById, getClassroomById, updateClassroom } from '@/libs/actions/classrooms'
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -69,13 +54,14 @@ declare module '@tanstack/table-core' {
   }
 }
 
-type UsersStudentTypeWithAction = StudentType & {
+type ClassroomTypeWithAction = {
+  id: number
+  name: string
+  grade: {
+    name: string
+  }
   action?: string
 }
-
-// type UserStudentStatusType = {
-//   [key: string]: ThemeColor
-// }
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   // Rank the item
@@ -119,33 +105,36 @@ const DebouncedInput = ({
   return <CustomTextField {...props} value={value} onChange={e => setValue(e.target.value)} />
 }
 
-// Vars
-
-// const userStudentStatusObj: UserStudentStatusType = {
-//   Validated: 'success',
-//   'Waiting for Validation': 'warning',
-//   Initiating: 'secondary'
-// }
-
-const sortedClassroomArray = (array: any[]) => {
-  return array.sort((a, b) => a.classroom.name.localeCompare(b.classroom.name))
-}
-
 // Column Definitions
-const columnHelper = createColumnHelper<UsersStudentTypeWithAction>()
+const columnHelper = createColumnHelper<ClassroomTypeWithAction>()
 
-const UserStudentListTable = ({ tableData }: { tableData?: StudentType[] }) => {
-  // Router
-  const { push } = useRouter()
-
+const ClassroomListTable = ({ tableData }: { tableData?: ClassroomType[] }) => {
   // States
   const [rowSelection, setRowSelection] = useState({})
-  const [filteredData, setFilteredData] = useState(tableData)
   const [globalFilter, setGlobalFilter] = useState('')
+
+  // Crud State
+  const [addClassroomOpen, setAddClassroomOpen] = useState(false)
+  const [updateClassroomOpen, setUpdateClassroomOpen] = useState(false)
+
+  const [selectedDataById, setSelectedDataById] = useState<{
+    id: number | null
+    name: string
+    grade: {
+      id: number | string
+    }
+  }>({
+    id: null,
+    name: '',
+    grade: {
+      id: ''
+    }
+  })
 
   // Delete Actions
   const [openDialog, setOpenDialog] = useState<boolean>(false)
   const [selectedId, setSelectedId] = useState<number>(0)
+
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const handleOpenDialog = (id: number) => {
@@ -158,7 +147,7 @@ const UserStudentListTable = ({ tableData }: { tableData?: StudentType[] }) => {
     setIsLoading(true)
 
     try {
-      const res = await deleteStudentById(selectedId)
+      const res = await deleteClassroomById(selectedId)
 
       setIsLoading(false)
       setOpenDialog(false)
@@ -178,119 +167,104 @@ const UserStudentListTable = ({ tableData }: { tableData?: StudentType[] }) => {
     }
   }
 
-  const columns = useMemo<ColumnDef<UsersStudentTypeWithAction, any>[]>(
+  const handleUpdate = async (val: ClassroomType, id: number) => {
+    setIsLoading(true)
+
+    try {
+      const res = await updateClassroom(val, id)
+
+      setIsLoading(false)
+      setOpenDialog(false)
+
+      if (res.statusCode === 200) {
+        toast.success(`Berhasil mengupdate data!`)
+
+        return
+      }
+
+      toast.error(`Gagal mengupdate data! ${res.result.response.message[0]}`)
+    } catch (error) {
+      setIsLoading(false)
+      setOpenDialog(false)
+
+      toast.error(`Gagal mengupdate data!`)
+    }
+  }
+
+  const handleOpenUpdateDrawer = async (id: number) => {
+    const selectedData = await getClassroomById(id)
+
+    setSelectedDataById(selectedData.result)
+
+    setUpdateClassroomOpen(true)
+  }
+
+  const handleCreate = async (val: ClassroomType) => {
+    setIsLoading(true)
+
+    try {
+      const res = await createClassroom(val)
+
+      setIsLoading(false)
+      setOpenDialog(false)
+
+      if (res.statusCode === 201) {
+        toast.success(`Berhasil menambah data!`)
+
+        return
+      }
+
+      toast.error(`Gagal menambah data! ${res.result.response.message[0]}`)
+    } catch (error) {
+      setIsLoading(false)
+      setOpenDialog(false)
+
+      toast.error(`Gagal menambah data!`)
+    }
+  }
+
+  // End Crud
+
+  const columns = useMemo<ColumnDef<ClassroomTypeWithAction, any>[]>(
     () => [
-      {
-        id: 'select',
-        header: ({ table }) => (
-          <Checkbox
-            {...{
-              checked: table.getIsAllRowsSelected(),
-              indeterminate: table.getIsSomeRowsSelected(),
-              onChange: table.getToggleAllRowsSelectedHandler()
-            }}
-          />
-        ),
-        cell: ({ row }) => (
-          <Checkbox
-            {...{
-              checked: row.getIsSelected(),
-              disabled: !row.getCanSelect(),
-              indeterminate: row.getIsSomeSelected(),
-              onChange: row.getToggleSelectedHandler()
-            }}
-          />
-        )
-      },
       columnHelper.accessor('name', {
-        header: 'Siswa',
-        cell: ({ row }) => (
-          <div className='flex items-center gap-4'>
-            {getAvatar({ avatar: row.original.avatar, name: row.original.name })}
-            <div className='flex flex-col'>
-              <Typography color='text.primary' className='font-medium'>
-                {row.original.name}
-              </Typography>
-              <Typography variant='body2'>{row.original.email}</Typography>
-            </div>
-          </div>
-        )
-      }),
-      columnHelper.accessor('nis', {
-        header: 'NIS',
-        cell: ({ row }) => (
-          <Typography className='capitalize' color='text.primary'>
-            {row.original.nis}
-          </Typography>
-        )
-      }),
-      columnHelper.accessor('nisn', {
-        header: 'NISN',
-        cell: ({ row }) => (
-          <Typography className='capitalize' color='text.primary'>
-            {row.original.nisn}
-          </Typography>
-        )
-      }),
-      columnHelper.accessor('subjectGroupsToClassroomsToStudents', {
         header: 'Kelas',
         cell: ({ row }) => (
-          <div className='flex items-center gap-2'>
-            {row.original.subjectGroupsToClassroomsToStudents.length === 0 ? (
-              <Chip variant='tonal' color='warning' label='Belum Diatur' className='bg-orange-100 text-orange-700' />
-            ) : (
-              sortedClassroomArray(row.original.subjectGroupsToClassroomsToStudents).map(val => (
-                <Chip variant='tonal' key={val.classroom.name} label={val.classroom.name} />
-              ))
-            )}
-          </div>
+          <Typography className='capitalize' color='text.primary'>
+            {row.original.name}
+          </Typography>
         )
       }),
-
-      // columnHelper.accessor('nominationStatus', {
-      //   header: 'Status Nominasi',
-      //   cell: ({ row }) => (
-      //     <div className='flex items-center gap-3'>
-      //       <Chip
-      //         variant='tonal'
-      //         label={row.original.nominationStatus}
-      //         size='small'
-      //         color={userStudentStatusObj[row.original.nominationStatus]}
-      //         className='capitalize'
-      //       />
-      //     </div>
-      //   )
-      // }),
+      columnHelper.accessor('grade', {
+        header: 'Jenjang',
+        cell: ({ row }) => (
+          <Typography className='capitalize' color='text.primary'>
+            {row.original.grade.name}
+          </Typography>
+        )
+      }),
       columnHelper.accessor('action', {
         header: 'Action',
         cell: ({ row }) => (
           <div className='flex items-center'>
-            <Tooltip title='Hapus'>
-              <IconButton onClick={() => handleOpenDialog(row.original.id)} color='error'>
-                <i className='tabler-trash' />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title='Preview'>
-              <IconButton onClick={() => push(`/user/student/profile/${row.original.id}`)}>
-                <i className='tabler-eye text-textSecondary' />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title='Edit'>
-              <IconButton onClick={() => push(`/user/student/edit/${row.original.id}`)}>
-                <i className='tabler-edit text-textSecondary' />
-              </IconButton>
-            </Tooltip>
+            <IconButton onClick={() => handleOpenDialog(row.original.id)}>
+              <i className='tabler-trash text-textSecondary' />
+            </IconButton>
+            <IconButton onClick={() => handleOpenUpdateDrawer(row.original.id)}>
+              <i className='tabler-edit text-textSecondary' />
+            </IconButton>
           </div>
         ),
         enableSorting: false
       })
     ],
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [tableData, filteredData]
+    [tableData]
   )
 
   const table = useReactTable({
-    data: filteredData as StudentType[],
+    data: tableData as ClassroomType[],
     columns,
     filterFns: {
       fuzzy: fuzzyFilter
@@ -318,21 +292,10 @@ const UserStudentListTable = ({ tableData }: { tableData?: StudentType[] }) => {
     getFacetedMinMaxValues: getFacetedMinMaxValues()
   })
 
-  const getAvatar = (params: Pick<StudentType, 'avatar' | 'name'>) => {
-    const { avatar, name } = params
-
-    if (avatar) {
-      return <CustomAvatar src={avatar} size={34} />
-    } else {
-      return <CustomAvatar size={34}>{getInitials(name as string)}</CustomAvatar>
-    }
-  }
-
   return (
     <>
       <Card>
-        <CardHeader title='Data Siswa' className='pbe-4' />
-        <TableFilters setData={setFilteredData} tableData={tableData} />
+        <CardHeader title='Data Kelas' className='pbe-4' />
         <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
           <CustomTextField
             select
@@ -348,25 +311,16 @@ const UserStudentListTable = ({ tableData }: { tableData?: StudentType[] }) => {
             <DebouncedInput
               value={globalFilter ?? ''}
               onChange={value => setGlobalFilter(String(value))}
-              placeholder='Cari Siswa'
+              placeholder='Cari Kelas'
               className='max-sm:is-full'
             />
             <Button
-              color='secondary'
-              variant='tonal'
-              startIcon={<i className='tabler-upload' />}
-              className='max-sm:is-full'
-            >
-              Export
-            </Button>
-            <Button
               variant='contained'
               startIcon={<i className='tabler-plus' />}
-              href='/user/student/add'
-              component={Link}
+              onClick={() => setAddClassroomOpen(!addClassroomOpen)}
               className='max-sm:is-full'
             >
-              Tambah Siswa
+              Tambah Kelas
             </Button>
           </div>
         </div>
@@ -435,6 +389,19 @@ const UserStudentListTable = ({ tableData }: { tableData?: StudentType[] }) => {
           }}
         />
       </Card>
+      <AddClassroomDrawer
+        open={addClassroomOpen}
+        isLoading={isLoading}
+        handleClose={() => setAddClassroomOpen(!addClassroomOpen)}
+        handleCreate={handleCreate}
+      />
+      <UpdateClassroomDrawer
+        open={updateClassroomOpen}
+        selectedData={selectedDataById}
+        isLoading={isLoading}
+        handleClose={() => setUpdateClassroomOpen(!updateClassroomOpen)}
+        handleUpdate={(val, id) => handleUpdate(val, id)}
+      />
       <DeleteDialog
         open={openDialog}
         isLoading={isLoading}
@@ -445,4 +412,4 @@ const UserStudentListTable = ({ tableData }: { tableData?: StudentType[] }) => {
   )
 }
 
-export default UserStudentListTable
+export default ClassroomListTable

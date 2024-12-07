@@ -88,10 +88,10 @@ const renderTabs = (value: TabCategory) => {
           )}
         >
           <CustomAvatar variant='rounded' skin='light' size={38} {...(item.type === value && { color: 'primary' })}>
-            <i className={classnames('text-[22px]', { 'text-textSecondary': item.type !== value }, item.avatarIcon)} />
+            <i className={classnames('text-[16px]', { 'text-textSecondary': item.type !== value }, item.avatarIcon)} />
           </CustomAvatar>
-          <Typography className='font-medium capitalize' color='text.primary'>
-            Semester
+          <Typography className='font-medium capitalize text-sm' color='text.primary'>
+            SMT
           </Typography>
         </div>
       }

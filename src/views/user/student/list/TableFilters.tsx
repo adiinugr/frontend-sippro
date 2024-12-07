@@ -11,6 +11,7 @@ import type { StudentType } from '@/types/usersTypes'
 
 // Component Imports
 import CustomTextField from '@core/components/mui/TextField'
+import { fetchClassrooms } from '@/libs/actions/classrooms'
 
 const TableFilters = ({
   setData,
@@ -20,12 +21,28 @@ const TableFilters = ({
   tableData?: StudentType[]
 }) => {
   // States
-  const [classroom, setClassroom] = useState<StudentType['classroom']>('')
+  const [classroom, setClassroom] = useState<string>('')
   const [nominationStatus, setNominationStatus] = useState<StudentType['nominationStatus']>('')
+
+  const [classrromData, setClassroomData] = useState([])
+
+  useEffect(() => {
+    async function fetchData() {
+      const classroomRes = await fetchClassrooms()
+
+      setClassroomData(classroomRes.result)
+    }
+
+    fetchData()
+  }, [])
 
   useEffect(() => {
     const filteredData = tableData?.filter(student => {
-      if (classroom && student.classroom !== classroom) return false
+      const mappedClassroom = student.subjectGroupsToClassroomsToStudents.map(value => {
+        return value.classroom.name
+      })
+
+      if (classroom && !mappedClassroom.includes(classroom)) return false
       if (nominationStatus && student.nominationStatus !== nominationStatus) return false
 
       return true
@@ -47,9 +64,12 @@ const TableFilters = ({
             SelectProps={{ displayEmpty: true }}
           >
             <MenuItem value=''>Pilih Kelas</MenuItem>
-            <MenuItem value='XII-A'>XII-A</MenuItem>
-            <MenuItem value='XII-B'>XII-B</MenuItem>
-            <MenuItem value='XII-C'>XII-C</MenuItem>
+
+            {classrromData.map((classroom: { id: number; name: string }) => (
+              <MenuItem key={classroom.id} value={classroom.name}>
+                {classroom.name}
+              </MenuItem>
+            ))}
           </CustomTextField>
         </Grid>
         <Grid item xs={12} sm={4}>
