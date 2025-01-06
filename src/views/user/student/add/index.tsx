@@ -3,9 +3,10 @@
 // React Imports
 import { useState } from 'react'
 
-// MUI Imports
+// Next Import
 import { useRouter } from 'next/navigation'
 
+// MUI Imports
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
@@ -13,18 +14,19 @@ import Grid from '@mui/material/Grid'
 import Button from '@mui/material/Button'
 import InputAdornment from '@mui/material/InputAdornment'
 import IconButton from '@mui/material/IconButton'
+import { Divider, Typography } from '@mui/material'
 
 // Third-party Imports
 import { toast } from 'react-toastify'
 import { useForm, Controller } from 'react-hook-form'
 
 // Components Imports
-import { Divider, Typography } from '@mui/material'
-
 import CustomTextField from '@core/components/mui/TextField'
 
 // Styled Component Imports
 import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
+
+// Actions
 import { createStudent } from '@/libs/actions/students'
 
 type FormValues = {
@@ -90,14 +92,12 @@ const UserStudentAdd = () => {
       if (studentRes.statusCode === 201) {
         toast.success(`Berhasil menambahkan data!`)
         setIsLoading(false)
-        push('/user/student/list')
+        push('/teacher/user/student/list')
 
         return
       }
 
       setIsLoading(false)
-
-      console.log(studentRes.message)
 
       toast.error(`Gagal menambahkan data! ${studentRes.result.response.message[0]}`)
     } catch (error) {

@@ -5,6 +5,8 @@ import { useTheme } from '@mui/material/styles'
 import PerfectScrollbar from 'react-perfect-scrollbar'
 
 // Type Imports
+import { useSession } from 'next-auth/react'
+
 import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Menu'
 
 // Component Imports
@@ -40,6 +42,8 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
   const theme = useTheme()
   const verticalNavOptions = useVerticalNav()
 
+  const { data: session } = useSession()
+
   // Vars
   const { isBreakpointReached, transitionDuration } = verticalNavOptions
 
@@ -68,33 +72,62 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         renderExpandedMenuItemIcon={{ icon: <i className='tabler-circle text-xs' /> }}
         menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
       >
-        <MenuSection label='Admin'>
+        {/* Teacher Menu */}
+        <MenuSection label='Teacher'>
+          <MenuItem icon={<i className='tabler-layout-dashboard' />} href='/dashboard'>
+            Dashboard
+          </MenuItem>
           <SubMenu label='Setting' icon={<i className='tabler-file-settings' />}>
-            <MenuItem href='/setting/study-year'>Tahun Pelajaran</MenuItem>
-            <MenuItem href='/setting/grade'>Jenjang</MenuItem>
-            <MenuItem href='/setting/classroom'>Kelas</MenuItem>
-            <MenuItem href='/setting/subject'>Mata Pelajaran</MenuItem>
+            <MenuItem href='/teacher/setting/study-year'>Tahun Pelajaran</MenuItem>
+            <MenuItem href='/teacher/setting/grade'>Jenjang</MenuItem>
+            <MenuItem href='/teacher/setting/classroom'>Kelas</MenuItem>
+            <MenuItem href='/teacher/setting/subject'>Mata Pelajaran</MenuItem>
             <SubMenu label='Kelompok Mapel'>
-              <MenuItem href='/setting/subject-group/list'>List</MenuItem>
-              <MenuItem href='/setting/subject-group/add'>Tambah</MenuItem>
+              <MenuItem href='/teacher/setting/subject-group/list'>List</MenuItem>
+              <MenuItem href='/teacher/setting/subject-group/add'>Tambah</MenuItem>
             </SubMenu>
           </SubMenu>
-          <SubMenu label='Kampus' icon={<i className='tabler-school' />}>
-            <MenuItem href='/campus/passing-grade'>Passing Grade</MenuItem>
-          </SubMenu>
+          <MenuItem icon={<i className='tabler-school' />} href='/teacher/campus'>
+            Info Kampus
+          </MenuItem>
+          {session?.user.roles.includes('Super Admin') && (
+            <MenuItem icon={<i className='tabler-settings-star' />} href='/teacher/role'>
+              Role
+            </MenuItem>
+          )}
           <SubMenu label='User' icon={<i className='tabler-users' />}>
             <SubMenu label='Siswa'>
-              <MenuItem href='/user/student/list'>List</MenuItem>
-              <MenuItem href='/user/student/add'>Tambah</MenuItem>
+              <MenuItem href='/teacher/user/student/list'>List</MenuItem>
+              <MenuItem href='/teacher/user/student/add'>Tambah</MenuItem>
             </SubMenu>
+            {session?.user.roles.includes('Super Admin') && (
+              <SubMenu label='Guru'>
+                <MenuItem href='/teacher/user/teacher/list'>List</MenuItem>
+                <MenuItem href='/teacher/user/teacher/add'>Tambah</MenuItem>
+              </SubMenu>
+            )}
           </SubMenu>
         </MenuSection>
-        <MenuSection label='Siswa'>
-          <SubMenu label='Nilai Raport' icon={<i className='tabler-school' />}>
-            <MenuItem href='/user/student/report'>Input Nilai</MenuItem>
-            <MenuItem href='/user/student/overview'>Gambaran Umum</MenuItem>
-          </SubMenu>
-        </MenuSection>
+
+        {session?.user.status === 'student' && (
+          <MenuSection label='Siswa'>
+            <MenuItem icon={<i className='tabler-layout-dashboard' />} href='/dashboard'>
+              Dashboard
+            </MenuItem>
+            <MenuItem icon={<i className='tabler-school' />} href='/student/campus'>
+              Info Kampus
+            </MenuItem>
+            <MenuItem icon={<i className='tabler-report-analytics' />} href='/student/report'>
+              Nilai Raport
+            </MenuItem>
+            <MenuItem icon={<i className='tabler-message-chatbot' />} href='/student/chat-ai'>
+              Tanya AI
+            </MenuItem>
+            <MenuItem icon={<i className='tabler-user' />} href='/profile'>
+              Profile
+            </MenuItem>
+          </MenuSection>
+        )}
       </Menu>
       {/* <Menu
         popoutMenuOffset={{ mainAxis: 23 }}

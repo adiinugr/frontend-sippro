@@ -6,3 +6,8 @@ export type GradeType = {
     name: string
   }[]
 }
+
+
+export type AddGradeType = {
+  name: string
+}

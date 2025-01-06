@@ -1,15 +1,12 @@
-export type InputReportFirstSemesterType = {
-  orderNumber: number
-  subjectName: string
+export type InputReportType = {
+  subjectOrder: number
+  subject: {
+    id: number
+    code: string
+    name: string
+  }
+  subjectGroupId: number
+  subjectId: number
   smt1: string
   smt2: string
-}
-
-export type InputReportSecondSemesterType = {
-  orderNumber: number
-  subjectName: string
-  smt3: string
-  smt4: string
-  smt5: string
-  smt6: string
 }

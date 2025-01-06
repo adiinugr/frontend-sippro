@@ -6,22 +6,26 @@ import type { SyntheticEvent } from 'react'
 
 // MUI Imports
 import Card from '@mui/material/Card'
-import Button from '@mui/material/Button'
 import Tab from '@mui/material/Tab'
 import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
 import CardContent from '@mui/material/CardContent'
-import CardActions from '@mui/material/CardActions'
-import Divider from '@mui/material/Divider'
 import CardHeader from '@mui/material/CardHeader'
+import { Alert, CircularProgress } from '@mui/material'
 
 // Custom Components Import
-import ReportInputFirstSemester from '@/views/user/student/report/ReportInputFirstSemester'
-import ReportInputSecondSemester from '@/views/user/student/report/ReportInputSecondSemester'
+import ReportInputForm from '@/views/user/student/report/ReportInputForm'
 import CustomTabList from '@/@core/components/mui/TabList'
 
-const ReportInput = () => {
-  const [value, setValue] = useState('smt1-2')
+// Types
+import type { StudentType } from '@/types/usersTypes'
+
+interface Props {
+  studentData: StudentType
+}
+
+const ReportInput = ({ studentData }: Props) => {
+  const [value, setValue] = useState(studentData.stTSbgTc[0]?.clsrmsToSbjg.subjectGroup.lessonYear.name)
 
   const handleTabChange = (event: SyntheticEvent, newValue: string) => {
     setValue(newValue)
@@ -30,26 +34,42 @@ const ReportInput = () => {
   return (
     <Card>
       <CardHeader title='Input Nilai Raport' />
-      <TabContext value={value}>
-        <CustomTabList pill='true' onChange={handleTabChange} className='border-be px-7'>
-          <Tab label='Semester 1 s/d 2' value='smt1-2' />
-          <Tab label='Semester 3 s/d 6' value='smt3-6' />
-        </CustomTabList>
-        <CardContent>
-          <TabPanel value='smt1-2'>
-            <ReportInputFirstSemester />
-          </TabPanel>
-          <TabPanel value='smt3-6'>
-            <ReportInputSecondSemester />
-          </TabPanel>
+
+      {studentData.stTSbgTc.length === 0 && (
+        <CardContent className='p-10 grid place-content-center'>
+          <Alert severity='warning' className='text-orange-800 bg-orange-50'>
+            Data kelompok mapel dan kelas belum ditambahkan. Silakan hubungi Admin!
+          </Alert>
         </CardContent>
-        <Divider />
-        <CardActions>
-          <Button type='submit' variant='contained' className='mie-2'>
-            Submit
-          </Button>
-        </CardActions>
-      </TabContext>
+      )}
+
+      {studentData ? (
+        <TabContext value={value}>
+          <CustomTabList pill='true' onChange={handleTabChange} className='border-be px-7'>
+            {studentData.stTSbgTc.map(item => (
+              <Tab
+                key={item.clsrmsToSbjg.id}
+                label={item.clsrmsToSbjg.subjectGroup.lessonYear.name}
+                value={item.clsrmsToSbjg.subjectGroup.lessonYear.name}
+              />
+            ))}
+          </CustomTabList>
+
+          {studentData.stTSbgTc.map(item => (
+            <TabPanel key={item.clsrmsToSbjg.id} value={item.clsrmsToSbjg.subjectGroup.lessonYear.name}>
+              <ReportInputForm
+                subjectData={item.clsrmsToSbjg.subjectGroup.sbjsToSbjgs}
+                marks={studentData.marks}
+                studentId={studentData.id}
+              />
+            </TabPanel>
+          ))}
+        </TabContext>
+      ) : (
+        <CardContent className='p-10 grid place-content-center'>
+          <CircularProgress />
+        </CardContent>
+      )}
     </Card>
   )
 }

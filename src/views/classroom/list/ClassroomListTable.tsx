@@ -35,14 +35,16 @@ import { rankItem, type RankingInfo } from '@tanstack/match-sorter-utils'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import AddClassroomDrawer from './AddClassroomDrawer'
 import CustomTextField from '@core/components/mui/TextField'
+import DeleteDialog from '@/components/other/DeleteDialog'
+import UpdateClassroomDrawer from './UpdateClassroomDrawer'
 
 // Type Imports
 import type { ClassroomType } from '@/types/classroomTypes'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
-import DeleteDialog from '@/components/other/DeleteDialog'
-import UpdateClassroomDrawer from './UpdateClassroomDrawer'
+
+// Actions
 import { createClassroom, deleteClassroomById, getClassroomById, updateClassroom } from '@/libs/actions/classrooms'
 
 declare module '@tanstack/table-core' {

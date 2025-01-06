@@ -1,5 +1,7 @@
+// MUI Imports
 import { Grid } from '@mui/material'
 
+// Components Import
 import SubjectGroupSetting from '@/views/subject-group/manage/SubjectGroupSetting'
 
 interface Props {
@@ -7,53 +9,50 @@ interface Props {
     id: number
     name: string
     grade: {
+      id: number
       name: string
     }
     lessonYear: {
+      id: number
       name: string
     }
-    subjectsToSubjectGroups: {
+    sbjsToSbjgs: {
       subject: {
+        id: number
         code: string
         name: string
       }
+      subjectOrder: number
     }[]
-    subjectGroupsToClassroomsToStudents: {
+    clsrmsToSbjgs: {
+      id: number
       classroom: {
-        id: any
+        id: number
         name: string
+        gradeId: number
       }
-      student: {
-        name: string
-      }
+      stdsToSbjgsToClsrms: {
+        student: {
+          id: number
+          name: string
+          nis: string
+          nisn: string
+        }
+      }[]
     }[]
   }
 }
 
 const SubjectGroupManage = ({ selectedSubjectGroup }: Props) => {
-  const classroomData = selectedSubjectGroup.subjectGroupsToClassroomsToStudents
-
   const subjectGroup = {
     id: selectedSubjectGroup.id,
     name: selectedSubjectGroup.name
   }
 
-  const groupedDataByClassroom = Object.entries(
-    classroomData.reduce((acc: any, { classroom, student }) => {
-      if (!acc[classroom.name]) {
-        acc[classroom.name] = []
-      }
-
-      acc[classroom.name].push({ classroom, student })
-
-      return acc
-    }, {})
-  ).map(([classroom, data]) => ({ classroom, data }))
-
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
-        <SubjectGroupSetting classroomData={groupedDataByClassroom as any} subjectGroup={subjectGroup} />
+        <SubjectGroupSetting classroomData={selectedSubjectGroup.clsrmsToSbjgs} subjectGroup={subjectGroup} />
       </Grid>
     </Grid>
   )

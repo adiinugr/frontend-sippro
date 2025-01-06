@@ -9,7 +9,6 @@ import CardHeader from '@mui/material/CardHeader'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import TablePagination from '@mui/material/TablePagination'
-import type { TextFieldProps } from '@mui/material/TextField'
 import MenuItem from '@mui/material/MenuItem'
 import { FormHelperText, IconButton } from '@mui/material'
 
@@ -31,14 +30,16 @@ import {
 import type { ColumnDef, FilterFn } from '@tanstack/react-table'
 import { rankItem, type RankingInfo } from '@tanstack/match-sorter-utils'
 
-import TablePaginationComponent from '@components/TablePaginationComponent'
+// Type Imports
+import type { TextFieldProps } from '@mui/material/TextField'
+
+import type { SubjectGroupListType } from '@/types/subjectGroupTypes'
 
 // Component Imports
+import TablePaginationComponent from '@components/TablePaginationComponent'
 import AddSubjectListDrawer from './AddSubjectListDrawer'
 import CustomTextField from '@core/components/mui/TextField'
-
-// Type Imports
-import type { SubjectGroupListType } from '@/types/subjectGroupTypes'
+import EditSubjectListDrawer from '@/views/subject-group/edit/EditSubjectListDrawer'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
@@ -116,9 +117,20 @@ const SubjectGroupEditListTable = ({
 }) => {
   // States
   const [addSubjectOpen, setAddSubjectOpen] = useState(false)
+  const [editSubjectOpen, setEditSubjectOpen] = useState(false)
   const [rowSelection, setRowSelection] = useState({})
 
+  const [selectedEditSubject, setSelecteEditSubject] = useState<{ subjectOrder: number; name: string }>({
+    subjectOrder: 0,
+    name: ''
+  })
+
   const [globalFilter, setGlobalFilter] = useState('')
+
+  const handleClickEdit = (original: SubjectGroupListTypeWithAction) => {
+    setSelecteEditSubject(original)
+    setEditSubjectOpen(true)
+  }
 
   useEffect(() => {
     if (data.length === 0) {
@@ -161,7 +173,7 @@ const SubjectGroupEditListTable = ({
             >
               <i className='tabler-trash text-textSecondary' />
             </IconButton>
-            <IconButton>
+            <IconButton onClick={() => handleClickEdit(row.original)}>
               <i className='tabler-edit text-textSecondary' />
             </IconButton>
           </div>
@@ -315,6 +327,13 @@ const SubjectGroupEditListTable = ({
         handleClose={() => setAddSubjectOpen(!addSubjectOpen)}
         selectedSubjects={data}
         setData={setData}
+      />
+      <EditSubjectListDrawer
+        open={editSubjectOpen}
+        handleClose={() => setEditSubjectOpen(!editSubjectOpen)}
+        selectedSubjects={data}
+        setData={setData}
+        selectedEditSubject={selectedEditSubject}
       />
     </>
   )

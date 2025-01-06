@@ -6,17 +6,18 @@ import Drawer from '@mui/material/Drawer'
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
+import { FormHelperText, MenuItem } from '@mui/material'
 
 // Third-party Imports
 import { useForm, Controller } from 'react-hook-form'
 
 // Types Imports
-import { FormHelperText, MenuItem } from '@mui/material'
-
 import type { SubjectGroupListType } from '@/types/subjectGroupTypes'
 
 // Component Imports
 import CustomTextField from '@core/components/mui/TextField'
+
+// Actions
 import { fetchSubjects } from '@/libs/actions/subjects'
 
 type Props = {
@@ -62,7 +63,6 @@ const AddSubjectListDrawer = (props: Props) => {
 
   const onSubmit = (data: FormValidateType) => {
     const newSubject: SubjectGroupListType = {
-      // id: (selectedSubjects?.length && selectedSubjects?.length + 1) || 1,
       subjectOrder: data.subjectOrder as number,
       name: data.name
     }

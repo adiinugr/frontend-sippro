@@ -4,6 +4,8 @@
 import { useState } from 'react'
 
 // MUI Imports
+import { useRouter } from 'next/navigation'
+
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
@@ -15,19 +17,42 @@ import IconButton from '@mui/material/IconButton'
 // Third-party Imports
 import { toast } from 'react-toastify'
 import { useForm, Controller } from 'react-hook-form'
+import type { ZodType } from 'zod'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 // Components Imports
 import CustomTextField from '@core/components/mui/TextField'
+
+// Libs
+import { resetStudentPassword } from '@/libs/actions/auth'
 
 type FormValues = {
   password: string
   confirmPassword: string
 }
 
-const StudentChangePassword = () => {
+export const ChangePasswordSchema: ZodType<FormValues> = z
+  .object({
+    password: z
+      .string()
+      .min(8, { message: 'Password terlalu pendek' })
+      .max(20, { message: 'Password terlalu panjang' }),
+    confirmPassword: z.string()
+  })
+  .refine(data => data.password === data.confirmPassword, {
+    message: 'Password tidak sesuai',
+    path: ['confirmPassword']
+  })
+
+const StudentChangePassword = ({ studentId }: { studentId: number }) => {
+  const { push } = useRouter()
+
   // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)
   const [isConfirmPasswordShown, setIsConfirmPasswordShown] = useState(false)
+
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   // Hooks
   const {
@@ -36,6 +61,7 @@ const StudentChangePassword = () => {
     handleSubmit,
     formState: { errors }
   } = useForm<FormValues>({
+    resolver: zodResolver(ChangePasswordSchema),
     defaultValues: {
       password: '',
       confirmPassword: ''
@@ -45,11 +71,33 @@ const StudentChangePassword = () => {
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
   const handleClickShowConfirmPassword = () => setIsConfirmPasswordShown(show => !show)
 
-  const onSubmit = () => toast.success('Form Submitted')
+  const onSubmit = async (data: FormValues) => {
+    setIsLoading(true)
+
+    try {
+      const studentRes = await resetStudentPassword({ userId: studentId, password: data.password })
+
+      if (studentRes.statusCode === 200) {
+        toast.success(`Berhasil mengubah data!`)
+        setIsLoading(false)
+        push('/teacher/user/student/list')
+
+        return
+      }
+
+      setIsLoading(false)
+
+      toast.error(`Gagal mengubah data! ${studentRes.message}`)
+    } catch (error) {
+      setIsLoading(false)
+
+      toast.error(`Gagal mengubah data! Silakan hubungi Admin!`)
+    }
+  }
 
   return (
     <Card>
-      <CardHeader title='Identitas Siswa' />
+      <CardHeader title='Ganti Password' />
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={6}>
@@ -57,13 +105,12 @@ const StudentChangePassword = () => {
               <Controller
                 name='password'
                 control={control}
-                rules={{ required: true }}
                 render={({ field }) => (
                   <CustomTextField
                     {...field}
                     fullWidth
                     label='Password'
-                    placeholder='············'
+                    placeholder='********'
                     id='form-validation-basic-password'
                     type={isPasswordShown ? 'text' : 'password'}
                     InputProps={{
@@ -80,7 +127,7 @@ const StudentChangePassword = () => {
                         </InputAdornment>
                       )
                     }}
-                    {...(errors.password && { error: true, helperText: 'This field is required.' })}
+                    {...(errors.password && { error: true, helperText: errors.password.message })}
                   />
                 )}
               />
@@ -89,13 +136,12 @@ const StudentChangePassword = () => {
               <Controller
                 name='confirmPassword'
                 control={control}
-                rules={{ required: true }}
                 render={({ field }) => (
                   <CustomTextField
                     {...field}
                     fullWidth
                     label='Konfirmasi Password'
-                    placeholder='············'
+                    placeholder='********'
                     id='form-validation-basic-confirm-password'
                     type={isConfirmPasswordShown ? 'text' : 'password'}
                     InputProps={{
@@ -112,14 +158,14 @@ const StudentChangePassword = () => {
                         </InputAdornment>
                       )
                     }}
-                    {...(errors.confirmPassword && { error: true, helperText: 'This field is required.' })}
+                    {...(errors.confirmPassword && { error: true, helperText: errors.confirmPassword.message })}
                   />
                 )}
               />
             </Grid>
             <Grid item xs={12} className='flex gap-4'>
-              <Button variant='contained' type='submit'>
-                Submit
+              <Button disabled={isLoading} variant='contained' type='submit'>
+                {isLoading ? 'Loading...' : 'Submit'}
               </Button>
               <Button variant='tonal' color='secondary' type='reset' onClick={() => reset()}>
                 Reset

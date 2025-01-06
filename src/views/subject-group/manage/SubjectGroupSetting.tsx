@@ -1,13 +1,14 @@
 'use client'
 
+// React Import
 import type { SyntheticEvent } from 'react'
-
 import { useState } from 'react'
 
+// Mui Import
 import { TabContext, TabPanel } from '@mui/lab'
-
 import { Card, CardContent, CardHeader, Tab } from '@mui/material'
 
+// Components Import
 import CustomTabList from '@/@core/components/mui/TabList'
 import ManageClassroomListTable from '@/views/subject-group/manage/ManageClassroomListTable'
 
@@ -17,12 +18,13 @@ interface ClassroomDataProps {
     name: string
   }
   classroomData: {
-    classroom: string
-    data: {
-      classroom: {
-        id: number
-        name: string
-      }
+    id: number
+    classroom: {
+      id: number
+      name: string
+      gradeId: number
+    }
+    stdsToSbjgsToClsrms: {
       student: {
         id: number
         name: string
@@ -35,7 +37,7 @@ interface ClassroomDataProps {
 
 const SubjectGroupSetting = ({ subjectGroup, classroomData }: ClassroomDataProps) => {
   // States
-  const [value, setValue] = useState<string>(classroomData[0].classroom)
+  const [value, setValue] = useState<string>(classroomData[0].classroom.name)
 
   const handleChange = (event: SyntheticEvent, newValue: string) => {
     setValue(newValue)
@@ -48,13 +50,18 @@ const SubjectGroupSetting = ({ subjectGroup, classroomData }: ClassroomDataProps
         <TabContext value={value}>
           <CustomTabList pill='true' onChange={handleChange} aria-label='customized tabs example'>
             {classroomData.map(val => (
-              <Tab key={val.classroom} value={val.classroom} label={val.classroom} />
+              <Tab key={val.classroom.id} value={val.classroom.name} label={val.classroom.name} />
             ))}
           </CustomTabList>
 
           {classroomData.map(val => (
-            <TabPanel key={val.classroom} value={val.classroom}>
-              <ManageClassroomListTable tableData={val.data} classroom={val.classroom} subjectGroup={subjectGroup} />
+            <TabPanel key={val.classroom.name} value={val.classroom.name}>
+              <ManageClassroomListTable
+                classroomsToSubjectGroupId={val.id}
+                tableData={val.stdsToSbjgsToClsrms}
+                classroom={val.classroom.name}
+                subjectGroup={subjectGroup}
+              />
             </TabPanel>
           ))}
         </TabContext>

@@ -10,7 +10,6 @@ import { useRouter } from 'next/navigation'
 // MUI Imports
 import { styled } from '@mui/material/styles'
 import Badge from '@mui/material/Badge'
-import Avatar from '@mui/material/Avatar'
 import Popper from '@mui/material/Popper'
 import Fade from '@mui/material/Fade'
 import Paper from '@mui/material/Paper'
@@ -22,7 +21,10 @@ import MenuItem from '@mui/material/MenuItem'
 import Button from '@mui/material/Button'
 
 // Hook Imports
+import { useSession, signOut } from 'next-auth/react'
+
 import { useSettings } from '@core/hooks/useSettings'
+import CustomAvatar from '@/@core/components/mui/Avatar'
 
 // Styled component for badge content
 const BadgeContentSpan = styled('span')({
@@ -43,6 +45,7 @@ const UserDropdown = () => {
 
   // Hooks
   const router = useRouter()
+  const { data: session } = useSession()
 
   const { settings } = useSettings()
 
@@ -63,8 +66,12 @@ const UserDropdown = () => {
   }
 
   const handleUserLogout = async () => {
-    // Redirect to login page
-    router.push('/login')
+    try {
+      // Sign out from the app
+      await signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return (
@@ -76,13 +83,14 @@ const UserDropdown = () => {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         className='mis-2'
       >
-        <Avatar
+        <CustomAvatar
           ref={anchorRef}
-          alt='John Doe'
-          src='/images/avatars/1.png'
           onClick={handleDropdownOpen}
+          color='primary'
           className='cursor-pointer bs-[38px] is-[38px]'
-        />
+        >
+          <i className='tabler-user' />
+        </CustomAvatar>
       </Badge>
       <Popper
         open={open}
@@ -103,30 +111,20 @@ const UserDropdown = () => {
               <ClickAwayListener onClickAway={e => handleDropdownClose(e as MouseEvent | TouchEvent)}>
                 <MenuList>
                   <div className='flex items-center plb-2 pli-6 gap-2' tabIndex={-1}>
-                    <Avatar alt='John Doe' src='/images/avatars/1.png' />
+                    <CustomAvatar color='primary'>
+                      <i className='tabler-user' />
+                    </CustomAvatar>
                     <div className='flex items-start flex-col'>
                       <Typography className='font-medium' color='text.primary'>
-                        John Doe
+                        {session?.user?.name}
                       </Typography>
-                      <Typography variant='caption'>admin@vuexy.com</Typography>
+                      <Typography variant='caption'>{session?.user?.email}</Typography>
                     </div>
                   </div>
                   <Divider className='mlb-1' />
-                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e)}>
+                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e, '/profile')}>
                     <i className='tabler-user' />
                     <Typography color='text.primary'>My Profile</Typography>
-                  </MenuItem>
-                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e)}>
-                    <i className='tabler-settings' />
-                    <Typography color='text.primary'>Settings</Typography>
-                  </MenuItem>
-                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e)}>
-                    <i className='tabler-currency-dollar' />
-                    <Typography color='text.primary'>Pricing</Typography>
-                  </MenuItem>
-                  <MenuItem className='mli-2 gap-3' onClick={e => handleDropdownClose(e)}>
-                    <i className='tabler-help-circle' />
-                    <Typography color='text.primary'>FAQ</Typography>
                   </MenuItem>
                   <div className='flex items-center plb-2 pli-3'>
                     <Button

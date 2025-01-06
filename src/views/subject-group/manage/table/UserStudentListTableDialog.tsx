@@ -4,14 +4,10 @@
 import { useEffect, useState, useMemo } from 'react'
 
 // MUI Imports
-
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
-
 import Typography from '@mui/material/Typography'
-
 import Checkbox from '@mui/material/Checkbox'
-
 import TablePagination from '@mui/material/TablePagination'
 import type { TextFieldProps } from '@mui/material/TextField'
 import MenuItem from '@mui/material/MenuItem'
@@ -34,13 +30,13 @@ import {
 import type { ColumnDef, FilterFn } from '@tanstack/react-table'
 import type { RankingInfo } from '@tanstack/match-sorter-utils'
 
+// Components
 import TablePaginationComponent from '@components/TablePaginationComponent'
-
-// import type { ThemeColor } from '@core/types'
-import type { StudentType } from '@/types/usersTypes'
-
 import CustomTextField from '@core/components/mui/TextField'
 import CustomAvatar from '@core/components/mui/Avatar'
+
+// Type
+import type { StudentType } from '@/types/usersTypes'
 
 // Util Imports
 import { getInitials } from '@/utils/getInitials'

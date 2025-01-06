@@ -1,9 +1,8 @@
 // MUI Imports
 import Grid from '@mui/material/Grid'
-
-// Type Imports
 import { Alert, Card } from '@mui/material'
 
+// Type Imports
 import type { ClassroomType } from '@/types/classroomTypes'
 
 // Component Imports

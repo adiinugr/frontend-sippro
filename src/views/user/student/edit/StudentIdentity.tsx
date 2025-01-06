@@ -3,8 +3,10 @@
 // MUI Imports
 import { useEffect, useState } from 'react'
 
+// Next Import
 import { useRouter } from 'next/navigation'
 
+// MUI Imports
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
@@ -20,6 +22,8 @@ import CustomTextField from '@core/components/mui/TextField'
 
 // Styled Component Imports
 import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
+
+// Actions
 import { updateStudentById } from '@/libs/actions/students'
 
 type FormValues = {
@@ -97,9 +101,6 @@ const StudentIdentity = ({ studentData }: Props) => {
       dateOfBirth: dateOfBirth?.toISOString()
     }
 
-    console.log(studentDataPayload)
-    console.log(studentData.id)
-
     setIsLoading(true)
 
     try {
@@ -108,19 +109,16 @@ const StudentIdentity = ({ studentData }: Props) => {
       if (studentRes.statusCode === 200) {
         toast.success(`Berhasil mengubah data!`)
         setIsLoading(false)
-        push('/user/student/list')
+        push('/teacher/user/student/list')
 
         return
       }
 
       setIsLoading(false)
 
-      console.log(studentRes.message)
-
       toast.error(`Gagal mengubah data! ${studentRes.message}`)
     } catch (error) {
       setIsLoading(false)
-      console.log(error)
 
       toast.error(`Gagal mengubah data! Silakan hubungi Admin!`)
     }
@@ -242,9 +240,6 @@ const StudentIdentity = ({ studentData }: Props) => {
             <Grid item xs={12} className='flex gap-4'>
               <Button disabled={isLoading} variant='contained' type='submit'>
                 {isLoading ? 'Loading...' : 'Submit'}
-              </Button>
-              <Button variant='tonal' color='secondary' type='reset' onClick={() => reset()}>
-                Reset
               </Button>
             </Grid>
           </Grid>

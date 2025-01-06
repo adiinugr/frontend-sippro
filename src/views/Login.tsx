@@ -4,23 +4,32 @@
 import { useState } from 'react'
 
 // Next Imports
-import { useRouter } from 'next/navigation'
 
 // MUI Imports
+import { useRouter, useSearchParams } from 'next/navigation'
+
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { styled, useTheme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
-import Checkbox from '@mui/material/Checkbox'
 import Button from '@mui/material/Button'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Divider from '@mui/material/Divider'
+import { FormHelperText, MenuItem } from '@mui/material'
+
+// import Checkbox from '@mui/material/Checkbox'
+// import FormControlLabel from '@mui/material/FormControlLabel'
+// import Divider from '@mui/material/Divider'
 
 // Third-party Imports
 import classnames from 'classnames'
+import { Controller, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
 
 // Type Imports
+
+import { toast } from 'react-toastify'
+
 import type { SystemMode } from '@core/types'
 
 // Component Imports
@@ -34,6 +43,7 @@ import themeConfig from '@configs/themeConfig'
 // Hook Imports
 import { useImageVariant } from '@core/hooks/useImageVariant'
 import { useSettings } from '@core/hooks/useSettings'
+import { loginUser } from '@/libs/actions/auth'
 
 // Styled Custom Components
 const LoginIllustration = styled('img')(({ theme }) => ({
@@ -59,9 +69,31 @@ const MaskImg = styled('img')({
   zIndex: -1
 })
 
-const LoginV2 = ({ mode }: { mode: SystemMode }) => {
+type FormValues = {
+  email: string
+  password: string
+  loginAs: string
+}
+
+const schema = z.object({
+  email: z.string().email({ message: 'Email tidak valid' }),
+
+  // .refine(
+  //   email => {
+  //     const domainPart = email.split('@')[1]
+
+  //     return domainPart && domainPart === 'sma10sby.sch.id'
+  //   },
+  //   { message: 'Gunakan email sekolah' }
+  // ),
+  password: z.string().min(1, 'Password harus diisi'),
+  loginAs: z.string().min(1, 'Role harus diisi')
+})
+
+const LoginPage = ({ mode }: { mode: SystemMode }) => {
   // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   // Vars
   const darkImg = '/images/pages/auth-mask-dark.png'
@@ -72,11 +104,12 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
   const borderedLightIllustration = '/images/illustrations/auth/v2-login-light-border.png'
 
   // Hooks
-  const router = useRouter()
   const { settings } = useSettings()
   const theme = useTheme()
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
   const authBackground = useImageVariant(mode, lightImg, darkImg)
+  const searchParams = useSearchParams()
+  const router = useRouter()
 
   const characterIllustration = useImageVariant(
     mode,
@@ -86,7 +119,43 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
     borderedDarkIllustration
   )
 
+  const {
+    control,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      email: '',
+      password: '',
+      loginAs: 'student'
+    }
+  })
+
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
+
+  const onSubmit = async (data: FormValues) => {
+    try {
+      setIsLoading(true)
+      const response = await loginUser(data)
+
+      if (response?.message) {
+        toast.error(response.message)
+        setIsLoading(false)
+
+        return
+      }
+
+      toast.success('Berhasil login.')
+      const redirectURL = searchParams.get('redirectTo') ?? '/'
+
+      router.push(redirectURL)
+      setIsLoading(false)
+    } catch (error) {
+      toast.error('Terjadi kesalahan. Silakan coba lagi.')
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div className='flex bs-full justify-center'>
@@ -116,42 +185,71 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
             <Typography variant='h4'>{`Welcome to ${themeConfig.templateName}! 👋🏻`}</Typography>
             <Typography>Please sign-in to your account and start the adventure</Typography>
           </div>
-          <form
-            noValidate
-            autoComplete='off'
-            onSubmit={e => {
-              e.preventDefault()
-              router.push('/')
-            }}
-            className='flex flex-col gap-5'
-          >
-            <CustomTextField autoFocus fullWidth label='Email or Username' placeholder='Enter your email or username' />
-            <CustomTextField
-              fullWidth
-              label='Password'
-              placeholder='············'
-              id='outlined-adornment-password'
-              type={isPasswordShown ? 'text' : 'password'}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position='end'>
-                    <IconButton edge='end' onClick={handleClickShowPassword} onMouseDown={e => e.preventDefault()}>
-                      <i className={isPasswordShown ? 'tabler-eye-off' : 'tabler-eye'} />
-                    </IconButton>
-                  </InputAdornment>
-                )
-              }}
+          <form noValidate autoComplete='off' onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-5'>
+            <Controller
+              name='email'
+              control={control}
+              render={({ field }) => (
+                <CustomTextField
+                  {...field}
+                  fullWidth
+                  type='email'
+                  label='Email'
+                  placeholder='johndoe@gmail.com'
+                  {...(errors.email && { error: true, helperText: errors.email.message })}
+                />
+              )}
             />
-            <div className='flex justify-between items-center gap-x-3 gap-y-1 flex-wrap'>
+            <Controller
+              name='password'
+              control={control}
+              render={({ field }) => (
+                <CustomTextField
+                  {...field}
+                  fullWidth
+                  label='Password'
+                  placeholder='············'
+                  id='form-validation-basic-password'
+                  type={isPasswordShown ? 'text' : 'password'}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position='end'>
+                        <IconButton
+                          edge='end'
+                          onClick={handleClickShowPassword}
+                          onMouseDown={e => e.preventDefault()}
+                          aria-label='toggle password visibility'
+                        >
+                          <i className={isPasswordShown ? 'tabler-eye-off' : 'tabler-eye'} />
+                        </IconButton>
+                      </InputAdornment>
+                    )
+                  }}
+                  {...(errors.password && { error: true, helperText: errors.password.message })}
+                />
+              )}
+            />
+            <Controller
+              name='loginAs'
+              control={control}
+              render={({ field }) => (
+                <CustomTextField select fullWidth label='Login Sebagai' {...field} error={Boolean(errors.loginAs)}>
+                  <MenuItem value='student'>Siswa</MenuItem>
+                  <MenuItem value='teacher'>Guru</MenuItem>
+                </CustomTextField>
+              )}
+            />
+            {errors.loginAs && <FormHelperText error>{errors.loginAs.message}</FormHelperText>}
+            {/* <div className='flex justify-between items-center gap-x-3 gap-y-1 flex-wrap'>
               <FormControlLabel control={<Checkbox />} label='Remember me' />
               <Typography className='text-end' color='primary' component={Link}>
                 Forgot password?
               </Typography>
-            </div>
-            <Button fullWidth variant='contained' type='submit'>
-              Login
+            </div> */}
+            <Button disabled={isLoading} fullWidth variant='contained' type='submit'>
+              {isLoading ? 'Loading...' : 'Login'}
             </Button>
-            <div className='flex justify-center items-center flex-wrap gap-2'>
+            {/* <div className='flex justify-center items-center flex-wrap gap-2'>
               <Typography>New on our platform?</Typography>
               <Typography component={Link} color='primary'>
                 Create an account
@@ -171,7 +269,7 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
               <IconButton className='text-error' size='small'>
                 <i className='tabler-brand-google-filled' />
               </IconButton>
-            </div>
+            </div> */}
           </form>
         </div>
       </div>
@@ -179,4 +277,4 @@ const LoginV2 = ({ mode }: { mode: SystemMode }) => {
   )
 }
 
-export default LoginV2
+export default LoginPage

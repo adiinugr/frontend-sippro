@@ -50,10 +50,10 @@ export type Config = {
 }
 
 const themeConfig: Config = {
-  templateName: 'My LMS',
-  homePageUrl: '/home',
+  templateName: 'ACADEMIX',
+  homePageUrl: '/dashboard',
   settingsCookieName: 'my-lms',
-  mode: 'system', // 'system', 'light', 'dark'
+  mode: 'light', // 'system', 'light', 'dark'
   skin: 'default', // 'default', 'bordered'
   semiDark: true, // true, false
   layout: 'vertical', // 'vertical', 'collapsed', 'horizontal'

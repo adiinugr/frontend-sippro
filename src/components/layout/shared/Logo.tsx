@@ -79,6 +79,7 @@ const Logo = ({ color }: { color?: CSSProperties['color'] }) => {
         isCollapsed={layout === 'collapsed'}
         transitionDuration={transitionDuration}
         isBreakpointReached={isBreakpointReached}
+        className='font-cakra'
       >
         {themeConfig.templateName}
       </LogoText>

@@ -24,19 +24,19 @@ const TableFilters = ({
   gradeData: { id: number; name: string }[]
 }) => {
   // States
-  const [studyYear, setStudyYear] = useState<SubjectGroupType['studyYear']>('')
-  const [grade, setGrade] = useState<SubjectGroupType['grade']>('')
+  const [lessonYear, setLessonYear] = useState<SubjectGroupType['lessonYear']['name']>('')
+  const [grade, setGrade] = useState<SubjectGroupType['grade']['name']>('')
 
   useEffect(() => {
     const filteredData = tableData?.filter(item => {
-      if (studyYear && item.studyYear !== studyYear) return false
-      if (grade && item.grade !== grade) return false
+      if (lessonYear && item.lessonYear.name !== lessonYear) return false
+      if (grade && item.grade.name !== grade) return false
 
       return true
     })
 
     setData(filteredData || [])
-  }, [studyYear, grade, tableData, setData])
+  }, [lessonYear, grade, tableData, setData])
 
   return (
     <CardContent>
@@ -46,8 +46,8 @@ const TableFilters = ({
             select
             fullWidth
             id='select-study-year'
-            value={studyYear}
-            onChange={e => setStudyYear(e.target.value)}
+            value={lessonYear}
+            onChange={e => setLessonYear(e.target.value)}
             SelectProps={{ displayEmpty: true }}
           >
             <MenuItem value=''>Pilih Tahun Pelajaran</MenuItem>

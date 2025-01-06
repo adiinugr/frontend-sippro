@@ -10,10 +10,9 @@ import Grid from '@mui/material/Grid'
 
 interface Props {
   isLoading: boolean
-  reset: () => void
 }
 
-const AddActions = ({ isLoading, reset }: Props) => {
+const AddActions = ({ isLoading }: Props) => {
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
@@ -28,9 +27,6 @@ const AddActions = ({ isLoading, reset }: Props) => {
               startIcon={<i className='tabler-device-floppy' />}
             >
               {isLoading ? 'Loading...' : 'Simpan'}
-            </Button>
-            <Button fullWidth color='secondary' variant='tonal' className='capitalize' onClick={() => reset()}>
-              Reset
             </Button>
             <Button
               component={Link}

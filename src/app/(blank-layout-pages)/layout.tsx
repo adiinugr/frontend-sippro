@@ -1,4 +1,6 @@
 // Type Imports
+import { ToastContainer } from 'react-toastify'
+
 import type { ChildrenType } from '@core/types'
 
 // Component Imports
@@ -7,6 +9,8 @@ import BlankLayout from '@layouts/BlankLayout'
 
 // Util Imports
 import { getSystemMode } from '@core/utils/serverHelpers'
+
+import 'react-toastify/dist/ReactToastify.css'
 
 type Props = ChildrenType
 
@@ -17,6 +21,7 @@ const Layout = ({ children }: Props) => {
 
   return (
     <Providers direction={direction}>
+      <ToastContainer />
       <BlankLayout systemMode={systemMode}>{children}</BlankLayout>
     </Providers>
   )

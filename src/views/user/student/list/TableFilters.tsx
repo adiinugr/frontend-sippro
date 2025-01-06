@@ -11,6 +11,8 @@ import type { StudentType } from '@/types/usersTypes'
 
 // Component Imports
 import CustomTextField from '@core/components/mui/TextField'
+
+// Actions
 import { fetchClassrooms } from '@/libs/actions/classrooms'
 
 const TableFilters = ({
@@ -22,7 +24,8 @@ const TableFilters = ({
 }) => {
   // States
   const [classroom, setClassroom] = useState<string>('')
-  const [nominationStatus, setNominationStatus] = useState<StudentType['nominationStatus']>('')
+
+  // const [nominationStatus, setNominationStatus] = useState<StudentType['nominationStatus']>('')
 
   const [classrromData, setClassroomData] = useState([])
 
@@ -38,18 +41,19 @@ const TableFilters = ({
 
   useEffect(() => {
     const filteredData = tableData?.filter(student => {
-      const mappedClassroom = student.subjectGroupsToClassroomsToStudents.map(value => {
-        return value.classroom.name
+      const mappedClassroom = student.stTSbgTc.map(value => {
+        return value.clsrmsToSbjg.classroom.name
       })
 
       if (classroom && !mappedClassroom.includes(classroom)) return false
-      if (nominationStatus && student.nominationStatus !== nominationStatus) return false
+
+      // if (nominationStatus && student.nominationStatus !== nominationStatus) return false
 
       return true
     })
 
     setData(filteredData || [])
-  }, [classroom, nominationStatus, tableData, setData])
+  }, [classroom, tableData, setData])
 
   return (
     <CardContent>
@@ -72,7 +76,7 @@ const TableFilters = ({
             ))}
           </CustomTextField>
         </Grid>
-        <Grid item xs={12} sm={4}>
+        {/* <Grid item xs={12} sm={4}>
           <CustomTextField
             select
             fullWidth
@@ -86,7 +90,7 @@ const TableFilters = ({
             <MenuItem value='Waiting for Validation'>Waiting for Validation</MenuItem>
             <MenuItem value='Validated'>Validated</MenuItem>
           </CustomTextField>
-        </Grid>
+        </Grid> */}
       </Grid>
     </CardContent>
   )

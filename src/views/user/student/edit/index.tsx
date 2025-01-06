@@ -1,13 +1,15 @@
 'use client'
 
+// React Import
 import type { SyntheticEvent } from 'react'
 import { useState } from 'react'
 
+// MUI Import
 import { TabContext, TabPanel } from '@mui/lab'
 import { Grid, Tab } from '@mui/material'
 
+// Components Import
 import CustomTabList from '@/@core/components/mui/TabList'
-
 import StudentIdentity from '@/views/user/student/edit/StudentIdentity'
 import StudentChangePassword from '@/views/user/student/edit/StudentChangePassword'
 
@@ -45,7 +47,7 @@ const UserStudentEdit = ({ selectedData }: Props) => {
             <StudentIdentity studentData={selectedData} />
           </TabPanel>
           <TabPanel value='security' className='p-0'>
-            <StudentChangePassword />
+            <StudentChangePassword studentId={selectedData.id} />
           </TabPanel>
         </Grid>
       </Grid>

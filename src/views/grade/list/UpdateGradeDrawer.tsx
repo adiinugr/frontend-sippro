@@ -11,7 +11,7 @@ import Divider from '@mui/material/Divider'
 import { useForm, Controller } from 'react-hook-form'
 
 // Types Imports
-import type { GradeType } from '@/types/gradeTypes'
+import type { AddGradeType } from '@/types/gradeTypes'
 
 // Component Imports
 import CustomTextField from '@core/components/mui/TextField'
@@ -21,7 +21,7 @@ type Props = {
   isLoading: boolean
   selectedData: { id: number | null; name: string }
   handleClose: () => void
-  handleUpdate: (data: GradeType, id: number) => void
+  handleUpdate: (data: AddGradeType, id: number) => void
 }
 
 type FormValidateType = {
@@ -48,7 +48,7 @@ const UpdateGradeDrawer = (props: Props) => {
     resetForm(selectedData)
   }, [resetForm, selectedData])
 
-  const onSubmit = (data: GradeType) => {
+  const onSubmit = (data: AddGradeType) => {
     handleUpdate(data, selectedData.id as number)
     handleClose()
   }

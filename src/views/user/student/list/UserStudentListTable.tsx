@@ -3,11 +3,11 @@
 // React Imports
 import { useEffect, useState, useMemo } from 'react'
 
-// MUI Imports
+// Next Import
 import Link from 'next/link'
-
 import { useRouter } from 'next/navigation'
 
+// MUI Imports
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import Button from '@mui/material/Button'
@@ -18,6 +18,7 @@ import IconButton from '@mui/material/IconButton'
 import TablePagination from '@mui/material/TablePagination'
 import type { TextFieldProps } from '@mui/material/TextField'
 import MenuItem from '@mui/material/MenuItem'
+import { Tooltip } from '@mui/material'
 
 // Third-party Imports
 import classnames from 'classnames'
@@ -36,29 +37,27 @@ import {
 } from '@tanstack/react-table'
 import type { ColumnDef, FilterFn } from '@tanstack/react-table'
 import type { RankingInfo } from '@tanstack/match-sorter-utils'
-
 import { toast } from 'react-toastify'
 
-import { Tooltip } from '@mui/material'
-
-import TablePaginationComponent from '@components/TablePaginationComponent'
-
-// import type { ThemeColor } from '@core/types'
+// Types
 import type { StudentType } from '@/types/usersTypes'
 
 // Component Imports
-import TableFilters from './TableFilters'
-
-import CustomTextField from '@core/components/mui/TextField'
 import CustomAvatar from '@core/components/mui/Avatar'
+import CustomTextField from '@core/components/mui/TextField'
+import TableFilters from './TableFilters'
+import TablePaginationComponent from '@components/TablePaginationComponent'
+import DeleteDialog from '@/components/other/DeleteDialog'
 
 // Util Imports
 import { getInitials } from '@/utils/getInitials'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
+
+// Actions
 import { deleteStudentById } from '@/libs/actions/students'
-import DeleteDialog from '@/components/other/DeleteDialog'
+import DialogImportStudents from '@/views/user/student/list/dialog'
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -72,10 +71,6 @@ declare module '@tanstack/table-core' {
 type UsersStudentTypeWithAction = StudentType & {
   action?: string
 }
-
-// type UserStudentStatusType = {
-//   [key: string]: ThemeColor
-// }
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   // Rank the item
@@ -128,7 +123,7 @@ const DebouncedInput = ({
 // }
 
 const sortedClassroomArray = (array: any[]) => {
-  return array.sort((a, b) => a.classroom.name.localeCompare(b.classroom.name))
+  return array.sort((a, b) => a.clsrmsToSbjg.classroom.name.localeCompare(b.clsrmsToSbjg.classroom.name))
 }
 
 // Column Definitions
@@ -232,35 +227,21 @@ const UserStudentListTable = ({ tableData }: { tableData?: StudentType[] }) => {
           </Typography>
         )
       }),
-      columnHelper.accessor('subjectGroupsToClassroomsToStudents', {
+      columnHelper.accessor('stTSbgTc', {
         header: 'Kelas',
         cell: ({ row }) => (
           <div className='flex items-center gap-2'>
-            {row.original.subjectGroupsToClassroomsToStudents.length === 0 ? (
+            {row.original.stTSbgTc.length === 0 ? (
               <Chip variant='tonal' color='warning' label='Belum Diatur' className='bg-orange-100 text-orange-700' />
             ) : (
-              sortedClassroomArray(row.original.subjectGroupsToClassroomsToStudents).map(val => (
-                <Chip variant='tonal' key={val.classroom.name} label={val.classroom.name} />
+              sortedClassroomArray(row.original.stTSbgTc).map(val => (
+                <Chip variant='tonal' key={val.clsrmsToSbjg.classroom.id} label={val.clsrmsToSbjg.classroom.name} />
               ))
             )}
           </div>
         )
       }),
 
-      // columnHelper.accessor('nominationStatus', {
-      //   header: 'Status Nominasi',
-      //   cell: ({ row }) => (
-      //     <div className='flex items-center gap-3'>
-      //       <Chip
-      //         variant='tonal'
-      //         label={row.original.nominationStatus}
-      //         size='small'
-      //         color={userStudentStatusObj[row.original.nominationStatus]}
-      //         className='capitalize'
-      //       />
-      //     </div>
-      //   )
-      // }),
       columnHelper.accessor('action', {
         header: 'Action',
         cell: ({ row }) => (
@@ -271,13 +252,23 @@ const UserStudentListTable = ({ tableData }: { tableData?: StudentType[] }) => {
               </IconButton>
             </Tooltip>
             <Tooltip title='Preview'>
-              <IconButton onClick={() => push(`/user/student/profile/${row.original.id}`)}>
+              <IconButton onClick={() => push(`/teacher/user/student/profile/${row.original.id}`)}>
                 <i className='tabler-eye text-textSecondary' />
               </IconButton>
             </Tooltip>
             <Tooltip title='Edit'>
-              <IconButton onClick={() => push(`/user/student/edit/${row.original.id}`)}>
+              <IconButton onClick={() => push(`/teacher/user/student/edit/${row.original.id}`)}>
                 <i className='tabler-edit text-textSecondary' />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title='Nilai Raport'>
+              <IconButton onClick={() => push(`/teacher/user/student/report/${row.original.id}`)}>
+                <i className='tabler-report-analytics text-textSecondary' />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title='Tanya AI'>
+              <IconButton onClick={() => push(`/teacher/user/student/chat-ai/${row.original.id}`)}>
+                <i className='tabler-brand-openai text-textSecondary' />
               </IconButton>
             </Tooltip>
           </div>
@@ -351,18 +342,11 @@ const UserStudentListTable = ({ tableData }: { tableData?: StudentType[] }) => {
               placeholder='Cari Siswa'
               className='max-sm:is-full'
             />
-            <Button
-              color='secondary'
-              variant='tonal'
-              startIcon={<i className='tabler-upload' />}
-              className='max-sm:is-full'
-            >
-              Export
-            </Button>
+            <DialogImportStudents />
             <Button
               variant='contained'
               startIcon={<i className='tabler-plus' />}
-              href='/user/student/add'
+              href='/teacher/user/student/add'
               component={Link}
               className='max-sm:is-full'
             >

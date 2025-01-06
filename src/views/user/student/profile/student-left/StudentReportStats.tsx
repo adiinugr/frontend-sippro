@@ -1,0 +1,68 @@
+'use client'
+
+// MUI Imports
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import Typography from '@mui/material/Typography'
+import { Button, CardActions } from '@mui/material'
+
+// Third-party Imports
+import classnames from 'classnames'
+
+// Components Imports
+import CustomAvatar from '@core/components/mui/Avatar'
+
+// Type
+type Props = {
+  studentMarksBySemester: {
+    semester: string
+    marks: any[]
+  }[]
+}
+
+const StudentReportStats = ({ studentMarksBySemester }: Props) => {
+  // Props
+
+  return (
+    <Card className='bs-full'>
+      <CardContent>
+        <div className='flex items-center flex-wrap gap-2 justify-between'>
+          <div className='flex flex-col gap-x-4 gap-y-0.5'>
+            <Typography variant='h5'>Nilai Raport</Typography>
+            <Typography variant='subtitle1' color='text.secondary'>
+              Data Submit Nilai Raport
+            </Typography>
+          </div>
+          <CustomAvatar variant='rounded' color='primary' skin='filled' size={42}>
+            <i className={classnames('tabler-report-analytics', 'text-[26px]')} />
+          </CustomAvatar>
+        </div>
+        <div className='flex justify-between items-center mt-8'>
+          {studentMarksBySemester.map((mark: { semester: string; marks: string | any[] }) => (
+            <div key={mark.semester} className='grid place-items-center gap-1'>
+              <CustomAvatar
+                variant='rounded'
+                color={mark.marks.length > 0 ? 'success' : 'error'}
+                skin='light-static'
+                size={32}
+              >
+                <i
+                  className={classnames(
+                    { 'tabler-circle-check': mark.marks.length > 0, 'tabler-playstation-x': mark.marks.length == 0 },
+                    'text-[22px]'
+                  )}
+                />
+              </CustomAvatar>
+              <Typography variant='subtitle2'>{`SMT ${mark.semester}`}</Typography>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+      <CardActions>
+        <Button variant='tonal'>Input Nilai</Button>
+      </CardActions>
+    </Card>
+  )
+}
+
+export default StudentReportStats

@@ -6,10 +6,6 @@ export type ClassroomType = {
 }
 
 export type ManageClassroomType = {
-  classroom: {
-    id: number
-    name: string
-  }
   student: {
     id: number
     name: string

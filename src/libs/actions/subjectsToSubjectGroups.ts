@@ -44,9 +44,9 @@ async function updateSubjectsToSubjectGroup(data: { code: string; name: string }
   }
 }
 
-async function deleteSubjectsToSubjectGroupById(subjectId: number) {
+async function deleteSubjectsToSubjectGroupById(subjectGroupId: number) {
   try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/subjects-to-subject-group/${subjectId}`, {
+    const res = await fetch(`${NEXT_PUBLIC_API_URL}/subjects-to-subject-group/${subjectGroupId}`, {
       method: 'DELETE'
     })
 

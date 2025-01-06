@@ -3,11 +3,11 @@
 // React Imports
 import { useEffect, useState, useMemo } from 'react'
 
-// MUI Imports
+// Next Imports
 import Link from 'next/link'
-
 import { useRouter } from 'next/navigation'
 
+// MUI Imports
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import Button from '@mui/material/Button'
@@ -16,6 +16,7 @@ import IconButton from '@mui/material/IconButton'
 import TablePagination from '@mui/material/TablePagination'
 import type { TextFieldProps } from '@mui/material/TextField'
 import MenuItem from '@mui/material/MenuItem'
+import { Tooltip } from '@mui/material'
 
 // Third-party Imports
 import classnames from 'classnames'
@@ -34,23 +35,22 @@ import {
 } from '@tanstack/react-table'
 import type { ColumnDef, FilterFn } from '@tanstack/react-table'
 import type { RankingInfo } from '@tanstack/match-sorter-utils'
-
-// Component Imports
 import { toast } from 'react-toastify'
 
-import { Chip, Tooltip } from '@mui/material'
-
+// Component Imports
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import TableFilters from './TableFilters'
 import CustomTextField from '@core/components/mui/TextField'
+import DeleteDialog from '@/components/other/DeleteDialog'
 
 // Type Imports
 import type { SubjectGroupType } from '@/types/subjectGroupTypes'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
+
+// Actions
 import { deleteSubjectGroupById } from '@/libs/actions/subjectGroups'
-import DeleteDialog from '@/components/other/DeleteDialog'
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -62,10 +62,6 @@ declare module '@tanstack/table-core' {
 }
 
 type SubjectGroupTypeWithAction = SubjectGroupType & {
-  classrooms: {
-    classroom: string
-    data: any[]
-  }[]
   stats?: string
   action?: string
 }
@@ -170,11 +166,11 @@ const SubjectGroupListTable = ({
 
   const columns = useMemo<ColumnDef<SubjectGroupTypeWithAction, any>[]>(
     () => [
-      columnHelper.accessor('studyYear', {
+      columnHelper.accessor('lessonYear', {
         header: 'Tahun Pelajaran',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
-            {row.original.studyYear}
+            {row.original.lessonYear.name}
           </Typography>
         )
       }),
@@ -182,7 +178,7 @@ const SubjectGroupListTable = ({
         header: 'Kelas',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
-            {row.original.grade}
+            {row.original.grade.name}
           </Typography>
         )
       }),
@@ -198,10 +194,10 @@ const SubjectGroupListTable = ({
         header: 'Statistik',
         cell: ({ row }) => (
           <div className='flex items-center gap-2 flex-wrap divide-x'>
-            {row.original.classrooms.map(val => (
-              <div key={val.classroom} className='p-2'>
-                <p className='font-bold text-sm text-teal-600'>{val.classroom}</p>
-                <p className='text-sm'>{`${val.data.length} Siswa`}</p>
+            {row.original.clsrmsToSbjgs.map(val => (
+              <div key={val.classroom.id} className='p-2'>
+                <p className='font-bold text-sm text-teal-600'>{val.classroom.name}</p>
+                <p className='text-sm'>{`${val.stdsToSbjgsToClsrms.length} Siswa`}</p>
               </div>
             ))}
           </div>
@@ -217,12 +213,12 @@ const SubjectGroupListTable = ({
               </IconButton>
             </Tooltip>
             <Tooltip title='Edit'>
-              <IconButton onClick={() => push(`/setting/subject-group/edit/${row.original.id}`)}>
+              <IconButton onClick={() => push(`/teacher/setting/subject-group/edit/${row.original.id}`)}>
                 <i className='tabler-edit' />
               </IconButton>
             </Tooltip>
             <Tooltip title='Kelola Siswa'>
-              <IconButton onClick={() => push(`/setting/subject-group/manage/${row.original.id}`)}>
+              <IconButton onClick={() => push(`/teacher/setting/subject-group/manage/${row.original.id}`)}>
                 <i className='tabler-user-square-rounded' />
               </IconButton>
             </Tooltip>
@@ -296,7 +292,7 @@ const SubjectGroupListTable = ({
               variant='contained'
               component={Link}
               startIcon={<i className='tabler-plus' />}
-              href='/setting/subject-group/add'
+              href='/teacher/setting/subject-group/add'
               className='max-sm:is-full'
             >
               Tambah Kelompok Baru

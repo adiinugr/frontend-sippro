@@ -9,7 +9,6 @@ import CardHeader from '@mui/material/CardHeader'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import TablePagination from '@mui/material/TablePagination'
-import type { TextFieldProps } from '@mui/material/TextField'
 import MenuItem from '@mui/material/MenuItem'
 import { Chip, IconButton, Tooltip } from '@mui/material'
 
@@ -31,19 +30,23 @@ import {
 import type { ColumnDef, FilterFn } from '@tanstack/react-table'
 import { rankItem, type RankingInfo } from '@tanstack/match-sorter-utils'
 
+// Type Imports
+import type { TextFieldProps } from '@mui/material/TextField'
+
+import type { AddGradeType, GradeType } from '@/types/gradeTypes'
+
 // Component Imports
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import AddGradeDrawer from './AddGradeDrawer'
 import CustomTextField from '@core/components/mui/TextField'
-
-// Type Imports
-import type { GradeType } from '@/types/gradeTypes'
+import DeleteDialog from '@/components/other/DeleteDialog'
+import UpdateGradeDrawer from '@/views/grade/list/UpdateGradeDrawer'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
+
+// Actions
 import { createGrade, deleteGradeById, getGradeById, updateGrade } from '@/libs/actions/grades'
-import DeleteDialog from '@/components/other/DeleteDialog'
-import UpdateGradeDrawer from '@/views/grade/list/UpdateGradeDrawer'
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -158,7 +161,7 @@ const GradeListTable = ({ tableData }: { tableData?: GradeType[] }) => {
     }
   }
 
-  const handleUpdate = async (val: GradeType, id: number) => {
+  const handleUpdate = async (val: AddGradeType, id: number) => {
     setIsLoading(true)
 
     try {
@@ -190,7 +193,7 @@ const GradeListTable = ({ tableData }: { tableData?: GradeType[] }) => {
     setUpdateGradeOpen(true)
   }
 
-  const handleCreate = async (val: GradeType) => {
+  const handleCreate = async (val: AddGradeType) => {
     setIsLoading(true)
 
     try {

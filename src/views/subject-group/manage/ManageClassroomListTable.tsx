@@ -3,14 +3,16 @@
 // React Imports
 import { useEffect, useState, useMemo } from 'react'
 
-// MUI Imports
+// Next Import
+import { useRouter } from 'next/navigation'
 
+// MUI Imports
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import TablePagination from '@mui/material/TablePagination'
 import type { TextFieldProps } from '@mui/material/TextField'
 import MenuItem from '@mui/material/MenuItem'
-import { Chip, IconButton, Tooltip } from '@mui/material'
+import { IconButton, Tooltip } from '@mui/material'
 
 // Third-party Imports
 import classnames from 'classnames'
@@ -33,19 +35,18 @@ import { rankItem, type RankingInfo } from '@tanstack/match-sorter-utils'
 // Component Imports
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import CustomTextField from '@core/components/mui/TextField'
+import AddSubjectGroupStudentTable from '@/views/subject-group/manage/AddSubjectGroupStudentTable'
+import DeleteDialog from '@/components/other/DeleteDialog'
 
 // Type Imports
 import type { ManageClassroomType } from '@/types/classroomTypes'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
-import OpenDialogOnElementClick from '@/components/dialogs/OpenDialogOnElementClick'
-import AddSubjectGroupStudentTable from '@/views/subject-group/manage/dialog'
+
+// Actions
 import { fetchClassrooms } from '@/libs/actions/classrooms'
-import DeleteDialog from '@/components/other/DeleteDialog'
-import { deleteSubjectGroupsToClassroomsToStudent } from '@/libs/actions/subjectGroupsToClassroomsToStudents'
-import revalidateTag from '@/libs/actions/revalidate'
-import { useRouter } from 'next/navigation'
+import { deleteStudentsSubjectGroupsToClassrooms } from '@/libs/actions/studentsTosubjectGroupsToClassrooms'
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -113,36 +114,53 @@ const DebouncedInput = ({
 const columnHelper = createColumnHelper<ManageClassroomTypeWithAction>()
 
 const ManageClassroomListTable = ({
+  classroomsToSubjectGroupId,
   tableData,
   subjectGroup,
   classroom
-}: { tableData?: ManageClassroomType[] } & { subjectGroup: { id: number; name: string }; classroom: string }) => {
+}: { tableData?: ManageClassroomType[] } & {
+  subjectGroup: { id: number; name: string }
+  classroom: string
+  classroomsToSubjectGroupId: number
+}) => {
   const router = useRouter()
 
   // States
   const [rowSelection, setRowSelection] = useState({})
   const [globalFilter, setGlobalFilter] = useState('')
 
-  const mappedData = tableData?.map(data => {
-    return {
-      id: data.student.id,
-      name: data.student.name,
-      nis: data.student.nis,
-      nisn: data.student.nisn
-    }
-  })
-
-  const [classroomData] = useState(mappedData)
+  const [classroomData, setClassroomData] = useState([])
 
   // Crud State
   const [addStudentDialogOpen, setAddStudentDialogOpen] = useState(false)
-  const [selectedClassroom, setClasroomData] = useState([])
+
+  const [selectedClassroom, setClasroomData] = useState<
+    {
+      id: number
+      name: string
+      nis: string
+      nisn: string
+    }[]
+  >([])
 
   // Delete Actions
   const [openDialog, setOpenDialog] = useState<boolean>(false)
   const [selectedId, setSelectedId] = useState<number>(0)
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  useEffect(() => {
+    const mappedData: any = tableData?.map(data => {
+      return {
+        id: data.student.id,
+        name: data.student.name,
+        nis: data.student.nis,
+        nisn: data.student.nisn
+      }
+    })
+
+    setClassroomData(mappedData)
+  }, [tableData])
 
   const handleOpenDialog = (id: number) => {
     setSelectedId(id)
@@ -173,20 +191,20 @@ const ManageClassroomListTable = ({
   const handleDeleteData = async () => {
     const payloadData = {
       studentId: selectedId,
-      subjectGroupId: subjectGroup.id,
-      classroomId
+      classroomsToSubjectGroupId
     }
 
     setIsLoading(true)
 
     try {
-      const res = await deleteSubjectGroupsToClassroomsToStudent(payloadData)
+      const res = await deleteStudentsSubjectGroupsToClassrooms(payloadData)
 
       setIsLoading(false)
       setOpenDialog(false)
 
       if (res.statusCode === 200) {
         toast.success(`Berhasil menghapus data!`)
+        router.refresh()
 
         return
       }

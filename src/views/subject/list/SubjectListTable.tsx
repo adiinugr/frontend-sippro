@@ -9,7 +9,6 @@ import CardHeader from '@mui/material/CardHeader'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import TablePagination from '@mui/material/TablePagination'
-import type { TextFieldProps } from '@mui/material/TextField'
 import MenuItem from '@mui/material/MenuItem'
 import { IconButton } from '@mui/material'
 
@@ -31,21 +30,23 @@ import type { ColumnDef, FilterFn } from '@tanstack/react-table'
 import { rankItem, type RankingInfo } from '@tanstack/match-sorter-utils'
 import { toast } from 'react-toastify'
 
+// Type Imports
+import type { TextFieldProps } from '@mui/material/TextField'
+
+import type { SubjectType } from '@/types/subjectTypes'
+
 // Component Imports
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import AddSubjectDrawer from './AddSubjectDrawer'
 import CustomTextField from '@core/components/mui/TextField'
+import DeleteDialog from '@/components/other/DeleteDialog'
+import UpdateSubjectDrawer from '@/views/subject/list/UpdateSubjectDrawer'
 
 // Actions
 import { createSubject, deleteSubjectById, getSubjectById, updateSubject } from '@/libs/actions/subjects'
 
-// Type Imports
-import type { SubjectType } from '@/types/subjectTypes'
-
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
-import DeleteDialog from '@/components/other/DeleteDialog'
-import UpdateSubjectDrawer from '@/views/subject/list/UpdateSubjectDrawer'
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
