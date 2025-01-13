@@ -82,6 +82,7 @@ const Logo = ({ color }: { color?: CSSProperties['color'] }) => {
         className='font-cakra'
       >
         {themeConfig.templateName}
+        <p className='bg-purple-500 text-sm px-2 rounded-full align-top font-sans font-medium w-fit mt-1'>beta</p>
       </LogoText>
     </div>
   )

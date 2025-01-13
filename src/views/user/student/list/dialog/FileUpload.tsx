@@ -4,6 +4,8 @@
 import { useState } from 'react'
 
 // MUI Imports
+import Link from 'next/link'
+
 import Dialog from '@mui/material/Dialog'
 import Button from '@mui/material/Button'
 import DialogTitle from '@mui/material/DialogTitle'
@@ -72,6 +74,7 @@ const FileUpload = ({ open, setOpen }: FileUploadProps) => {
           name: student['NAMA SISWA'],
           nis: student['NIS'],
           nisn: student['NISN'],
+          status: 'student',
           placeOfBirth: student['TEMPAT LAHIR'],
           dateOfBirth: convertDateToIsoString(student['TANGGAL LAHIR'])
         }
@@ -145,7 +148,11 @@ const FileUpload = ({ open, setOpen }: FileUploadProps) => {
       <DialogTitle variant='h4' className='flex flex-col gap-2 text-center p-6 sm:pbs-16 sm:pbe-6 sm:pli-16'>
         Import Data Siswa
         <Typography component='span' className='flex flex-col text-center'>
-          Upload file import di bawah ini!
+          Untuk mendownload template, klik{' '}
+          <Link href='/xlsx/template_import_siswa.xlsx' className='text-blue-500 hover:underline'>
+            di sini
+          </Link>
+          .
         </Typography>
       </DialogTitle>
       <form onSubmit={e => e.preventDefault()}>

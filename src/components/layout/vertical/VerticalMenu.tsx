@@ -73,41 +73,43 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
       >
         {/* Teacher Menu */}
-        <MenuSection label='Teacher'>
-          <MenuItem icon={<i className='tabler-layout-dashboard' />} href='/dashboard'>
-            Dashboard
-          </MenuItem>
-          <SubMenu label='Setting' icon={<i className='tabler-file-settings' />}>
-            <MenuItem href='/teacher/setting/study-year'>Tahun Pelajaran</MenuItem>
-            <MenuItem href='/teacher/setting/grade'>Jenjang</MenuItem>
-            <MenuItem href='/teacher/setting/classroom'>Kelas</MenuItem>
-            <MenuItem href='/teacher/setting/subject'>Mata Pelajaran</MenuItem>
-            <SubMenu label='Kelompok Mapel'>
-              <MenuItem href='/teacher/setting/subject-group/list'>List</MenuItem>
-              <MenuItem href='/teacher/setting/subject-group/add'>Tambah</MenuItem>
-            </SubMenu>
-          </SubMenu>
-          <MenuItem icon={<i className='tabler-school' />} href='/teacher/campus'>
-            Info Kampus
-          </MenuItem>
-          {session?.user.roles.includes('Super Admin') && (
-            <MenuItem icon={<i className='tabler-settings-star' />} href='/teacher/role'>
-              Role
+        {session?.user.status === 'teacher' && (
+          <MenuSection label='Teacher'>
+            <MenuItem icon={<i className='tabler-layout-dashboard' />} href='/dashboard'>
+              Dashboard
             </MenuItem>
-          )}
-          <SubMenu label='User' icon={<i className='tabler-users' />}>
-            <SubMenu label='Siswa'>
-              <MenuItem href='/teacher/user/student/list'>List</MenuItem>
-              <MenuItem href='/teacher/user/student/add'>Tambah</MenuItem>
-            </SubMenu>
-            {session?.user.roles.includes('Super Admin') && (
-              <SubMenu label='Guru'>
-                <MenuItem href='/teacher/user/teacher/list'>List</MenuItem>
-                <MenuItem href='/teacher/user/teacher/add'>Tambah</MenuItem>
+            <SubMenu label='Setting' icon={<i className='tabler-file-settings' />}>
+              <MenuItem href='/teacher/setting/study-year'>Tahun Pelajaran</MenuItem>
+              <MenuItem href='/teacher/setting/grade'>Jenjang</MenuItem>
+              <MenuItem href='/teacher/setting/classroom'>Kelas</MenuItem>
+              <MenuItem href='/teacher/setting/subject'>Mata Pelajaran</MenuItem>
+              <SubMenu label='Kelompok Mapel'>
+                <MenuItem href='/teacher/setting/subject-group/list'>List</MenuItem>
+                <MenuItem href='/teacher/setting/subject-group/add'>Tambah</MenuItem>
               </SubMenu>
+            </SubMenu>
+            <MenuItem icon={<i className='tabler-school' />} href='/teacher/campus'>
+              Info Kampus
+            </MenuItem>
+            {session?.user?.roles?.includes('Super Admin') && (
+              <MenuItem icon={<i className='tabler-settings-star' />} href='/teacher/role'>
+                Role
+              </MenuItem>
             )}
-          </SubMenu>
-        </MenuSection>
+            <SubMenu label='User' icon={<i className='tabler-users' />}>
+              <SubMenu label='Siswa'>
+                <MenuItem href='/teacher/user/student/list'>List</MenuItem>
+                <MenuItem href='/teacher/user/student/add'>Tambah</MenuItem>
+              </SubMenu>
+              {session?.user?.roles?.includes('Super Admin') && (
+                <SubMenu label='Guru'>
+                  <MenuItem href='/teacher/user/teacher/list'>List</MenuItem>
+                  <MenuItem href='/teacher/user/teacher/add'>Tambah</MenuItem>
+                </SubMenu>
+              )}
+            </SubMenu>
+          </MenuSection>
+        )}
 
         {session?.user.status === 'student' && (
           <MenuSection label='Siswa'>

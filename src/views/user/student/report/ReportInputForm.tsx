@@ -240,7 +240,7 @@ const ReportInputForm = ({ subjectData, studentId, marks }: Props) => {
             <tbody>
               {table
                 .getRowModel()
-                .rows.slice(0, 10)
+                .rows.slice(0, 20)
                 .map(row => {
                   return (
                     <tr key={row.id}>

@@ -46,7 +46,7 @@ export const ChangePasswordSchema: ZodType<FormValues> = z
   })
 
 const StudentChangePassword = ({ studentId }: { studentId: number }) => {
-  const { push } = useRouter()
+  const { back } = useRouter()
 
   // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)
@@ -80,7 +80,7 @@ const StudentChangePassword = ({ studentId }: { studentId: number }) => {
       if (studentRes.statusCode === 200) {
         toast.success(`Berhasil mengubah data!`)
         setIsLoading(false)
-        push('/teacher/user/student/list')
+        back()
 
         return
       }

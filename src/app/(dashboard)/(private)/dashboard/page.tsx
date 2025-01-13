@@ -12,8 +12,8 @@ export default async function DashboardPage() {
 
   const data = await getStudentById(Number(session?.user?.id))
 
-  if (data.statusCode === 404 || !session) {
-    redirect('/not-found')
+  if (!session) {
+    redirect('/login')
   }
 
   return session.user.status === 'student' ? <StudentProfile data={data} /> : <TeacherDashboard />

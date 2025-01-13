@@ -34,7 +34,7 @@ type FormValues = {
 }
 
 const TeacherChangePassword = ({ teacherId }: { teacherId: number }) => {
-  const { push } = useRouter()
+  const { back } = useRouter()
 
   // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)
@@ -68,7 +68,7 @@ const TeacherChangePassword = ({ teacherId }: { teacherId: number }) => {
       if (studentRes.statusCode === 200) {
         toast.success(`Berhasil mengubah data!`)
         setIsLoading(false)
-        push('/teacher/user/teacher/list')
+        back()
 
         return
       }

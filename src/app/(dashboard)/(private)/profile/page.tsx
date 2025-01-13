@@ -20,8 +20,8 @@ const StudentEditPage = async () => {
   const studentData = await getStudentById(Number(session?.user?.id))
   const teacherData = await getTeacherById(Number(session?.user?.id))
 
-  if (studentData.statusCode === 404 || teacherData.statusCode === 404 || !session) {
-    redirect('/not-found')
+  if (!session) {
+    redirect('/login')
   }
 
   return (

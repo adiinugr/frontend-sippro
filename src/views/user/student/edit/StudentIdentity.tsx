@@ -49,7 +49,7 @@ interface Props {
 }
 
 const StudentIdentity = ({ studentData }: Props) => {
-  const { push } = useRouter()
+  const { back } = useRouter()
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -109,7 +109,7 @@ const StudentIdentity = ({ studentData }: Props) => {
       if (studentRes.statusCode === 200) {
         toast.success(`Berhasil mengubah data!`)
         setIsLoading(false)
-        push('/teacher/user/student/list')
+        back()
 
         return
       }
