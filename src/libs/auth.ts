@@ -6,6 +6,7 @@ import Credentials from 'next-auth/providers/credentials'
 const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
 
 export const config: NextAuthConfig = {
+  trustHost: true,
   pages: { signIn: '/login' },
   session: {
     strategy: 'jwt'

@@ -62,7 +62,29 @@ declare module '@tanstack/table-core' {
   }
 }
 
-type SubjectGroupTypeWithAction = SubjectGroupType & {
+type SubjectGroupTypeWithAction = {
+  id: number
+  lessonYear: string
+  grade: string
+  name: string
+  clsrmsToSbjgs: {
+    id: number
+    classroom: {
+      id: number
+      name: string
+    }
+    stdsToSbjgsToClsrms: {
+      student: {
+        id: number
+        name: string
+        nis: string
+        nisn: string
+        placeOfBirth: string
+        dateOfBirth: string
+        email: string
+      }
+    }[]
+  }[]
   stats?: string
   action?: string
 }
@@ -171,7 +193,7 @@ const SubjectGroupListTable = ({
         header: 'Tahun Pelajaran',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
-            {row.original.lessonYear.name}
+            {row.original.lessonYear}
           </Typography>
         )
       }),
@@ -179,7 +201,7 @@ const SubjectGroupListTable = ({
         header: 'Kelas',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
-            {row.original.grade.name}
+            {row.original.grade}
           </Typography>
         )
       }),
