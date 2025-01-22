@@ -24,6 +24,14 @@ interface Props {
   studentData: StudentType
 }
 
+const sortLessonYear = (arr: any[]) => {
+  const sortedArr = arr.sort((a, b) =>
+    a.clsrmsToSbjg.subjectGroup.lessonYear.name.localeCompare(b.clsrmsToSbjg.subjectGroup.lessonYear.name)
+  )
+
+  return sortedArr
+}
+
 const ReportInput = ({ studentData }: Props) => {
   const [value, setValue] = useState(studentData.stTSbgTc[0]?.clsrmsToSbjg.subjectGroup.lessonYear.name)
 
@@ -46,7 +54,7 @@ const ReportInput = ({ studentData }: Props) => {
       {studentData ? (
         <TabContext value={value}>
           <CustomTabList pill='true' onChange={handleTabChange} className='border-be px-7'>
-            {studentData.stTSbgTc.map(item => (
+            {sortLessonYear(studentData.stTSbgTc).map(item => (
               <Tab
                 key={item.clsrmsToSbjg.id}
                 label={item.clsrmsToSbjg.subjectGroup.lessonYear.name}

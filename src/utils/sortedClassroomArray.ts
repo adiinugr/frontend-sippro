@@ -1,7 +1,5 @@
 const sortedClassroomArray = (array: any[]) => {
-  return array.sort((a, b) =>
-    a.classroomToSubjectGroup.classroom.name.localeCompare(b.classroomToSubjectGroup.classroom.name)
-  )
+  return array.sort((a, b) => a.classroom.name.localeCompare(b.classroom.name))
 }
 
 export { sortedClassroomArray }

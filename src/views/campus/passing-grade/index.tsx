@@ -2,11 +2,11 @@
 
 import Grid from '@mui/material/Grid'
 
-import CampusHeader from '@/views/campus/CampusHeader'
+import CampusHeader from '@/views/campus/passing-grade/CampusHeader'
 
 // MUI Imports
 
-const Campus = () => {
+const CampusPassingGrade = () => {
   // States
 
   return (
@@ -18,4 +18,4 @@ const Campus = () => {
   )
 }
 
-export default Campus
+export default CampusPassingGrade

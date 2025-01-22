@@ -115,7 +115,7 @@ const ReportBarChart = ({ tabData }: { tabData: any }) => {
     setValue(newValue)
   }
 
-  const colors = Array(9).fill('var(--mui-palette-primary-lightOpacity)')
+  const colors = Array(16).fill('var(--mui-palette-primary-lightOpacity)')
 
   const options: ApexOptions = {
     chart: {
@@ -172,7 +172,7 @@ const ReportBarChart = ({ tabData }: { tabData: any }) => {
       }
     },
     yaxis: {
-      min: 60,
+      min: 70,
       max: 100,
       labels: {
         offsetX: -18,

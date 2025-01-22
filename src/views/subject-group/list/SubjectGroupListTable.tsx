@@ -51,6 +51,7 @@ import tableStyles from '@core/styles/table.module.css'
 
 // Actions
 import { deleteSubjectGroupById } from '@/libs/actions/subjectGroups'
+import { sortedClassroomArray } from '@/utils/sortedClassroomArray'
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -170,7 +171,7 @@ const SubjectGroupListTable = ({
         header: 'Tahun Pelajaran',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
-            {row.original.lessonYear.name}
+            {row.original.lessonYear}
           </Typography>
         )
       }),
@@ -178,7 +179,7 @@ const SubjectGroupListTable = ({
         header: 'Kelas',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
-            {row.original.grade.name}
+            {row.original.grade}
           </Typography>
         )
       }),
@@ -194,7 +195,7 @@ const SubjectGroupListTable = ({
         header: 'Statistik',
         cell: ({ row }) => (
           <div className='flex items-center gap-2 flex-wrap divide-x'>
-            {row.original.clsrmsToSbjgs.map(val => (
+            {sortedClassroomArray(row.original.clsrmsToSbjgs).map(val => (
               <div key={val.classroom.id} className='p-2'>
                 <p className='font-bold text-sm text-teal-600'>{val.classroom.name}</p>
                 <p className='text-sm'>{`${val.stdsToSbjgsToClsrms.length} Siswa`}</p>
@@ -242,6 +243,16 @@ const SubjectGroupListTable = ({
       globalFilter
     },
     initialState: {
+      sorting: [
+        {
+          id: 'lessonYear',
+          desc: false
+        },
+        {
+          id: 'grade',
+          desc: false
+        }
+      ],
       pagination: {
         pageSize: 10
       }

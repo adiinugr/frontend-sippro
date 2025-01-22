@@ -56,9 +56,20 @@ function ChatAi({ studentData }: Props) {
     return markArr
   })
 
+  const achievements = studentData.achievements.map(achievement => {
+    const achievementArr = []
+
+    achievementArr.push(
+      `${achievement.medal} ${achievement.category} ${achievement.title} tingkat ${achievement.level} yang diselenggarakan oleh ${achievement.organizer}`
+    )
+
+    return achievementArr
+  })
+
   const { messages, input, handleInputChange, handleSubmit, isLoading, append, error, reload } = useChat({
     body: {
       mark: marks.join(', '),
+      achievements: achievements.join(', '),
       studentName: studentData.name
     }
   })

@@ -38,7 +38,7 @@ function StudentRight({ studentMarksBySemester, subjectProgresData, studentData 
       const subject: string[] = []
 
       item.marks.forEach(mark => {
-        markData.push(mark.mark)
+        markData.push(Number(mark.mark))
         subject.push(mark.subject.code)
       })
 

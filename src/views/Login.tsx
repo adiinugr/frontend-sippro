@@ -46,17 +46,31 @@ import { useSettings } from '@core/hooks/useSettings'
 import { loginUser } from '@/libs/actions/auth'
 
 // Styled Custom Components
-const LoginIllustration = styled('img')(({ theme }) => ({
+const LogoIllustration = styled('img')(({ theme }) => ({
   zIndex: 2,
   blockSize: 'auto',
-  maxBlockSize: 680,
+  maxBlockSize: 180,
   maxInlineSize: '100%',
   margin: theme.spacing(12),
   [theme.breakpoints.down(1536)]: {
-    maxBlockSize: 550
+    maxBlockSize: 180
   },
   [theme.breakpoints.down('lg')]: {
+    maxBlockSize: 180
+  }
+}))
+
+const LoginIllustration = styled('img')(({ theme }) => ({
+  zIndex: 2,
+  blockSize: 'auto',
+  maxBlockSize: 480,
+  maxInlineSize: '100%',
+  margin: theme.spacing(12),
+  [theme.breakpoints.down(1536)]: {
     maxBlockSize: 450
+  },
+  [theme.breakpoints.down('lg')]: {
+    maxBlockSize: 350
   }
 }))
 
@@ -98,26 +112,31 @@ const LoginPage = ({ mode }: { mode: SystemMode }) => {
   // Vars
   const darkImg = '/images/pages/auth-mask-dark.png'
   const lightImg = '/images/pages/auth-mask-light.png'
-  const darkIllustration = '/images/illustrations/auth/v2-login-dark.png'
-  const lightIllustration = '/images/illustrations/auth/v2-login-light.png'
-  const borderedDarkIllustration = '/images/illustrations/auth/v2-login-dark-border.png'
-  const borderedLightIllustration = '/images/illustrations/auth/v2-login-light-border.png'
+
+  // const darkIllustration = '/images/illustrations/auth/v2-login-dark.png'
+  // const lightIllustration = '/images/illustrations/auth/v2-login-light.png'
+  // const borderedDarkIllustration = '/images/illustrations/auth/v2-login-dark-border.png'
+  // const borderedLightIllustration = '/images/illustrations/auth/v2-login-light-border.png'
 
   // Hooks
   const { settings } = useSettings()
   const theme = useTheme()
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
   const authBackground = useImageVariant(mode, lightImg, darkImg)
+
+  const schoolLogo = '/images/logo/school-logo.png'
+  const characterWithObject = '/images/illustrations/characters-with-objects/2.png'
+
   const searchParams = useSearchParams()
   const router = useRouter()
 
-  const characterIllustration = useImageVariant(
-    mode,
-    lightIllustration,
-    darkIllustration,
-    borderedLightIllustration,
-    borderedDarkIllustration
-  )
+  // const characterIllustration = useImageVariant(
+  //   mode,
+  //   lightIllustration,
+  //   darkIllustration,
+  //   borderedLightIllustration,
+  //   borderedDarkIllustration
+  // )
 
   const {
     control,
@@ -167,7 +186,10 @@ const LoginPage = ({ mode }: { mode: SystemMode }) => {
           }
         )}
       >
-        <LoginIllustration src={characterIllustration} alt='character-illustration' />
+        <div className='grid place-content-center gap-2 text-center'>
+          <LogoIllustration className='mx-auto' src={schoolLogo} alt='character-illustration' />
+          <LoginIllustration className='mx-auto' src={characterWithObject} alt='character-illustration' />
+        </div>
         {!hidden && (
           <MaskImg
             alt='mask'
@@ -183,7 +205,7 @@ const LoginPage = ({ mode }: { mode: SystemMode }) => {
         <div className='flex flex-col gap-6 is-full sm:is-auto md:is-full sm:max-is-[400px] md:max-is-[unset] mbs-11 sm:mbs-14 md:mbs-0'>
           <div className='flex flex-col gap-1'>
             <Typography variant='h4'>{`Welcome to ${themeConfig.templateName}! 👋🏻`}</Typography>
-            <Typography>Please sign-in to your account and start the adventure</Typography>
+            <Typography>Sistem Informasi Pemilihan Prodi. Silakan login dengan akunmu!</Typography>
           </div>
           <form noValidate autoComplete='off' onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-5'>
             <Controller

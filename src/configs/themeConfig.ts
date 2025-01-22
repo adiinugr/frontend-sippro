@@ -50,7 +50,7 @@ export type Config = {
 }
 
 const themeConfig: Config = {
-  templateName: 'ACADEMIX',
+  templateName: 'SIPPRO',
   homePageUrl: '/dashboard',
   settingsCookieName: 'my-lms',
   mode: 'light', // 'system', 'light', 'dark'

@@ -88,9 +88,11 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
                 <MenuItem href='/teacher/setting/subject-group/add'>Tambah</MenuItem>
               </SubMenu>
             </SubMenu>
-            <MenuItem icon={<i className='tabler-school' />} href='/teacher/campus'>
-              Info Kampus
-            </MenuItem>
+            <SubMenu label='Info Kampus' icon={<i className='tabler-school' />}>
+              <MenuItem href='/teacher/campus/passing-grade'>Passing Grade & Kuota</MenuItem>
+              <MenuItem href='/teacher/campus/linear-subject'>Mapel Pendukung</MenuItem>
+              <MenuItem href='/teacher/campus/graduate-info'>Info Lulusan</MenuItem>
+            </SubMenu>
             {session?.user?.roles?.includes('Super Admin') && (
               <MenuItem icon={<i className='tabler-settings-star' />} href='/teacher/role'>
                 Role
@@ -116,11 +118,16 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             <MenuItem icon={<i className='tabler-layout-dashboard' />} href='/dashboard'>
               Dashboard
             </MenuItem>
-            <MenuItem icon={<i className='tabler-school' />} href='/student/campus'>
-              Info Kampus
-            </MenuItem>
+            <SubMenu label='Info Kampus' icon={<i className='tabler-school' />}>
+              <MenuItem href='/student/campus/passing-grade'>Passing Grade & Kuota</MenuItem>
+              <MenuItem href='/student/campus/linear-subject'>Mapel Pendukung</MenuItem>
+              <MenuItem href='/student/campus/graduate-info'>Info Lulusan</MenuItem>
+            </SubMenu>
             <MenuItem icon={<i className='tabler-report-analytics' />} href='/student/report'>
               Nilai Raport
+            </MenuItem>
+            <MenuItem icon={<i className='tabler-trophy' />} href='/student/achievement'>
+              Prestasi
             </MenuItem>
             <MenuItem icon={<i className='tabler-message-chatbot' />} href='/student/chat-ai'>
               Tanya AI

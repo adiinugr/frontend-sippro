@@ -81,6 +81,7 @@ const UserStudentAdd = () => {
       nis,
       nisn,
       placeOfBirth,
+      status: 'student',
       dateOfBirth: dateOfBirth?.toISOString()
     }
 

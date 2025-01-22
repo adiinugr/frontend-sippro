@@ -14,7 +14,7 @@ const EditPage = async ({ params }: { params: { id: number } }) => {
   // Vars
   const data = await getSubjectGroupById(params.id)
 
-  if (data.statusCode === 404) {
+  if (!data) {
     redirect('/not-found')
   }
 

@@ -10,6 +10,11 @@ const nextConfig = {
         locale: false
       }
     ]
+  },
+  webpack: config => {
+    config.resolve.alias.canvas = false
+
+    return config
   }
 }
 

@@ -10,7 +10,7 @@ type Props = {
 }
 
 export default function StudentProfile({ data }: Props) {
-  const subjectGroup = data.result.stTSbgTc.map(
+  const subjectGroup = data?.result?.stTSbgTc?.map(
     (item: { clsrmsToSbjg: { subjectGroup: { lessonYear: { name: string } } } }) => {
       return item.clsrmsToSbjg.subjectGroup.lessonYear.name
     }

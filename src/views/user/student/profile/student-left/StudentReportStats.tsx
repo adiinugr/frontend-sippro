@@ -10,6 +10,8 @@ import { Button, CardActions } from '@mui/material'
 import classnames from 'classnames'
 
 // Components Imports
+import { useSession } from 'next-auth/react'
+
 import CustomAvatar from '@core/components/mui/Avatar'
 
 // Type
@@ -22,6 +24,9 @@ type Props = {
 
 const StudentReportStats = ({ studentMarksBySemester }: Props) => {
   // Props
+  const { data: session } = useSession()
+
+  const userStatus = session ? session.user.status : null
 
   return (
     <Card className='bs-full'>
@@ -58,9 +63,13 @@ const StudentReportStats = ({ studentMarksBySemester }: Props) => {
           ))}
         </div>
       </CardContent>
-      <CardActions>
-        <Button variant='tonal'>Input Nilai</Button>
-      </CardActions>
+      {userStatus === 'student' && (
+        <CardActions>
+          <Button href='/student/report' variant='tonal'>
+            Input Nilai
+          </Button>
+        </CardActions>
+      )}
     </Card>
   )
 }

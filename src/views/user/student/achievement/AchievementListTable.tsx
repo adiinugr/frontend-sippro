@@ -4,19 +4,17 @@
 import { useEffect, useState, useMemo } from 'react'
 
 // MUI Imports
-import { useRouter } from 'next/navigation'
-
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import TablePagination from '@mui/material/TablePagination'
 import MenuItem from '@mui/material/MenuItem'
-import { FormHelperText, IconButton } from '@mui/material'
+import { IconButton, Tooltip } from '@mui/material'
 
 // Third-party Imports
 import classnames from 'classnames'
-
+import { toast } from 'react-toastify'
 import {
   createColumnHelper,
   flexRender,
@@ -35,19 +33,25 @@ import { rankItem, type RankingInfo } from '@tanstack/match-sorter-utils'
 // Type Imports
 import type { TextFieldProps } from '@mui/material/TextField'
 
-import { toast } from 'react-toastify'
-
-import type { SubjectGroupListType } from '@/types/subjectGroupTypes'
+import type { AchievementType, AddAchievementType } from '@/types/achievementTypes'
 
 // Component Imports
 import TablePaginationComponent from '@components/TablePaginationComponent'
-import AddSubjectListDrawer from './AddSubjectListDrawer'
+import AddAchievementDrawer from './AddAchievementDrawer'
 import CustomTextField from '@core/components/mui/TextField'
-import EditSubjectListDrawer from '@/views/subject-group/edit/EditSubjectListDrawer'
+import DeleteDialog from '@/components/other/DeleteDialog'
+import UpdateAchievementDrawer from './UpdateAchievementDrawer'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
-import { createSubjectsToSubjectGroup, deleteSubjectsToSubjectGroupById } from '@/libs/actions/subjectsToSubjectGroups'
+
+// Actions
+import {
+  createAchievements,
+  deleteAchievementById,
+  getAchievementById,
+  updateAchievement
+} from '@/libs/actions/achievements'
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -58,7 +62,14 @@ declare module '@tanstack/table-core' {
   }
 }
 
-type SubjectGroupListTypeWithAction = SubjectGroupListType & {
+type AchievementTypeWithAction = {
+  id: number
+  title: string
+  category: string
+  medal: string
+  level: string
+  organizer: string
+  date: string
   action?: string
 }
 
@@ -105,131 +116,188 @@ const DebouncedInput = ({
 }
 
 // Column Definitions
-const columnHelper = createColumnHelper<SubjectGroupListTypeWithAction>()
+const columnHelper = createColumnHelper<AchievementTypeWithAction>()
 
-const SubjectGroupEditListTable = ({
-  mappedSubjectsData,
-  subjectData,
-  selectedSubjectGroup
-}: {
-  mappedSubjectsData: any
-  subjectData: any
-  selectedSubjectGroup: any
-}) => {
-  const { push } = useRouter()
-
+const AchievementListTable = ({ tableData, studentId }: { tableData?: AchievementType[]; studentId: number }) => {
   // States
-  const [addSubjectOpen, setAddSubjectOpen] = useState(false)
-  const [editSubjectOpen, setEditSubjectOpen] = useState(false)
   const [rowSelection, setRowSelection] = useState({})
-
-  const [data, setData] = useState(...[mappedSubjectsData])
-  const [error, setError] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-
-  const [selectedEditSubject, setSelecteEditSubject] = useState<{ subjectOrder: number; name: string }>({
-    subjectOrder: 0,
-    name: ''
-  })
-
   const [globalFilter, setGlobalFilter] = useState('')
 
-  const handleClickEdit = (original: SubjectGroupListTypeWithAction) => {
-    setSelecteEditSubject(original)
-    setEditSubjectOpen(true)
+  // Crud State
+  const [addAchievementOpen, setAddAchievementOpen] = useState(false)
+  const [updateAchievementOpen, setUpdateAchievementOpen] = useState(false)
+
+  const [selectedDataById, setSelectedDataById] = useState<{
+    id: number | null
+    title: string
+    category: string
+    medal: string
+    level: string
+    organizer: string
+    date: string
+  }>({
+    id: null,
+    title: '',
+    category: '',
+    medal: '',
+    level: '',
+    organizer: '',
+    date: ''
+  })
+
+  // Delete Actions
+  const [openDialog, setOpenDialog] = useState<boolean>(false)
+  const [selectedId, setSelectedId] = useState<number>(0)
+
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  const handleOpenDialog = (id: number) => {
+    setSelectedId(id)
+    setOpenDialog(true)
   }
 
-  useEffect(() => {
-    if (data.length === 0) {
-      setError('Mata pelajaran tidak boleh kosong!')
-    } else {
-      setError('')
-    }
-  }, [data?.length, error])
-
-  const handleSubmit = async () => {
-    const mappedSubjectData = data.map((subject: { name: string; subjectOrder: number }) => {
-      const filteredData: { id: number }[] = subjectData.filter((value: { name: string }) => value.name == subject.name)
-
-      return {
-        subjectOrder: subject.subjectOrder,
-        id: filteredData[0].id
-      }
-    })
-
+  // Crud Operations
+  const handleDeleteData = async () => {
     setIsLoading(true)
 
     try {
-      await deleteSubjectsToSubjectGroupById(selectedSubjectGroup.id)
+      const res = await deleteAchievementById(selectedId)
 
-      const subjectToSubjectGroupPromise = await Promise.all(
-        mappedSubjectData.map(async (val: { subjectOrder: number; id: number }) => {
-          const res = await createSubjectsToSubjectGroup({
-            subjectOrder: val.subjectOrder,
-            subjectId: val.id,
-            subjectGroupId: selectedSubjectGroup.id
-          })
+      setIsLoading(false)
+      setOpenDialog(false)
 
-          return res
-        })
-      )
-
-      const isResError = subjectToSubjectGroupPromise.some(el => el.statusCode !== 201)
-
-      if (isResError) {
-        toast.error(`Gagal mengubah Data Mapel! Silakan hubungi Admin!`)
-        setIsLoading(false)
+      if (res.statusCode === 200) {
+        toast.success(`Berhasil menghapus data!`)
 
         return
       }
 
-      toast.success(`Berhasil mengubah Data Mapel!`)
-      setIsLoading(false)
-
-      push('/teacher/setting/subject-group/list')
+      toast.error(`Gagal menghapus data!`)
     } catch (error) {
       setIsLoading(false)
+      setOpenDialog(false)
 
-      toast.error(`Gagal mengubah Data Mapel! Silakan hubungi Admin!`)
+      toast.error(`Gagal menghapus data!`)
     }
   }
 
-  const columns = useMemo<ColumnDef<SubjectGroupListTypeWithAction, any>[]>(
+  const handleUpdate = async (val: AddAchievementType, id: number) => {
+    setIsLoading(true)
+
+    try {
+      const res = await updateAchievement(val, id)
+
+      setIsLoading(false)
+      setOpenDialog(false)
+
+      if (res.statusCode === 200) {
+        toast.success(`Berhasil mengupdate data!`)
+
+        return
+      }
+
+      toast.error(`Gagal mengupdate data! ${res.result.response.message[0]}`)
+    } catch (error) {
+      setIsLoading(false)
+      setOpenDialog(false)
+
+      toast.error(`Gagal mengupdate data!`)
+    }
+  }
+
+  const handleOpenUpdateDrawer = async (id: number) => {
+    const selectedData = await getAchievementById(id)
+
+    setSelectedDataById(selectedData.result)
+
+    setUpdateAchievementOpen(true)
+  }
+
+  const handleCreate = async (data: AddAchievementType) => {
+    const { title, category, level, medal, organizer, date } = data
+
+    setIsLoading(true)
+
+    try {
+      const res = await createAchievements({
+        title,
+        category,
+        level,
+        medal,
+        organizer,
+        date: date?.toISOString() as string,
+        studentId
+      })
+
+      setIsLoading(false)
+      setOpenDialog(false)
+
+      if (res.statusCode === 201) {
+        toast.success(`Berhasil menambah data!`)
+
+        return
+      }
+
+      toast.error(`Gagal menambah data! ${res.result.response.message[0]}`)
+    } catch (error) {
+      setIsLoading(false)
+      setOpenDialog(false)
+
+      toast.error(`Gagal menambah data!`)
+    }
+  }
+
+  // End Crud
+
+  const columns = useMemo<ColumnDef<AchievementTypeWithAction, any>[]>(
     () => [
-      columnHelper.accessor('subjectOrder', {
-        header: 'No Urut',
+      columnHelper.accessor('title', {
+        header: 'Nama Kejuaraan',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
-            {row.original.subjectOrder}
+            {row.original.title}
           </Typography>
         )
       }),
-      columnHelper.accessor('name', {
-        header: 'Nama Mapel',
+      columnHelper.accessor('category', {
+        header: 'Kategori',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
-            {row.original.name}
+            {row.original.category}
           </Typography>
         )
       }),
+      columnHelper.accessor('medal', {
+        header: 'Predikat Juara',
+        cell: ({ row }) => (
+          <Typography className='capitalize' color='text.primary'>
+            {row.original.medal}
+          </Typography>
+        )
+      }),
+      columnHelper.accessor('level', {
+        header: 'Tingkat',
+        cell: ({ row }) => (
+          <Typography className='capitalize' color='text.primary'>
+            {row.original.level}
+          </Typography>
+        )
+      }),
+
       columnHelper.accessor('action', {
         header: 'Action',
         cell: ({ row }) => (
           <div className='flex items-center'>
-            <IconButton
-              onClick={() =>
-                setData(
-                  data?.filter(
-                    (product: { subjectOrder: number }) => product.subjectOrder !== row.original.subjectOrder
-                  )
-                )
-              }
-            >
-              <i className='tabler-trash text-textSecondary' />
-            </IconButton>
-            <IconButton onClick={() => handleClickEdit(row.original)}>
-              <i className='tabler-edit text-textSecondary' />
-            </IconButton>
+            <Tooltip title='Delete'>
+              <IconButton onClick={() => handleOpenDialog(row.original.id)}>
+                <i className='tabler-trash text-textSecondary' />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title='Edit'>
+              <IconButton onClick={() => handleOpenUpdateDrawer(row.original.id)}>
+                <i className='tabler-edit text-textSecondary' />
+              </IconButton>
+            </Tooltip>
           </div>
         ),
         enableSorting: false
@@ -237,11 +305,11 @@ const SubjectGroupEditListTable = ({
     ],
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [data]
+    [tableData]
   )
 
   const table = useReactTable({
-    data: data as SubjectGroupListType[],
+    data: tableData as AchievementType[],
     columns,
     filterFns: {
       fuzzy: fuzzyFilter
@@ -251,12 +319,6 @@ const SubjectGroupEditListTable = ({
       globalFilter
     },
     initialState: {
-      sorting: [
-        {
-          id: 'subjectOrder',
-          desc: false
-        }
-      ],
       pagination: {
         pageSize: 10
       }
@@ -278,7 +340,7 @@ const SubjectGroupEditListTable = ({
   return (
     <>
       <Card>
-        <CardHeader title='Data Mata Pelajaran' className='pbe-4' />
+        <CardHeader title='Data Jenjang' className='pbe-4' />
         <div className='flex justify-between flex-col items-start md:flex-row md:items-center p-6 border-bs gap-4'>
           <CustomTextField
             select
@@ -294,16 +356,16 @@ const SubjectGroupEditListTable = ({
             <DebouncedInput
               value={globalFilter ?? ''}
               onChange={value => setGlobalFilter(String(value))}
-              placeholder='Cari Mapel'
+              placeholder='Cari Jenjang'
               className='max-sm:is-full'
             />
             <Button
-              variant='tonal'
+              variant='contained'
               startIcon={<i className='tabler-plus' />}
-              onClick={() => setAddSubjectOpen(!addSubjectOpen)}
+              onClick={() => setAddAchievementOpen(!addAchievementOpen)}
               className='max-sm:is-full'
             >
-              Tambah Mapel
+              Tambah Jenjang
             </Button>
           </div>
         </div>
@@ -362,7 +424,6 @@ const SubjectGroupEditListTable = ({
             )}
           </table>
         </div>
-        <div className='p-6'>{error && <FormHelperText error>{error}</FormHelperText>}</div>
         <TablePagination
           component={() => <TablePaginationComponent table={table} />}
           count={table.getFilteredRowModel().rows.length}
@@ -372,36 +433,28 @@ const SubjectGroupEditListTable = ({
             table.setPageIndex(page)
           }}
         />
-
-        <div className='p-6 grid place-content-end'>
-          <Button
-            disabled={isLoading}
-            type='submit'
-            onClick={handleSubmit}
-            fullWidth
-            variant='contained'
-            className='capitalize w-fit'
-            startIcon={<i className='tabler-device-floppy' />}
-          >
-            {isLoading ? 'Loading...' : 'Simpan Data Mapel'}
-          </Button>
-        </div>
       </Card>
-      <AddSubjectListDrawer
-        open={addSubjectOpen}
-        handleClose={() => setAddSubjectOpen(!addSubjectOpen)}
-        selectedSubjects={data}
-        setData={setData}
+      <AddAchievementDrawer
+        open={addAchievementOpen}
+        isLoading={isLoading}
+        handleClose={() => setAddAchievementOpen(!addAchievementOpen)}
+        handleCreate={handleCreate}
       />
-      <EditSubjectListDrawer
-        open={editSubjectOpen}
-        handleClose={() => setEditSubjectOpen(!editSubjectOpen)}
-        selectedSubjects={data}
-        setData={setData}
-        selectedEditSubject={selectedEditSubject}
+      <UpdateAchievementDrawer
+        open={updateAchievementOpen}
+        selectedData={selectedDataById}
+        isLoading={isLoading}
+        handleClose={() => setUpdateAchievementOpen(!updateAchievementOpen)}
+        handleUpdate={(val, id) => handleUpdate(val, id)}
+      />
+      <DeleteDialog
+        open={openDialog}
+        isLoading={isLoading}
+        handleClose={() => setOpenDialog(false)}
+        handleSubmit={handleDeleteData}
       />
     </>
   )
 }
 
-export default SubjectGroupEditListTable
+export default AchievementListTable

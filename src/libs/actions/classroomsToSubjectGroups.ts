@@ -55,10 +55,26 @@ async function deleteClassroomsToSubjectGroupById(subjectGroupId: number) {
   }
 }
 
+async function deleteClassroomsToSubjectGroupByClassroomsId(classroomId: number, subjectGroupId: number) {
+  try {
+    const res = await fetch(
+      `${NEXT_PUBLIC_API_URL}/classrooms-to-subject-group/delete-by-classroom-id/${classroomId}/${subjectGroupId}`,
+      {
+        method: 'DELETE'
+      }
+    )
+
+    return res.json()
+  } catch (error) {
+    return error
+  }
+}
+
 export {
   createClasroomsToSubjectGroup,
   getClasroomsToSubjectGroup,
 
   // updateClassroomsToSubjectGroup,
-  deleteClassroomsToSubjectGroupById
+  deleteClassroomsToSubjectGroupById,
+  deleteClassroomsToSubjectGroupByClassroomsId
 }

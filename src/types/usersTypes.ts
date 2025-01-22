@@ -10,6 +10,15 @@ export type StudentType = {
   email: string
   placeOfBirth: string
   dateOfBirth: string
+  achievements: {
+    id: number
+    title: string
+    category: string
+    medal: string
+    level: string
+    organizer: string
+    date: string
+  }[]
   stTSbgTc: {
     clsrmsToSbjg: {
       id: number

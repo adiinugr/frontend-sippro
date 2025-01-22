@@ -114,14 +114,6 @@ const DebouncedInput = ({
   return <CustomTextField {...props} value={value} onChange={e => setValue(e.target.value)} />
 }
 
-// Vars
-
-// const userStudentStatusObj: UserStudentStatusType = {
-//   Validated: 'success',
-//   'Waiting for Validation': 'warning',
-//   Initiating: 'secondary'
-// }
-
 const sortedClassroomArray = (array: any[]) => {
   return array.sort((a, b) => a.clsrmsToSbjg.classroom.name.localeCompare(b.clsrmsToSbjg.classroom.name))
 }
@@ -266,9 +258,14 @@ const UserStudentListTable = ({ tableData }: { tableData?: StudentType[] }) => {
                 <i className='tabler-report-analytics text-textSecondary' />
               </IconButton>
             </Tooltip>
+            <Tooltip title='Prestasi'>
+              <IconButton onClick={() => push(`/teacher/user/student/achievement/${row.original.id}`)}>
+                <i className='tabler-trophy text-textSecondary' />
+              </IconButton>
+            </Tooltip>
             <Tooltip title='Tanya AI'>
               <IconButton onClick={() => push(`/teacher/user/student/chat-ai/${row.original.id}`)}>
-                <i className='tabler-brand-openai text-textSecondary' />
+                <i className='tabler-message-chatbot text-textSecondary' />
               </IconButton>
             </Tooltip>
           </div>

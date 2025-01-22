@@ -10,7 +10,7 @@ import classnames from 'classnames'
 // Styles imports
 import { Button } from '@mui/material'
 
-import styles from './styles.module.css'
+import styles from '../styles.module.css'
 
 const CampusHeader = () => {
   return (
