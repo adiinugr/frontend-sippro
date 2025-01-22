@@ -171,7 +171,7 @@ const SubjectGroupListTable = ({
         header: 'Tahun Pelajaran',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
-            {row.original.lessonYear}
+            {row.original.lessonYear.name}
           </Typography>
         )
       }),
@@ -179,7 +179,7 @@ const SubjectGroupListTable = ({
         header: 'Kelas',
         cell: ({ row }) => (
           <Typography className='capitalize' color='text.primary'>
-            {row.original.grade}
+            {row.original.grade.name}
           </Typography>
         )
       }),

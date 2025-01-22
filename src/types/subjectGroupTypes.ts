@@ -1,8 +1,14 @@
 export type SubjectGroupType = {
   id: number
   name: string
-  lessonYear: string
-  grade: string
+  lessonYear: {
+    id: number
+    name: string
+  }
+  grade: {
+    id: number
+    name: string
+  }
   sbjsToSbjgs: {
     subject: {
       id: number

@@ -43,7 +43,13 @@ const NonMemoizedMarkdown = ({ children, className }: { children: string; classN
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     a: ({ node, children, ...props }) => {
       return (
-        <Link className='text-blue-500 hover:underline' target='_blank' rel='noreferrer' {...props}>
+        <Link
+          href={children as string}
+          className='text-blue-500 hover:underline'
+          target='_blank'
+          rel='noreferrer'
+          {...props}
+        >
           {children}
         </Link>
       )

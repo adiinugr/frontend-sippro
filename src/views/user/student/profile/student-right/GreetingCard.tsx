@@ -11,7 +11,7 @@ import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
 
 // Types
-import { StudentType } from '@/types/usersTypes'
+import type { StudentType } from '@/types/usersTypes'
 
 type Props = {
   studentData: StudentType

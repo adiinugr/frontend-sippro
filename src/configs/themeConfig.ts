@@ -34,6 +34,7 @@ type Footer = {
 }
 
 export type Config = {
+  toastPosition: string
   templateName: string
   homePageUrl: string
   settingsCookieName: string
@@ -72,7 +73,8 @@ const themeConfig: Config = {
     contentWidth: 'compact', // 'compact', 'wide'
     detached: true //! true, false (This will not work in the Horizontal Layout)
   },
-  disableRipple: false // true, false
+  disableRipple: false, // true, false
+  toastPosition: 'top-center'
 }
 
 export default themeConfig
