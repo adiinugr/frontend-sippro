@@ -27,7 +27,7 @@ interface Props {
 }
 
 const SubjectLineChart = ({ data }: Props) => {
-  const series = [{ data: data.data }]
+  const series = [{ data: data.data.filter(val => val !== 0) }]
 
   // Hooks
   const theme = useTheme()

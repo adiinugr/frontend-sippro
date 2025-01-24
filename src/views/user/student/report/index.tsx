@@ -33,7 +33,7 @@ const sortLessonYear = (arr: any[]) => {
 }
 
 const ReportInput = ({ studentData }: Props) => {
-  const [value, setValue] = useState(studentData.stTSbgTc[0]?.clsrmsToSbjg.subjectGroup.lessonYear.name)
+  const [value, setValue] = useState(sortLessonYear(studentData.stTSbgTc)[0]?.clsrmsToSbjg.subjectGroup.lessonYear.name)
 
   const handleTabChange = (event: SyntheticEvent, newValue: string) => {
     setValue(newValue)
@@ -63,7 +63,7 @@ const ReportInput = ({ studentData }: Props) => {
             ))}
           </CustomTabList>
 
-          {studentData.stTSbgTc.map(item => (
+          {sortLessonYear(studentData.stTSbgTc).map(item => (
             <TabPanel key={item.clsrmsToSbjg.id} value={item.clsrmsToSbjg.subjectGroup.lessonYear.name}>
               <ReportInputForm
                 subjectData={item.clsrmsToSbjg.subjectGroup.sbjsToSbjgs}

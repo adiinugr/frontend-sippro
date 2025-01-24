@@ -28,6 +28,8 @@ const StudentReportStats = ({ studentMarksBySemester }: Props) => {
 
   const userStatus = session ? session.user.status : null
 
+  console.log(studentMarksBySemester[0].marks.every(val => val.mark !== 0))
+
   return (
     <Card className='bs-full'>
       <CardContent>
@@ -43,19 +45,16 @@ const StudentReportStats = ({ studentMarksBySemester }: Props) => {
           </CustomAvatar>
         </div>
         <div className='flex justify-between items-center mt-8'>
-          {studentMarksBySemester.map((mark: { semester: string; marks: string | any[] }) => (
+          {studentMarksBySemester.map((mark: { semester: string; marks: any[] }) => (
             <div key={mark.semester} className='grid place-items-center gap-1'>
               <CustomAvatar
                 variant='rounded'
-                color={mark.marks.length > 0 ? 'success' : 'error'}
+                color={mark.marks.every(val => val.mark !== 0) ? 'success' : 'error'}
                 skin='light-static'
                 size={32}
               >
                 <i
-                  className={classnames(
-                    { 'tabler-circle-check': mark.marks.length > 0, 'tabler-playstation-x': mark.marks.length == 0 },
-                    'text-[22px]'
-                  )}
+                  className={`${mark.marks.every(val => val.mark !== 0) ? 'tabler-circle-check' : 'tabler-playstation-x'} text-[22px]`}
                 />
               </CustomAvatar>
               <Typography variant='subtitle2'>{`SMT ${mark.semester}`}</Typography>

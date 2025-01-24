@@ -8,6 +8,10 @@ import { fetchStudents } from '@/libs/actions/students'
 const UserStudentListPage = async () => {
   const studentData = await fetchStudents()
 
+  if (!studentData.result) {
+    return <p>Tidak ada data!</p>
+  }
+
   return <UserStudentList userStudentData={studentData.result} />
 }
 

@@ -8,6 +8,10 @@ import { fetchTeachers } from '@/libs/actions/teachers'
 const UserTeacherListPage = async () => {
   const teacherData = await fetchTeachers()
 
+  if (!teacherData.result) {
+    return <p>Tidak ada data!</p>
+  }
+
   return <UserTeacherList userTeacherData={teacherData.result} />
 }
 
