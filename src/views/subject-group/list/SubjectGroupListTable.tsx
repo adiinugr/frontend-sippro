@@ -44,7 +44,7 @@ import CustomTextField from '@core/components/mui/TextField'
 import DeleteDialog from '@/components/other/DeleteDialog'
 
 // Type Imports
-import type { SubjectGroupType } from '@/types/subjectGroupTypes'
+import type { SubjectGroupTableType } from '@/types/subjectGroupTypes'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
@@ -139,7 +139,7 @@ const SubjectGroupListTable = ({
   lessonYearData,
   gradeData
 }: {
-  tableData?: SubjectGroupType[]
+  tableData?: SubjectGroupTableType[]
   lessonYearData: { id: number; name: string }[]
   gradeData: { id: number; name: string }[]
 }) => {
@@ -148,7 +148,6 @@ const SubjectGroupListTable = ({
   // States
   const [rowSelection, setRowSelection] = useState({})
 
-  // const [data, setData] = useState(...[tableData])
   const [filteredData, setFilteredData] = useState(tableData)
   const [globalFilter, setGlobalFilter] = useState('')
 
@@ -255,7 +254,7 @@ const SubjectGroupListTable = ({
   )
 
   const table = useReactTable({
-    data: filteredData as SubjectGroupType[],
+    data: filteredData as SubjectGroupTableType[],
     columns,
     filterFns: {
       fuzzy: fuzzyFilter

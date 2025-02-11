@@ -1,86 +1,57 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+// Libs
+import { apiClient } from '@/libs/api/client'
+import type { ApiResponse } from '@/libs/api/client'
+import type { GradeType } from '@/types/gradeTypes'
 
-const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
+// Constants
+const GRADES_PATH = '/grade'
+const REVALIDATE_PATH = '/setting/grade'
 
-async function fetchGrades() {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/grade`, {
-      method: 'GET',
-      cache: 'no-cache'
-    })
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+// Actions
+export async function fetchGrades(): Promise<ApiResponse<GradeType[]>> {
+  return apiClient<GradeType[]>(GRADES_PATH, {
+    method: 'GET',
+    cache: 'no-cache'
+  })
 }
 
-async function createGrade(data: { name: string }) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/grade`, {
+export async function createGrade(data: { name: string }): Promise<ApiResponse<GradeType>> {
+  return apiClient<GradeType>(
+    GRADES_PATH,
+    {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(data)
-    })
-
-    revalidatePath('/setting/grade')
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
-async function getGradeById(id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/grade/${id}`, {
-      method: 'GET'
-    })
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+export async function getGradeById(id: number): Promise<ApiResponse<GradeType>> {
+  return apiClient<GradeType>(`${GRADES_PATH}/${id}`, {
+    method: 'GET',
+    cache: 'no-cache'
+  })
 }
 
-async function updateGrade(data: { name: string }, id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/grade/${id}`, {
+export async function updateGrade(id: number, data: { name: string }): Promise<ApiResponse<GradeType>> {
+  return apiClient<GradeType>(
+    `${GRADES_PATH}/${id}`,
+    {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(data)
-    })
-
-    revalidatePath('/setting/grade')
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
-async function deleteGradeById(id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/grade/${id}`, {
+export async function deleteGradeById(id: number): Promise<ApiResponse<void>> {
+  return apiClient(
+    `${GRADES_PATH}/${id}`,
+    {
       method: 'DELETE'
-    })
-
-    revalidatePath('/setting/grade')
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
-
-export { fetchGrades, createGrade, getGradeById, updateGrade, deleteGradeById }

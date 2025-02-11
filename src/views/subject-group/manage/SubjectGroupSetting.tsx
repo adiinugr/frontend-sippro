@@ -11,28 +11,14 @@ import { Card, CardContent, CardHeader, Tab } from '@mui/material'
 // Components Import
 import CustomTabList from '@/@core/components/mui/TabList'
 import ManageClassroomListTable from '@/views/subject-group/manage/ManageClassroomListTable'
+import type { SubjectGroupType } from '@/types/subjectGroupTypes'
 
 interface ClassroomDataProps {
   subjectGroup: {
     id: number
     name: string
   }
-  classroomData: {
-    id: number
-    classroom: {
-      id: number
-      name: string
-      gradeId: number
-    }
-    stdsToSbjgsToClsrms: {
-      student: {
-        id: number
-        name: string
-        nis: string
-        nisn: string
-      }
-    }[]
-  }[]
+  classroomData: SubjectGroupType['clsrmsToSbjgs']
 }
 
 const SubjectGroupSetting = ({ subjectGroup, classroomData }: ClassroomDataProps) => {

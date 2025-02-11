@@ -1,28 +1,39 @@
+// Next Imports
 import { redirect } from 'next/navigation'
 
-import { Grid } from '@mui/material'
+// MUI Imports
+import Grid from '@mui/material/Grid'
 
 // Components
 import UserStudentEdit from '@/views/user/student/edit'
+import DataError from '@/components/other/DataError'
 
-// Actons
+// Actions
+import { auth } from '@/libs/auth'
 import { getStudentById } from '@/libs/actions/students'
 
-const StudentEditPage = async ({ params }: { params: { id: number } }) => {
-  // Vars
-  const data = await getStudentById(params.id)
+// Types
+import type { Session } from '@/types/auth'
+import type { StudentType } from '@/types/usersTypes'
 
-  if (data.statusCode === 404) {
-    redirect('/not-found')
+export default async function StudentEditPage({ params }: { params: { id: number } }) {
+  const session = (await auth()) as Session | null
+
+  if (!session || session.user.status !== 'teacher') {
+    redirect('/dashboard')
   }
 
-  return data ? (
+  const { result: student, statusCode } = await getStudentById(params.id)
+
+  if (statusCode !== 200) {
+    return <DataError />
+  }
+
+  return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
-        <UserStudentEdit selectedData={data.result} />
+        <UserStudentEdit selectedData={student as StudentType} />
       </Grid>
     </Grid>
-  ) : null
+  )
 }
-
-export default StudentEditPage

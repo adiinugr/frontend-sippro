@@ -239,8 +239,8 @@ const UserStudentListTable = ({ tableData }: { tableData?: StudentType[] }) => {
         cell: ({ row }) => (
           <div className='flex items-center'>
             <Tooltip title='Hapus'>
-              <IconButton onClick={() => handleOpenDialog(row.original.id)} color='error'>
-                <i className='tabler-trash' />
+              <IconButton onClick={() => handleOpenDialog(row.original.id)}>
+                <i className='tabler-trash text-textSecondary' />
               </IconButton>
             </Tooltip>
             <Tooltip title='Preview'>
@@ -407,7 +407,7 @@ const UserStudentListTable = ({ tableData }: { tableData?: StudentType[] }) => {
           </table>
         </div>
         <TablePagination
-          component={() => <TablePaginationComponent table={table} />}
+          component={() => <TablePaginationComponent table={table as any} />}
           count={table.getFilteredRowModel().rows.length}
           rowsPerPage={table.getState().pagination.pageSize}
           page={table.getState().pagination.pageIndex}

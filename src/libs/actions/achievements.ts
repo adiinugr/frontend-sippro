@@ -1,96 +1,60 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+// Libs
+import { apiClient } from '@/libs/api/client'
+import type { ApiResponse } from '@/libs/api/client'
 
-import type { AddAchievementType } from '@/types/achievementTypes'
+// Types
+import type { AchievementType, AddAchievementType } from '@/types/achievementTypes'
 
-const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
+// Constants
+const ACHIEVEMENTS_PATH = '/achievement'
+const REVALIDATE_PATH = '/'
 
-async function fetchAchievements() {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/achievement`, {
-      method: 'GET',
-      cache: 'no-cache'
-    })
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+// Actions
+async function fetchAchievements(): Promise<ApiResponse<AchievementType[]>> {
+  return apiClient<AchievementType[]>(ACHIEVEMENTS_PATH, {
+    method: 'GET',
+    cache: 'no-cache'
+  })
 }
 
-async function createAchievements(data: {
-  title: string
-  category: string
-  medal: string
-  level: string
-  organizer: string
-  date: string
-  studentId: number
-}) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/achievement`, {
+async function createAchievements(data: AchievementType): Promise<ApiResponse<AchievementType>> {
+  return apiClient<AchievementType>(
+    ACHIEVEMENTS_PATH,
+    {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(data)
-    })
-
-    revalidatePath('/')
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
-async function getAchievementById(id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/achievement/${id}`, {
-      method: 'GET'
-    })
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+async function getAchievementById(id: number): Promise<ApiResponse<AchievementType>> {
+  return apiClient<AchievementType>(`${ACHIEVEMENTS_PATH}/${id}`, {
+    method: 'GET'
+  })
 }
 
-async function updateAchievement(data: AddAchievementType, id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/achievement/${id}`, {
+async function updateAchievement(id: number, data: AddAchievementType): Promise<ApiResponse<AchievementType>> {
+  return apiClient<AchievementType>(
+    `${ACHIEVEMENTS_PATH}/${id}`,
+    {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(data)
-    })
-
-    revalidatePath('/')
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
-async function deleteAchievementById(id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/achievement/${id}`, {
+async function deleteAchievementById(id: number): Promise<ApiResponse<void>> {
+  return apiClient(
+    `${ACHIEVEMENTS_PATH}/${id}`,
+    {
       method: 'DELETE'
-    })
-
-    revalidatePath('/')
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
 export { fetchAchievements, createAchievements, getAchievementById, updateAchievement, deleteAchievementById }

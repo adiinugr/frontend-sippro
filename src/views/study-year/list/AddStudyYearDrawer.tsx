@@ -9,7 +9,7 @@ import Divider from '@mui/material/Divider'
 import { useForm, Controller } from 'react-hook-form'
 
 // Types Imports
-import type { StudyYearType } from '@/types/studyYearTypes'
+import type { StudyYearType } from '@/types/lessonYearTypes'
 
 // Component Imports
 import CustomTextField from '@core/components/mui/TextField'

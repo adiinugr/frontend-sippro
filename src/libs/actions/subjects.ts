@@ -1,86 +1,71 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+// Libs
+import { apiClient } from '@/libs/api/client'
+import type { ApiResponse } from '@/libs/api/client'
 
-const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
-
-async function fetchSubjects() {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/subject`, {
-      method: 'GET',
-      cache: 'no-cache'
-    })
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+// Types
+interface Subject {
+  id: number
+  name: string
+  code: string
 }
 
-async function createSubject(data: { name: string }) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/subject`, {
+interface CreateSubjectDto {
+  name: string
+}
+
+interface UpdateSubjectDto {
+  name: string
+  code: string
+}
+
+// Constants
+const SUBJECTS_PATH = '/subject'
+const REVALIDATE_PATH = '/setting/subject'
+
+// Actions
+export async function fetchSubjects(): Promise<ApiResponse<Subject[]>> {
+  return apiClient<Subject[]>(SUBJECTS_PATH, {
+    method: 'GET',
+    cache: 'no-cache'
+  })
+}
+
+export async function createSubject(data: CreateSubjectDto): Promise<ApiResponse<Subject>> {
+  return apiClient<Subject>(
+    SUBJECTS_PATH,
+    {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(data)
-    })
-
-    revalidatePath('/setting/subject')
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
-async function getSubjectById(id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/subject/${id}`, {
-      method: 'GET'
-    })
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+export async function getSubjectById(id: number): Promise<ApiResponse<Subject>> {
+  return apiClient<Subject>(`${SUBJECTS_PATH}/${id}`, {
+    method: 'GET'
+  })
 }
 
-async function updateSubject(data: { code: string; name: string }, id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/subject/${id}`, {
+export async function updateSubject(id: number, data: UpdateSubjectDto): Promise<ApiResponse<Subject>> {
+  return apiClient<Subject>(
+    `${SUBJECTS_PATH}/${id}`,
+    {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(data)
-    })
-
-    revalidatePath('/setting/subject')
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
-async function deleteSubjectById(id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/subject/${id}`, {
+export async function deleteSubjectById(id: number): Promise<ApiResponse<void>> {
+  return apiClient(
+    `${SUBJECTS_PATH}/${id}`,
+    {
       method: 'DELETE'
-    })
-
-    revalidatePath('/setting/subject')
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
-
-export { fetchSubjects, createSubject, getSubjectById, updateSubject, deleteSubjectById }

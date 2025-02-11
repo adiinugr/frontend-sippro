@@ -39,7 +39,7 @@ import DeleteDialog from '@/components/other/DeleteDialog'
 import UpdateStudyYearDrawer from '@/views/study-year/list/UpdateStudyYearDrawer'
 
 // Type Imports
-import type { StudyYearType } from '@/types/studyYearTypes'
+import type { StudyYearType } from '@/types/lessonYearTypes'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'

@@ -1,96 +1,91 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+import { apiClient } from '@/libs/api/client'
+import type { ApiResponse } from '@/libs/api/client'
 
-const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
-
-type teacherPayload = {
+// Types
+export interface Teacher {
+  id: number
   email: string
-
-  // Identity
   name: string
   placeOfBirth: string
-  dateOfBirth: Date | null | undefined | string
+  dateOfBirth: string
+  createdAt: string
+  updatedAt: string
 }
 
-async function fetchTeachers() {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/teacher`, {
-      method: 'GET',
-      cache: 'no-cache'
-    })
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+export interface TeacherWithRoles extends Teacher {
+  teachersToRoles: {
+    roles: {
+      name: string
+    }
+  }[]
 }
 
-async function createTeacher(data: teacherPayload & { password: string }) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/teacher`, {
+export interface CreateTeacherDto {
+  email: string
+  name: string
+  placeOfBirth: string
+  dateOfBirth: string
+  password: string
+}
+
+export type UpdateTeacherDto = Omit<CreateTeacherDto, 'password'>
+
+// Constants
+const TEACHERS_PATH = '/teacher'
+const REVALIDATE_PATH = '/user/teacher'
+
+// Actions
+export async function fetchTeachers(): Promise<ApiResponse<Teacher[]>> {
+  return apiClient<Teacher[]>(TEACHERS_PATH, {
+    method: 'GET',
+    cache: 'no-cache'
+  })
+}
+
+export async function fetchTeachersWithRoles(): Promise<ApiResponse<TeacherWithRoles[]>> {
+  return apiClient<TeacherWithRoles[]>(`${TEACHERS_PATH}/with-roles`, {
+    method: 'GET',
+    cache: 'no-cache'
+  })
+}
+
+export async function getTeacherById(id: number): Promise<ApiResponse<Teacher>> {
+  return apiClient<Teacher>(`${TEACHERS_PATH}/${id}`, {
+    method: 'GET',
+    cache: 'no-cache'
+  })
+}
+
+export async function createTeacher(data: CreateTeacherDto): Promise<ApiResponse<Teacher>> {
+  return apiClient<Teacher>(
+    TEACHERS_PATH,
+    {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(data)
-    })
-
-    revalidatePath('/user/teacher')
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
-async function getTeacherById(id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/teacher/${id}`, {
-      method: 'GET',
-      cache: 'no-cache'
-    })
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
-}
-
-async function updateTeacherById(data: teacherPayload, id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/teacher/${id}`, {
+export async function updateTeacher(id: number, data: UpdateTeacherDto): Promise<ApiResponse<Teacher>> {
+  return apiClient<Teacher>(
+    `${TEACHERS_PATH}/${id}`,
+    {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(data)
-    })
-
-    revalidatePath('/user/teacher')
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
-async function deleteTeacherById(id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/teacher/${id}`, {
+export async function deleteTeacher(id: number): Promise<ApiResponse<void>> {
+  return apiClient(
+    `${TEACHERS_PATH}/${id}`,
+    {
       method: 'DELETE'
-    })
-
-    revalidatePath('/user/teacher')
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
-
-export { fetchTeachers, createTeacher, getTeacherById, updateTeacherById, deleteTeacherById }

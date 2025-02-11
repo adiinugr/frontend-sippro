@@ -1,59 +1,61 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+// Libs
+import { apiClient } from '@/libs/api/client'
+import type { ApiResponse } from '@/libs/api/client'
 
-const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
+// Types
+interface SubjectsToSubjectGroup {
+  subjectOrder: number
+  subjectId: number
+  subjectGroupId: number
+}
 
-async function createSubjectsToSubjectGroup(data: { subjectOrder: number; subjectId: number; subjectGroupId: number }) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/subjects-to-subject-group`, {
+interface UpdateSubjectsToSubjectGroup {
+  code: string
+  name: string
+}
+
+// Constants
+const SUBJECTS_TO_SUBJECT_GROUP_PATH = '/subjects-to-subject-group'
+const REVALIDATE_PATH = '/setting/subject-group/list'
+
+// Actions
+async function createSubjectsToSubjectGroup(
+  data: SubjectsToSubjectGroup
+): Promise<ApiResponse<SubjectsToSubjectGroup>> {
+  return apiClient<SubjectsToSubjectGroup>(
+    SUBJECTS_TO_SUBJECT_GROUP_PATH,
+    {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(data)
-    })
-
-    revalidatePath('/setting/subject-group/list')
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
-async function updateSubjectsToSubjectGroup(data: { code: string; name: string }, id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/subjects-to-subject-group/${id}`, {
+async function updateSubjectsToSubjectGroup(
+  id: number,
+  data: UpdateSubjectsToSubjectGroup
+): Promise<ApiResponse<SubjectsToSubjectGroup>> {
+  return apiClient<SubjectsToSubjectGroup>(
+    `${SUBJECTS_TO_SUBJECT_GROUP_PATH}/${id}`,
+    {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(data)
-    })
-
-    revalidatePath('/setting/subject-group/list')
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
-async function deleteSubjectsToSubjectGroupById(subjectGroupId: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/subjects-to-subject-group/${subjectGroupId}`, {
+async function deleteSubjectsToSubjectGroupById(id: number): Promise<ApiResponse<void>> {
+  return apiClient(
+    `${SUBJECTS_TO_SUBJECT_GROUP_PATH}/${id}`,
+    {
       method: 'DELETE'
-    })
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
 export { createSubjectsToSubjectGroup, updateSubjectsToSubjectGroup, deleteSubjectsToSubjectGroupById }

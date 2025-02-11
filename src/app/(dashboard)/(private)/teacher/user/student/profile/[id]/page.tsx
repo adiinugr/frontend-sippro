@@ -1,19 +1,32 @@
 import { redirect } from 'next/navigation'
 
-// Actions
-import { getStudentById } from '@/libs/actions/students'
+// Components
 import StudentProfile from '@/views/user/student/profile'
+import DataError from '@/components/other/DataError'
 
-const ProfilePage = async ({ params }: { params: { id: number } }) => {
-  // Vars
+// Libs & Actions
+import { auth } from '@/libs/auth'
+import { getStudentById } from '@/libs/actions/students'
 
-  const data = await getStudentById(params.id)
+// Types
+import type { Session } from '@/types/auth'
 
-  if (data.statusCode === 404) {
+export default async function StudentProfilePage({ params }: { params: { id: number } }) {
+  const session = (await auth()) as Session | null
+
+  if (!session || session.user.status !== 'teacher') {
+    redirect('/dashboard')
+  }
+
+  const { result: student, statusCode } = await getStudentById(params.id)
+
+  if (statusCode === 404) {
     redirect('/not-found')
   }
 
-  return data ? <StudentProfile data={data} /> : null
-}
+  if (!student) {
+    return <DataError />
+  }
 
-export default ProfilePage
+  return <StudentProfile data={{ result: student }} />
+}

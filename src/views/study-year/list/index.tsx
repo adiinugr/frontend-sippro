@@ -2,7 +2,7 @@
 import Grid from '@mui/material/Grid'
 
 // Type Imports
-import type { StudyYearType } from '@/types/studyYearTypes'
+import type { StudyYearType } from '@/types/lessonYearTypes'
 
 // Component Imports
 import StudyYearListTable from './StudyYearListTable'

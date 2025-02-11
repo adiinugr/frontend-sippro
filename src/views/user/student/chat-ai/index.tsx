@@ -41,12 +41,12 @@ const optionPromps = [
   }
 ]
 
-type Props = {
-  studentData: StudentType
+interface ChatAiProps {
+  studentData: Partial<StudentType>
 }
 
-function ChatAi({ studentData }: Props) {
-  const marks = studentData.marks.map(mark => {
+function ChatAi({ studentData }: ChatAiProps) {
+  const marks = studentData.marks?.map(mark => {
     const markArr = []
 
     markArr.push(
@@ -56,7 +56,7 @@ function ChatAi({ studentData }: Props) {
     return markArr
   })
 
-  const achievements = studentData.achievements.map(achievement => {
+  const achievements = studentData.achievements?.map(achievement => {
     const achievementArr = []
 
     achievementArr.push(
@@ -68,9 +68,9 @@ function ChatAi({ studentData }: Props) {
 
   const { messages, input, handleInputChange, handleSubmit, isLoading, append, error, reload } = useChat({
     body: {
-      mark: marks.join(', '),
-      achievements: achievements.join(', '),
-      studentName: studentData.name
+      mark: marks?.join(', ') || '',
+      achievements: achievements?.join(', ') || '',
+      studentName: studentData.name || ''
     }
   })
 

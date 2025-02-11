@@ -1,15 +1,24 @@
-// Component Imports
+// Next Imports
+import { redirect } from 'next/navigation'
+
+// Components
 import SubjectList from '@/views/subject/list'
 
-// Data Imports
-
+// Libs & Actions
+import { auth } from '@/libs/auth'
 import { fetchSubjects } from '@/libs/actions/subjects'
 
-const SubjectListPage = async () => {
-  // Vars
-  const subjectData = await fetchSubjects()
+// Types
+import type { Session } from '@/types/auth'
 
-  return <SubjectList subjectData={subjectData.result} />
+export default async function SubjectListPage() {
+  const session = (await auth()) as Session | null
+
+  if (!session || session.user.status !== 'teacher') {
+    redirect('/dashboard')
+  }
+
+  const { result: subjects } = await fetchSubjects()
+
+  return <SubjectList subjectData={subjects} />
 }
-
-export default SubjectListPage

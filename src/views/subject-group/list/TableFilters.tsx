@@ -6,11 +6,15 @@ import CardContent from '@mui/material/CardContent'
 import Grid from '@mui/material/Grid'
 import MenuItem from '@mui/material/MenuItem'
 
-// Type Imports
-import type { SubjectGroupType } from '@/types/subjectGroupTypes'
-
 // Component Imports
 import CustomTextField from '@core/components/mui/TextField'
+
+type TableData = {
+  id: number
+  name: string
+  lessonYear: string
+  grade: string
+}
 
 const TableFilters = ({
   setData,
@@ -18,19 +22,19 @@ const TableFilters = ({
   lessonYearData,
   gradeData
 }: {
-  setData: (data: SubjectGroupType[]) => void
-  tableData?: SubjectGroupType[]
+  setData: (data: any) => void
+  tableData?: TableData[]
   lessonYearData: { id: number; name: string }[]
   gradeData: { id: number; name: string }[]
 }) => {
   // States
-  const [lessonYear, setLessonYear] = useState<SubjectGroupType['lessonYear']['name']>('')
-  const [grade, setGrade] = useState<SubjectGroupType['grade']['name']>('')
+  const [lessonYear, setLessonYear] = useState('')
+  const [grade, setGrade] = useState('')
 
   useEffect(() => {
     const filteredData = tableData?.filter(item => {
-      if (lessonYear && item.lessonYear.name !== lessonYear) return false
-      if (grade && item.grade.name !== grade) return false
+      if (lessonYear && item.lessonYear !== lessonYear) return false
+      if (grade && item.grade !== grade) return false
 
       return true
     })

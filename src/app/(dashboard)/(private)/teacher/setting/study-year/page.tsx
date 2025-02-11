@@ -1,13 +1,26 @@
-// Component Imports
+// Next Imports
+import { redirect } from 'next/navigation'
+
+// Components
 import StudyYearList from '@/views/study-year/list'
+
+// Libs & Actions
+import { auth } from '@/libs/auth'
 
 // Data
 import { fetchLessonYears } from '@/libs/actions/lessonYears'
 
-const StudyYearPage = async () => {
-  const lessonYearData = await fetchLessonYears()
+// Types
+import type { Session } from '@/types/auth'
 
-  return <StudyYearList studyYearData={lessonYearData.result} />
+export default async function StudyYearPage() {
+  const session = (await auth()) as Session | null
+
+  if (!session || session.user.status !== 'teacher') {
+    redirect('/dashboard')
+  }
+
+  const { result: lessonYears } = await fetchLessonYears()
+
+  return <StudyYearList studyYearData={lessonYears} />
 }
-
-export default StudyYearPage

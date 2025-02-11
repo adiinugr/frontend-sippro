@@ -77,8 +77,6 @@ const AddSubjectGroupStudentTable = ({ open, setOpen, subjectGroup, classroom }:
             setIsLoading(false)
             handleClose()
 
-            console.log(res)
-
             return
           }
 

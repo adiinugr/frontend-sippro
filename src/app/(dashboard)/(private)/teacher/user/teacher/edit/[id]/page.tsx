@@ -8,6 +8,9 @@ import UserTeacherEdit from '@/views/user/teacher/edit'
 // Actons
 import { getTeacherById } from '@/libs/actions/teachers'
 
+// Types
+import type { TeacherType } from '@/types/usersTypes'
+
 const TeacherEditPage = async ({ params }: { params: { id: number } }) => {
   // Vars
   const data = await getTeacherById(params.id)
@@ -19,7 +22,7 @@ const TeacherEditPage = async ({ params }: { params: { id: number } }) => {
   return data ? (
     <Grid container spacing={6}>
       <Grid item xs={12}>
-        <UserTeacherEdit selectedData={data.result} />
+        <UserTeacherEdit selectedData={data.result as TeacherType} />
       </Grid>
     </Grid>
   ) : null

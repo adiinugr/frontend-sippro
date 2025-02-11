@@ -12,20 +12,9 @@ import { Grid, Tab } from '@mui/material'
 import CustomTabList from '@/@core/components/mui/TabList'
 import StudentIdentity from '@/views/user/student/edit/StudentIdentity'
 import StudentChangePassword from '@/views/user/student/edit/StudentChangePassword'
+import type { StudentType } from '@/types/usersTypes'
 
-interface Props {
-  selectedData: {
-    id: number
-    name: string
-    email: string
-    nis: string
-    nisn: string
-    placeOfBirth: string
-    dateOfBirth: string
-  }
-}
-
-const UserStudentEdit = ({ selectedData }: Props) => {
+const UserStudentEdit = ({ selectedData }: { selectedData: StudentType }) => {
   // States
   const [activeTab, setActiveTab] = useState('identity')
 

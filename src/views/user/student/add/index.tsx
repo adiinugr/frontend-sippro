@@ -103,7 +103,6 @@ const UserStudentAdd = () => {
       toast.error(`Gagal menambahkan data! ${studentRes.result.response.message[0]}`)
     } catch (error) {
       setIsLoading(false)
-      console.log(error)
 
       toast.error(`Gagal menambahkan data! Silakan hubungi Admin!`)
     }

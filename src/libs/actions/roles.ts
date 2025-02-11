@@ -1,86 +1,68 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+import { apiClient } from '@/libs/api/client'
+import type { ApiResponse } from '@/libs/api/client'
 
-const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
-
-async function fetchRoles() {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/role`, {
-      method: 'GET',
-      cache: 'no-cache'
-    })
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+// Types
+export interface Role {
+  id: number
+  name: string
+  createdAt: string
+  updatedAt: string
 }
 
-async function createRole(data: { name: string }) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/role`, {
+export interface CreateRoleDto {
+  name: string
+}
+
+// Constants
+const ROLES_PATH = '/role'
+const REVALIDATE_PATH = '/teachers/roles'
+
+// Actions
+async function fetchRoles(): Promise<ApiResponse<Role[]>> {
+  return apiClient<Role[]>(ROLES_PATH, {
+    method: 'GET',
+    cache: 'no-cache'
+  })
+}
+
+async function createRole(data: CreateRoleDto): Promise<ApiResponse<Role>> {
+  return apiClient<Role>(
+    ROLES_PATH,
+    {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(data)
-    })
-
-    revalidatePath('/role')
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
-async function getRoleById(id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/role/${id}`, {
-      method: 'GET'
-    })
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+async function getRoleById(id: number): Promise<ApiResponse<Role>> {
+  return apiClient<Role>(`${ROLES_PATH}/${id}`, {
+    method: 'GET'
+  })
 }
 
-async function updateRole(data: { name: string }, id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/role/${id}`, {
+async function updateRole(id: number, data: CreateRoleDto): Promise<ApiResponse<Role>> {
+  return apiClient<Role>(
+    `${ROLES_PATH}/${id}`,
+    {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(data)
-    })
-
-    revalidatePath('/role')
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
-async function deleteRoleById(id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/role/${id}`, {
+async function deleteRoleById(id: number): Promise<ApiResponse<void>> {
+  return apiClient(
+    `${ROLES_PATH}/${id}`,
+    {
       method: 'DELETE'
-    })
-
-    revalidatePath('/role')
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
 export { fetchRoles, createRole, getRoleById, updateRole, deleteRoleById }

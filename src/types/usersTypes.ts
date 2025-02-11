@@ -58,8 +58,15 @@ export type StudentType = {
       }
     }
   }[]
-  role?: string
-  nominationStatus?: string
+  violations: {
+    id: number
+    date: string
+    rule: {
+      id: number
+      name: string
+      point: number
+    }
+  }[]
   avatar?: string
 }
 

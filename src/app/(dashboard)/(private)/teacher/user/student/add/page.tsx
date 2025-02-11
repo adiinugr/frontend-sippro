@@ -5,7 +5,7 @@ import Grid from '@mui/material/Grid'
 
 import UserStudentAdd from '@/views/user/student/add'
 
-const StudentAddPage = async () => {
+export default async function StudentAddPage() {
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
@@ -14,5 +14,3 @@ const StudentAddPage = async () => {
     </Grid>
   )
 }
-
-export default StudentAddPage

@@ -1,86 +1,57 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+// Libs
+import { apiClient } from '@/libs/api/client'
+import type { ApiResponse } from '@/libs/api/client'
+import type { ClassroomType } from '@/types/classroomTypes'
 
-const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
+// Constants
+const CLASSROOMS_PATH = '/classroom'
+const REVALIDATE_PATH = '/setting/classroom'
 
-async function fetchClassrooms() {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/classroom`, {
-      method: 'GET',
-      cache: 'no-cache'
-    })
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+// Actions
+export async function fetchClassrooms(): Promise<ApiResponse<ClassroomType[]>> {
+  return apiClient<ClassroomType[]>(CLASSROOMS_PATH, {
+    method: 'GET',
+    cache: 'no-cache'
+  })
 }
 
-async function createClassroom(data: { name: string }) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/classroom`, {
+export async function createClassroom(data: { name: string }): Promise<ApiResponse<ClassroomType>> {
+  return apiClient<ClassroomType>(
+    CLASSROOMS_PATH,
+    {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(data)
-    })
-
-    revalidatePath('/setting/classroom')
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
-async function getClassroomById(id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/classroom/${id}`, {
-      method: 'GET'
-    })
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+export async function getClassroomById(id: number): Promise<ApiResponse<ClassroomType>> {
+  return apiClient<ClassroomType>(`${CLASSROOMS_PATH}/${id}`, {
+    method: 'GET',
+    cache: 'no-cache'
+  })
 }
 
-async function updateClassroom(data: { name: string }, id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/classroom/${id}`, {
+export async function updateClassroom(id: number, data: { name: string }): Promise<ApiResponse<ClassroomType>> {
+  return apiClient<ClassroomType>(
+    `${CLASSROOMS_PATH}/${id}`,
+    {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(data)
-    })
-
-    revalidatePath('/setting/classroom')
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
-async function deleteClassroomById(id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/classroom/${id}`, {
+export async function deleteClassroomById(id: number): Promise<ApiResponse<void>> {
+  return apiClient(
+    `${CLASSROOMS_PATH}/${id}`,
+    {
       method: 'DELETE'
-    })
-
-    revalidatePath('/setting/classroom')
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
-
-export { fetchClassrooms, createClassroom, getClassroomById, updateClassroom, deleteClassroomById }

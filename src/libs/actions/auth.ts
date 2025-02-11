@@ -1,10 +1,20 @@
 'use server'
 
+// Libs
 import type { CredentialsSignin } from 'next-auth'
 
+// Libs
+import { apiClient } from '@/libs/api/client'
+import type { ApiResponse } from '@/libs/api/client'
 import { signIn } from '@/libs/auth'
 
-const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
+// Constants
+const AUTH_PATH = '/auth/reset-password'
+
+interface ResetPasswordDto {
+  userId: number
+  password: string
+}
 
 async function loginUser(data: { email: string; password: string; loginAs: string }) {
   try {
@@ -16,40 +26,18 @@ async function loginUser(data: { email: string; password: string; loginAs: strin
   }
 }
 
-async function resetStudentPassword(data: { userId: number; password: string }) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/auth/reset-password/student`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
+async function resetStudentPassword(data: ResetPasswordDto): Promise<ApiResponse<void>> {
+  return apiClient(`${AUTH_PATH}/student`, {
+    method: 'PATCH',
+    body: JSON.stringify(data)
+  })
 }
 
-async function resetTeacherPassword(data: { userId: number; password: string }) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/auth/reset-password/teacher`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
+async function resetTeacherPassword(data: ResetPasswordDto): Promise<ApiResponse<void>> {
+  return apiClient(`${AUTH_PATH}/teacher`, {
+    method: 'PATCH',
+    body: JSON.stringify(data)
+  })
 }
 
 export { loginUser, resetStudentPassword, resetTeacherPassword }

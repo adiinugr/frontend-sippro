@@ -1,98 +1,68 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+import { apiClient } from '@/libs/api/client'
+import type { ApiResponse } from '@/libs/api/client'
+import type { StudentType } from '@/types/usersTypes'
 
-const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
-
-type studentPayload = {
+export interface CreateStudentDto {
   email: string
-
-  // Identity
   name: string
   nis: string
   nisn: string
   placeOfBirth: string
-  dateOfBirth: Date | null | undefined | string
+  dateOfBirth: string
+  password: string
 }
 
-async function fetchStudents() {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/student`, {
-      method: 'GET',
-      cache: 'no-cache'
-    })
+export type UpdateStudentDto = Omit<CreateStudentDto, 'password'>
 
-    return res.json()
-  } catch (error) {
-    return error
-  }
+// Constants
+const STUDENTS_PATH = '/student'
+const REVALIDATE_PATH = '/user/student'
+
+// Actions
+export async function fetchStudents(): Promise<ApiResponse<StudentType[]>> {
+  return apiClient<StudentType[]>(STUDENTS_PATH, {
+    method: 'GET',
+    cache: 'no-cache'
+  })
 }
 
-async function createStudent(data: studentPayload & { password: string }) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/student`, {
+export async function getStudentById(id: number): Promise<ApiResponse<StudentType>> {
+  return apiClient<StudentType>(`${STUDENTS_PATH}/${id}`, {
+    method: 'GET',
+    cache: 'no-cache'
+  })
+}
+
+export async function createStudent(data: CreateStudentDto): Promise<ApiResponse<StudentType>> {
+  return apiClient<StudentType>(
+    STUDENTS_PATH,
+    {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(data)
-    })
-
-    revalidatePath('/user/student')
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
-async function getStudentById(id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/student/${id}`, {
-      method: 'GET',
-      cache: 'no-cache'
-    })
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
-}
-
-async function updateStudentById(data: studentPayload, id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/student/${id}`, {
+export async function updateStudent(id: number, data: UpdateStudentDto): Promise<ApiResponse<StudentType>> {
+  return apiClient<StudentType>(
+    `${STUDENTS_PATH}/${id}`,
+    {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(data)
-    })
-
-    revalidatePath('/user/student')
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
-async function deleteStudentById(id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/student/${id}`, {
+export async function deleteStudentById(id: number): Promise<ApiResponse<void>> {
+  return apiClient(
+    `${STUDENTS_PATH}/${id}`,
+    {
       method: 'DELETE'
-    })
-
-    revalidatePath('/user/student')
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
-
-export { fetchStudents, createStudent, getStudentById, updateStudentById, deleteStudentById }

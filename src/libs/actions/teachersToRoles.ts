@@ -1,39 +1,37 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+// Libs
+import { apiClient } from '@/libs/api/client'
+import type { ApiResponse } from '@/libs/api/client'
 
-const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
+// Types
+interface TeacherToRole {
+  teacherId: number
+  roleId: number
+}
 
-async function createTeacherToRole(data: { teacherId: number; roleId: number }) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/teachers-to-roles`, {
+// Constants
+const TEACHERS_TO_ROLES_PATH = '/teachers-to-roles'
+const REVALIDATE_PATH = '/role'
+
+// Actions
+export async function createTeacherToRole(data: TeacherToRole): Promise<ApiResponse<TeacherToRole>> {
+  return apiClient<TeacherToRole>(
+    TEACHERS_TO_ROLES_PATH,
+    {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(data)
-    })
-
-    revalidatePath('/role')
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
-async function deleteTeacherToRole(teacherId: number, roleId: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/teacher-to-roles/${teacherId}/${roleId}`, {
+export async function deleteTeacherToRole(teacherId: number, roleId: number): Promise<ApiResponse<void>> {
+  return apiClient(
+    `${TEACHERS_TO_ROLES_PATH}/${teacherId}/${roleId}`,
+    {
       method: 'DELETE'
-    })
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
-
-export { createTeacherToRole, deleteTeacherToRole }

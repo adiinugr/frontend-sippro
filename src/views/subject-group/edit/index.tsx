@@ -15,42 +15,14 @@ import { fetchGrades } from '@/libs/actions/grades'
 import { fetchSubjects } from '@/libs/actions/subjects'
 import { fetchClassrooms } from '@/libs/actions/classrooms'
 
-interface Props {
-  selectedData: {
-    id: number
-    name: string
-    lessonYearId: number
-    gradeId: number
-    lessonYear: {
-      id: number
-      name: string
-    }
-    grade: {
-      id: number
-      name: string
-    }
-    sbjsToSbjgs: {
-      subjectOrder: number
-      subject: {
-        id: number
-        code: string
-        name: string
-      }
-    }[]
-    clsrmsToSbjgs: {
-      classroom: {
-        id: number
-        name: string
-      }
-    }[]
-  }
-}
+// Types
+import type { SubjectGroupType } from '@/types/subjectGroupTypes'
 
-const SubjectGroupEditList = ({ selectedData }: Props) => {
-  const [lessonYearData, setLessonYearData] = useState([])
-  const [gradeData, setGradeData] = useState([])
-  const [subjectData, setSubjectData] = useState([])
-  const [classroomData, setClassroomData] = useState([])
+const SubjectGroupEditList = ({ selectedData }: { selectedData: SubjectGroupType }) => {
+  const [lessonYearData, setLessonYearData] = useState<any>([])
+  const [gradeData, setGradeData] = useState<any>([])
+  const [subjectData, setSubjectData] = useState<any>([])
+  const [classroomData, setClassroomData] = useState<any>([])
 
   const [selectedClassrooms, setSelectedClassrooms] = useState([])
 
@@ -81,11 +53,11 @@ const SubjectGroupEditList = ({ selectedData }: Props) => {
     async function fetchClassroomData() {
       const classroomRes = await fetchClassrooms()
 
-      const filteredClassroom = classroomRes.result.filter(
-        (item: { gradeId: number }) => item.gradeId === selectedData.gradeId
+      const filteredClassroom = classroomRes?.result?.filter(
+        (item: { gradeId: any }) => item.gradeId === selectedData.gradeId
       )
 
-      const mappedFilteredClassroom = filteredClassroom.map((item: { id: number; name: string }) => {
+      const mappedFilteredClassroom = filteredClassroom?.map((item: { id: number; name: string }) => {
         return {
           id: item.id,
           name: item.name

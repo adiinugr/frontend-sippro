@@ -1,40 +1,59 @@
+// Next Imports
 import { redirect } from 'next/navigation'
 
+// MUI Imports
 import { Grid } from '@mui/material'
 
 // Components
 import UserStudentEdit from '@/views/user/student/edit'
 import UserTeacherEdit from '@/views/user/teacher/edit'
 
-// Libs
+// Libs & Actions
 import { auth } from '@/libs/auth'
-
-// Actons
 import { getStudentById } from '@/libs/actions/students'
 import { getTeacherById } from '@/libs/actions/teachers'
+import type { StudentType } from '@/types/usersTypes'
 
-const StudentEditPage = async () => {
-  const session = await auth()
+// Types
+type UserStatus = 'student' | 'teacher'
 
-  // Vars
-  const studentData = await getStudentById(Number(session?.user?.id))
-  const teacherData = await getTeacherById(Number(session?.user?.id))
+interface User {
+  id: string
+  status: UserStatus
+}
+
+interface Session {
+  user: User
+}
+
+const ProfilePage = async () => {
+  // Get auth session
+  const session = (await auth()) as Session | null
 
   if (!session) {
     redirect('/login')
+  }
+
+  // Fetch user data based on status
+  const userData = await (session.user.status === 'student'
+    ? getStudentById(Number(session.user.id))
+    : getTeacherById(Number(session.user.id)))
+
+  if (!userData?.result) {
+    redirect('/404')
   }
 
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
         {session.user.status === 'student' ? (
-          <UserStudentEdit selectedData={studentData.result} />
+          <UserStudentEdit selectedData={userData.result as StudentType} />
         ) : (
-          <UserTeacherEdit selectedData={teacherData.result} />
+          <UserTeacherEdit selectedData={userData.result} />
         )}
       </Grid>
     </Grid>
   )
 }
 
-export default StudentEditPage
+export default ProfilePage

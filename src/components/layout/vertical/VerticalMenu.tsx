@@ -93,10 +93,22 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               <MenuItem href='/teacher/campus/linear-subject'>Mapel Pendukung</MenuItem>
               <MenuItem href='/teacher/campus/graduate-info'>Info Lulusan</MenuItem>
             </SubMenu>
+
             {session?.user?.roles?.includes('Super Admin') && (
-              <MenuItem icon={<i className='tabler-settings-star' />} href='/teacher/role'>
-                Role
-              </MenuItem>
+              <>
+                <SubMenu label='Tata Tertib' icon={<i className='tabler-alert-triangle' />}>
+                  <MenuItem href='/teacher/violation/category'>Kategori</MenuItem>
+                  <MenuItem href='/teacher/violation/rules'>Peraturan</MenuItem>
+                  <SubMenu label='Pelanggaran'>
+                    <MenuItem href='/teacher/violation/list'>List Data</MenuItem>
+                    <MenuItem href='/teacher/violation/add'>Tambah</MenuItem>
+                  </SubMenu>
+                </SubMenu>
+                <SubMenu label='Roles & Permissions' icon={<i className='tabler-lock' />}>
+                  <MenuItem href={`/teacher/roles`}>Roles</MenuItem>
+                  <MenuItem href={`/teacher/permissions`}>Permissions</MenuItem>
+                </SubMenu>{' '}
+              </>
             )}
             <SubMenu label='User' icon={<i className='tabler-users' />}>
               <SubMenu label='Siswa'>

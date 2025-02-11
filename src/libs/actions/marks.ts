@@ -1,74 +1,58 @@
 'use server'
 
-// import { revalidatePath } from 'next/cache'
+// Libs
+import { apiClient } from '@/libs/api/client'
+import type { ApiResponse } from '@/libs/api/client'
 
-const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
-
-async function fetchMarks() {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/mark`, {
-      method: 'GET',
-      cache: 'no-cache'
-    })
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
-}
-
-async function createMark(data: {
+// Types
+interface Mark {
   studentId: number
   subjectId: number
   subjectGroupId: number
   semester: string
   mark: number
-}) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/mark`, {
+}
+
+// Constants
+const MARKS_PATH = '/mark'
+const REVALIDATE_PATH = '/'
+
+// Actions
+export async function fetchMarks(): Promise<ApiResponse<Mark[]>> {
+  return apiClient<Mark[]>(MARKS_PATH, {
+    method: 'GET',
+    cache: 'no-cache'
+  })
+}
+
+export async function createMark(data: Mark): Promise<ApiResponse<Mark>> {
+  return apiClient<Mark>(
+    MARKS_PATH,
+    {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(data)
-    })
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
-async function updateMark(data: { name: string }, id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/mark/${id}`, {
+export async function updateMark(id: number, data: { name: string }): Promise<ApiResponse<Mark>> {
+  return apiClient<Mark>(
+    `${MARKS_PATH}/${id}`,
+    {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(data)
-    })
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
-async function deleteMarkById(studentId: number, subjectGroupId: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/mark/${studentId}/${subjectGroupId}`, {
+export async function deleteMarkById(studentId: number, subjectGroupId: number): Promise<ApiResponse<void>> {
+  return apiClient(
+    `${MARKS_PATH}/${studentId}/${subjectGroupId}`,
+    {
       method: 'DELETE'
-    })
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
-
-export { fetchMarks, createMark, updateMark, deleteMarkById }

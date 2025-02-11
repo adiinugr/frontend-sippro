@@ -1,7 +1,21 @@
-import React from 'react'
+// Next Imports
+import { redirect } from 'next/navigation'
 
+// Components
 import CampusLinearSubject from '@/views/campus/linear-subject'
 
-export default function CampusLinearSubjectPage() {
+// Libs & Actions
+import { auth } from '@/libs/auth'
+
+// Types
+import type { Session } from '@/types/auth'
+
+export default async function TeacherLinearSubjectPage() {
+  const session = (await auth()) as Session | null
+
+  if (!session || session.user.status !== 'teacher') {
+    redirect('/dashboard')
+  }
+
   return <CampusLinearSubject />
 }

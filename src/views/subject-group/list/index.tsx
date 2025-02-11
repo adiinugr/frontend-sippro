@@ -3,7 +3,7 @@ import Grid from '@mui/material/Grid'
 import { Alert, Card } from '@mui/material'
 
 // Type Imports
-import type { SubjectGroupType } from '@/types/subjectGroupTypes'
+import type { SubjectGroupTableType } from '@/types/subjectGroupTypes'
 
 // Component Imports
 import SubjectGroupListTable from './SubjectGroupListTable'
@@ -12,9 +12,9 @@ import SubjectGroupListTable from './SubjectGroupListTable'
 import { fetchLessonYears } from '@/libs/actions/lessonYears'
 import { fetchGrades } from '@/libs/actions/grades'
 
-const SubjectGroupList = async ({ subjectGroupData }: { subjectGroupData?: SubjectGroupType[] }) => {
-  const lessonYearRes = await fetchLessonYears()
-  const gradeRes = await fetchGrades()
+const SubjectGroupList = async ({ subjectGroupData }: { subjectGroupData?: SubjectGroupTableType[] }) => {
+  const lessonYearRes = (await fetchLessonYears()) as any
+  const gradeRes = (await fetchGrades()) as any
 
   return (
     <Grid container spacing={6}>

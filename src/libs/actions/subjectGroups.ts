@@ -1,90 +1,78 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+// Libs
+import { apiClient } from '@/libs/api/client'
+import type { ApiResponse } from '@/libs/api/client'
+import type { SubjectGroupType } from '@/types/subjectGroupTypes'
 
-const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
-
-async function fetchSubjectGroups() {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/subject-group`, {
-      method: 'GET',
-      cache: 'no-cache'
-    })
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
-}
-
-async function createSubjectGroup(data: { name: string; gradeId: number | string; lessonYearId: number | string }) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/subject-group`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-
-    revalidatePath('/setting/subject-group/list')
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
-}
-
-async function getSubjectGroupById(id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/subject-group/${id}`, {
-      method: 'GET',
-      cache: 'no-cache'
-    })
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
-}
-
-async function updateSubjectGroupById(
-  data: { name: string; gradeId: number | string; lessonYearId: number | string },
+// Types
+interface SubjectGroup {
   id: number
-) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/subject-group/${id}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+  name: string
+  gradeId: number
+  lessonYearId: number
+  grade: { id: number; name: string }
+  lessonYear: { id: number; name: string }
+  sbjsToSbjgs: any
+  clsrmsToSbjgs: any
+}
+
+interface CreateSubjectGroupDto {
+  name: string
+  gradeId: number | string
+  lessonYearId: number | string
+}
+
+// Constants
+const SUBJECT_GROUPS_PATH = '/subject-group'
+const REVALIDATE_PATH = '/setting/subject-group/list'
+
+// Actions
+export async function fetchSubjectGroups(): Promise<ApiResponse<SubjectGroupType[]>> {
+  return apiClient<SubjectGroupType[]>(SUBJECT_GROUPS_PATH, {
+    method: 'GET',
+    cache: 'no-cache'
+  })
+}
+
+export async function createSubjectGroup(data: CreateSubjectGroupDto): Promise<ApiResponse<SubjectGroup>> {
+  return apiClient<SubjectGroup>(
+    SUBJECT_GROUPS_PATH,
+    {
+      method: 'POST',
       body: JSON.stringify(data)
-    })
-
-    revalidatePath('/setting/subject-group/list')
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
-async function deleteSubjectGroupById(id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/subject-group/${id}`, {
+export async function getSubjectGroupById(id: number): Promise<ApiResponse<SubjectGroupType>> {
+  return apiClient<SubjectGroupType>(`${SUBJECT_GROUPS_PATH}/${id}`, {
+    method: 'GET',
+    cache: 'no-cache'
+  })
+}
+
+export async function updateSubjectGroupById(
+  id: number,
+  data: CreateSubjectGroupDto
+): Promise<ApiResponse<SubjectGroup>> {
+  return apiClient<SubjectGroup>(
+    `${SUBJECT_GROUPS_PATH}/${id}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(data)
+    },
+    REVALIDATE_PATH
+  )
+}
+
+export async function deleteSubjectGroupById(id: number): Promise<ApiResponse<void>> {
+  return apiClient(
+    `${SUBJECT_GROUPS_PATH}/${id}`,
+    {
       method: 'DELETE'
-    })
-
-    revalidatePath('/setting/subject-group/list')
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
-
-export { fetchSubjectGroups, createSubjectGroup, getSubjectGroupById, updateSubjectGroupById, deleteSubjectGroupById }

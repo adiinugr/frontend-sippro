@@ -1,13 +1,26 @@
-// Component Imports
+// Next Imports
+import { redirect } from 'next/navigation'
+
+// Components
 import GradeList from '@/views/grade/list'
 
-// Data
+// Libs & Actions
+import { auth } from '@/libs/auth'
 import { fetchGrades } from '@/libs/actions/grades'
 
-const GradePage = async () => {
-  const gradeData = await fetchGrades()
+// Types
+import type { Session } from '@/types/auth'
 
-  return <GradeList gradeData={gradeData.result} />
+export default async function GradePage() {
+  const session = (await auth()) as Session | null
+
+  if (!session || session.user.status !== 'teacher') {
+    redirect('/dashboard')
+  }
+
+  const { result: grades } = await fetchGrades()
+
+  console.log(grades)
+
+  return <GradeList gradeData={grades} />
 }
-
-export default GradePage

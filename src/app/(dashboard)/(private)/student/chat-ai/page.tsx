@@ -1,3 +1,4 @@
+// Next Imports
 import { redirect } from 'next/navigation'
 
 // Libs
@@ -6,15 +7,42 @@ import { auth } from '@/libs/auth'
 
 // Components
 import ChatAi from '@/views/user/student/chat-ai'
+import DataError from '@/components/other/DataError'
+
+// Types
+type UserStatus = 'student' | 'teacher'
+
+interface User {
+  id: string
+  status: UserStatus
+}
+
+interface Session {
+  user: User
+}
 
 export default async function StudentAiPage() {
-  const session = await auth()
+  // Get auth session
+  const session = (await auth()) as Session | null
 
-  const data = await getStudentById(Number(session?.user?.id))
-
-  if (data.statusCode === 404) {
-    redirect('/not-found')
+  if (!session) {
+    redirect('/login')
   }
 
-  return data ? <ChatAi studentData={data.result} /> : null
+  if (session.user.status !== 'student') {
+    redirect('/dashboard')
+  }
+
+  // Fetch student data
+  const studentData = await getStudentById(Number(session.user.id))
+
+  if (!studentData || studentData.statusCode !== 200) {
+    return <DataError />
+  }
+
+  if (!studentData.result) {
+    return <DataError />
+  }
+
+  return <ChatAi studentData={studentData.result} />
 }

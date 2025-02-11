@@ -1,14 +1,19 @@
-import { redirect } from 'next/navigation'
-
+// Actions
 import { getStudentById } from '@/libs/actions/students'
+
+// Components
 import ReportInput from '@/views/user/student/report'
+import DataError from '@/components/other/DataError'
+
+// Types
+import type { StudentType } from '@/types/usersTypes'
 
 export default async function StudentReportPage({ params }: { params: { id: number } }) {
-  const data = await getStudentById(params.id)
+  const { result: student, statusCode } = await getStudentById(params.id)
 
-  if (data.statusCode === 404) {
-    redirect('/not-found')
+  if (statusCode !== 200) {
+    return <DataError />
   }
 
-  return data ? <ReportInput studentData={data.result} /> : null
+  return <ReportInput studentData={student as StudentType} />
 }

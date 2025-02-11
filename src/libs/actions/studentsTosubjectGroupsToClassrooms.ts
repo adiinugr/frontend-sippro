@@ -1,52 +1,50 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+// Libs
+import { apiClient } from '@/libs/api/client'
+import type { ApiResponse } from '@/libs/api/client'
 
-const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
-
-async function createStudentsSubjectGroupsToClassrooms(data: {
+// Types
+interface StudentSubjectGroupClassroom {
   classroomsToSubjectGroupId: number
   studentId: number
   classroomId: number
-}) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/students-to-subject-groups-to-classroom`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-
-    revalidatePath(`/setting/subject-group/manage/${data.studentId}`, 'page')
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
 }
 
-async function deleteStudentsSubjectGroupsToClassrooms(data: {
+interface DeleteStudentSubjectGroupClassroom {
   classroomsToSubjectGroupId: number
   studentId: number
-}) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/students-to-subject-groups-to-classroom`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+}
+
+// Constants
+const STUDENTS_SUBJECT_GROUPS_CLASSROOMS_PATH = '/students-to-subject-groups-to-classroom'
+const REVALIDATE_PATH = '/setting/subject-group/manage'
+
+// Actions
+async function createStudentsSubjectGroupsToClassrooms(
+  data: StudentSubjectGroupClassroom
+): Promise<ApiResponse<StudentSubjectGroupClassroom>> {
+  return apiClient<StudentSubjectGroupClassroom>(
+    STUDENTS_SUBJECT_GROUPS_CLASSROOMS_PATH,
+    {
+      method: 'POST',
       body: JSON.stringify(data)
-    })
+    },
+    `${REVALIDATE_PATH}/${data.studentId}`
+  )
+}
 
-    revalidatePath(`/setting/subject-group/manage/${data.studentId}`, 'page')
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+async function deleteStudentsSubjectGroupsToClassrooms(
+  data: DeleteStudentSubjectGroupClassroom
+): Promise<ApiResponse<void>> {
+  return apiClient(
+    STUDENTS_SUBJECT_GROUPS_CLASSROOMS_PATH,
+    {
+      method: 'DELETE',
+      body: JSON.stringify(data)
+    },
+    `${REVALIDATE_PATH}/${data.studentId}`
+  )
 }
 
 export { createStudentsSubjectGroupsToClassrooms, deleteStudentsSubjectGroupsToClassrooms }

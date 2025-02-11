@@ -1,6 +1,8 @@
 export type SubjectGroupType = {
   id: number
   name: string
+  lessonYearId: number
+  gradeId: number
   lessonYear: {
     id: number
     name: string
@@ -10,6 +12,7 @@ export type SubjectGroupType = {
     name: string
   }
   sbjsToSbjgs: {
+    subjectOrder: number
     subject: {
       id: number
       code: string
@@ -39,4 +42,13 @@ export type SubjectGroupType = {
 export type SubjectGroupListType = {
   subjectOrder: number
   name: string
+}
+
+export type SubjectGroupTableType = {
+  id: number
+  name: string
+  lessonYear: string
+  grade: string
+  sbjsToSbjgs: any
+  clsrmsToSbjgs: any
 }

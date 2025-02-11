@@ -1,86 +1,64 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+import { apiClient } from '@/libs/api/client'
+import type { ApiResponse } from '@/libs/api/client'
 
-const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
-
-async function fetchLessonYears() {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/lesson-year`, {
-      method: 'GET',
-      cache: 'no-cache'
-    })
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+// Types
+export interface LessonYear {
+  id: number
+  name: string
 }
 
-async function createLessonYear(data: { name: string }) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/lesson-year`, {
+export interface CreateLessonYearDto {
+  name: string
+}
+
+// Constants
+const LESSON_YEARS_PATH = '/lesson-year'
+const REVALIDATE_PATH = '/setting/study-year'
+
+// Actions
+export async function fetchLessonYears(): Promise<ApiResponse<LessonYear[]>> {
+  return apiClient<LessonYear[]>(LESSON_YEARS_PATH, {
+    method: 'GET',
+    cache: 'no-cache'
+  })
+}
+
+export async function createLessonYear(data: CreateLessonYearDto): Promise<ApiResponse<LessonYear>> {
+  return apiClient<LessonYear>(
+    LESSON_YEARS_PATH,
+    {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(data)
-    })
-
-    revalidatePath('/setting/study-year')
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
-async function getLessonYearById(id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/lesson-year/${id}`, {
-      method: 'GET'
-    })
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+export async function getLessonYearById(id: number): Promise<ApiResponse<LessonYear>> {
+  return apiClient<LessonYear>(`${LESSON_YEARS_PATH}/${id}`, {
+    method: 'GET'
+  })
 }
 
-async function updateLessonYear(data: { name: string }, id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/lesson-year/${id}`, {
+export async function updateLessonYear(id: number, data: CreateLessonYearDto): Promise<ApiResponse<LessonYear>> {
+  return apiClient<LessonYear>(
+    `${LESSON_YEARS_PATH}/${id}`,
+    {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify(data)
-    })
-
-    revalidatePath('/setting/study-year')
-
-    return res.json()
-  } catch (error) {
-    if (error instanceof Error) {
-      return error
-    }
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
 
-async function deleteLessonYearById(id: number) {
-  try {
-    const res = await fetch(`${NEXT_PUBLIC_API_URL}/lesson-year/${id}`, {
+export async function deleteLessonYearById(id: number): Promise<ApiResponse<void>> {
+  return apiClient(
+    `${LESSON_YEARS_PATH}/${id}`,
+    {
       method: 'DELETE'
-    })
-
-    revalidatePath('/setting/study-year')
-
-    return res.json()
-  } catch (error) {
-    return error
-  }
+    },
+    REVALIDATE_PATH
+  )
 }
-
-export { fetchLessonYears, createLessonYear, getLessonYearById, updateLessonYear, deleteLessonYearById }

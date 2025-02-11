@@ -3,47 +3,9 @@ import { Grid } from '@mui/material'
 
 // Components Import
 import SubjectGroupSetting from '@/views/subject-group/manage/SubjectGroupSetting'
+import type { SubjectGroupType } from '@/types/subjectGroupTypes'
 
-interface Props {
-  selectedSubjectGroup: {
-    id: number
-    name: string
-    grade: {
-      id: number
-      name: string
-    }
-    lessonYear: {
-      id: number
-      name: string
-    }
-    sbjsToSbjgs: {
-      subject: {
-        id: number
-        code: string
-        name: string
-      }
-      subjectOrder: number
-    }[]
-    clsrmsToSbjgs: {
-      id: number
-      classroom: {
-        id: number
-        name: string
-        gradeId: number
-      }
-      stdsToSbjgsToClsrms: {
-        student: {
-          id: number
-          name: string
-          nis: string
-          nisn: string
-        }
-      }[]
-    }[]
-  }
-}
-
-const SubjectGroupManage = ({ selectedSubjectGroup }: Props) => {
+const SubjectGroupManage = ({ selectedSubjectGroup }: { selectedSubjectGroup: SubjectGroupType }) => {
   const subjectGroup = {
     id: selectedSubjectGroup.id,
     name: selectedSubjectGroup.name
@@ -52,7 +14,10 @@ const SubjectGroupManage = ({ selectedSubjectGroup }: Props) => {
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
-        <SubjectGroupSetting classroomData={selectedSubjectGroup.clsrmsToSbjgs} subjectGroup={subjectGroup} />
+        <SubjectGroupSetting
+          classroomData={selectedSubjectGroup.clsrmsToSbjgs as SubjectGroupType['clsrmsToSbjgs']}
+          subjectGroup={subjectGroup}
+        />
       </Grid>
     </Grid>
   )

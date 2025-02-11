@@ -8,6 +8,7 @@ export type AchievementType = {
   level: string
   organizer: string
   date: string
+  studentId: number
 }
 
 export type AddAchievementType = {

@@ -1,18 +1,28 @@
-// Component Imports
+// Next Imports
+import { redirect } from 'next/navigation'
+
+// Components
 import UserStudentList from '@/views/user/student/list'
+import DataError from '@/components/other/DataError'
 
-// Data Imports
-
+// Libs & Actions
+import { auth } from '@/libs/auth'
 import { fetchStudents } from '@/libs/actions/students'
 
-const UserStudentListPage = async () => {
-  const studentData = await fetchStudents()
+// Types
+import type { Session } from '@/types/auth'
 
-  if (!studentData.result) {
-    return <p>Tidak ada data!</p>
+export default async function StudentListPage() {
+  // Check auth and fetch data in parallel
+  const [session, { result: students }] = await Promise.all([auth() as Promise<Session | null>, fetchStudents()])
+
+  if (!session || session.user.status !== 'teacher') {
+    redirect('/dashboard')
   }
 
-  return <UserStudentList userStudentData={studentData.result} />
-}
+  if (!students) {
+    return <DataError />
+  }
 
-export default UserStudentListPage
+  return <UserStudentList userStudentData={students} />
+}
