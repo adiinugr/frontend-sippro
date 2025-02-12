@@ -2,7 +2,7 @@
 import { redirect } from 'next/navigation'
 
 // Components
-import StudyYearList from '@/views/study-year/list'
+import LessonYear from '@/views/lesson-year/list'
 
 // Libs & Actions
 import { auth } from '@/libs/auth'
@@ -13,7 +13,7 @@ import { fetchLessonYears } from '@/libs/actions/lessonYears'
 // Types
 import type { Session } from '@/types/auth'
 
-export default async function StudyYearPage() {
+export default async function LessonYearPage() {
   const session = (await auth()) as Session | null
 
   if (!session || session.user.status !== 'teacher') {
@@ -22,5 +22,5 @@ export default async function StudyYearPage() {
 
   const { result: lessonYears } = await fetchLessonYears()
 
-  return <StudyYearList studyYearData={lessonYears} />
+  return <LessonYear lessonYearData={lessonYears} />
 }

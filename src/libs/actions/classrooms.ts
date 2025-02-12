@@ -17,7 +17,7 @@ export async function fetchClassrooms(): Promise<ApiResponse<ClassroomType[]>> {
   })
 }
 
-export async function createClassroom(data: { name: string }): Promise<ApiResponse<ClassroomType>> {
+export async function createClassroom(data: { name: string }): Promise<ApiResponse<any>> {
   return apiClient<ClassroomType>(
     CLASSROOMS_PATH,
     {
@@ -35,7 +35,7 @@ export async function getClassroomById(id: number): Promise<ApiResponse<Classroo
   })
 }
 
-export async function updateClassroom(id: number, data: { name: string }): Promise<ApiResponse<ClassroomType>> {
+export async function updateClassroom(id: number, data: { name: string }): Promise<ApiResponse<any>> {
   return apiClient<ClassroomType>(
     `${CLASSROOMS_PATH}/${id}`,
     {

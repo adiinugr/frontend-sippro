@@ -5,7 +5,7 @@ import { apiClient } from '@/libs/api/client'
 import type { ApiResponse } from '@/libs/api/client'
 
 // Types
-import type { AchievementType, AddAchievementType } from '@/types/achievementTypes'
+import type { AchievementType, AddAchievementType, CreateAchievementType } from '@/types/achievementTypes'
 
 // Constants
 const ACHIEVEMENTS_PATH = '/achievement'
@@ -19,7 +19,7 @@ async function fetchAchievements(): Promise<ApiResponse<AchievementType[]>> {
   })
 }
 
-async function createAchievements(data: AchievementType): Promise<ApiResponse<AchievementType>> {
+async function createAchievements(data: CreateAchievementType): Promise<ApiResponse<any>> {
   return apiClient<AchievementType>(
     ACHIEVEMENTS_PATH,
     {
@@ -36,7 +36,7 @@ async function getAchievementById(id: number): Promise<ApiResponse<AchievementTy
   })
 }
 
-async function updateAchievement(id: number, data: AddAchievementType): Promise<ApiResponse<AchievementType>> {
+async function updateAchievement(id: number, data: AddAchievementType): Promise<ApiResponse<any>> {
   return apiClient<AchievementType>(
     `${ACHIEVEMENTS_PATH}/${id}`,
     {

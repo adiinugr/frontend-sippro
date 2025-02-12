@@ -82,7 +82,7 @@ const UserStudentAdd = () => {
       nisn,
       placeOfBirth,
       status: 'student',
-      dateOfBirth: dateOfBirth?.toISOString()
+      dateOfBirth: dateOfBirth?.toISOString() as string
     }
 
     setIsLoading(true)

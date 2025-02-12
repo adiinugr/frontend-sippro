@@ -151,7 +151,7 @@ const ViolationRulesTable = ({ tableData }: { tableData?: RuleType[] }) => {
     const fetchData = async () => {
       const rulesCategories = await fetchRuleCategories()
 
-      setRuleCategoriesData(rulesCategories.result)
+      setRuleCategoriesData(rulesCategories.result as any)
     }
 
     fetchData()
@@ -193,14 +193,11 @@ const ViolationRulesTable = ({ tableData }: { tableData?: RuleType[] }) => {
     setIsLoading(true)
 
     try {
-      const res = await updateRule(
-        {
-          name,
-          point: Number(point),
-          ruleCategoryId
-        },
-        id
-      )
+      const res = await updateRule(id, {
+        name,
+        point: Number(point),
+        ruleCategoryId
+      })
 
       setIsLoading(false)
       setOpenDialog(false)
@@ -223,7 +220,7 @@ const ViolationRulesTable = ({ tableData }: { tableData?: RuleType[] }) => {
   const handleOpenUpdateDrawer = async (id: number) => {
     const selectedData = await getRuleById(id)
 
-    setSelectedDataById(selectedData.result)
+    setSelectedDataById(selectedData.result as any)
 
     setUpdateRuleOpen(true)
   }

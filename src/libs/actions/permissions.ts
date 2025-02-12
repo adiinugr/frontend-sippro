@@ -5,6 +5,7 @@ import type { ApiResponse } from '@/libs/api/client'
 
 // Types
 export interface Permission {
+  response: any
   id: number
   name: string
   createdAt: string

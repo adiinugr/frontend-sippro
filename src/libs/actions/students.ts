@@ -35,7 +35,7 @@ export async function getStudentById(id: number): Promise<ApiResponse<StudentTyp
   })
 }
 
-export async function createStudent(data: CreateStudentDto): Promise<ApiResponse<StudentType>> {
+export async function createStudent(data: CreateStudentDto): Promise<ApiResponse<any>> {
   return apiClient<StudentType>(
     STUDENTS_PATH,
     {
@@ -46,7 +46,7 @@ export async function createStudent(data: CreateStudentDto): Promise<ApiResponse
   )
 }
 
-export async function updateStudent(id: number, data: UpdateStudentDto): Promise<ApiResponse<StudentType>> {
+export async function updateStudentById(id: number, data: UpdateStudentDto): Promise<ApiResponse<any>> {
   return apiClient<StudentType>(
     `${STUDENTS_PATH}/${id}`,
     {

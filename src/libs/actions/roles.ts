@@ -7,6 +7,7 @@ import type { ApiResponse } from '@/libs/api/client'
 export interface Role {
   id: number
   name: string
+  rolesToPermissions: any
   createdAt: string
   updatedAt: string
 }

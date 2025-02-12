@@ -58,7 +58,7 @@ const RoleDialog = ({ open, setOpen, title, id }: RoleDialogProps) => {
     const getPermissions = async () => {
       const response = await fetchPermissions()
 
-      setPermissions(response.result)
+      setPermissions(response.result as any)
     }
 
     getPermissions()
@@ -71,7 +71,7 @@ const RoleDialog = ({ open, setOpen, title, id }: RoleDialogProps) => {
 
       try {
         const response = await getRoleById(Number(id))
-        const rolePermissions = response.result.rolesToPermissions || []
+        const rolePermissions = response?.result?.rolesToPermissions || []
 
         const selectedPerms = rolePermissions
           .map((perm: any) => {
@@ -143,8 +143,8 @@ const RoleDialog = ({ open, setOpen, title, id }: RoleDialogProps) => {
     try {
       // Update or create role first
       const roleId = id
-        ? (await updateRole({ name: roleName }, Number(id))).result.id
-        : (await createRole({ name: roleName })).result.id
+        ? (await updateRole(Number(id), { name: roleName }))?.result?.id
+        : (await createRole({ name: roleName }))?.result?.id
 
       // Handle permissions
       await deleteRolePermissions(Number(roleId))

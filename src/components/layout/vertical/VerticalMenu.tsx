@@ -79,7 +79,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
               Dashboard
             </MenuItem>
             <SubMenu label='Setting' icon={<i className='tabler-file-settings' />}>
-              <MenuItem href='/teacher/setting/study-year'>Tahun Pelajaran</MenuItem>
+              <MenuItem href='/teacher/setting/lesson-year'>Tahun Pelajaran</MenuItem>
               <MenuItem href='/teacher/setting/grade'>Jenjang</MenuItem>
               <MenuItem href='/teacher/setting/classroom'>Kelas</MenuItem>
               <MenuItem href='/teacher/setting/subject'>Mata Pelajaran</MenuItem>

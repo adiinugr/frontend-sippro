@@ -52,6 +52,7 @@ import {
   getAchievementById,
   updateAchievement
 } from '@/libs/actions/achievements'
+import type { StudentType } from '@/types/usersTypes'
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -118,7 +119,13 @@ const DebouncedInput = ({
 // Column Definitions
 const columnHelper = createColumnHelper<AchievementTypeWithAction>()
 
-const AchievementListTable = ({ tableData, studentId }: { tableData?: AchievementType[]; studentId: number }) => {
+const AchievementListTable = ({
+  tableData,
+  studentId
+}: {
+  tableData?: StudentType['achievements']
+  studentId: number
+}) => {
   // States
   const [rowSelection, setRowSelection] = useState({})
   const [globalFilter, setGlobalFilter] = useState('')
@@ -185,7 +192,7 @@ const AchievementListTable = ({ tableData, studentId }: { tableData?: Achievemen
     setIsLoading(true)
 
     try {
-      const res = await updateAchievement(val, id)
+      const res = await updateAchievement(id, val)
 
       setIsLoading(false)
       setOpenDialog(false)
@@ -208,7 +215,7 @@ const AchievementListTable = ({ tableData, studentId }: { tableData?: Achievemen
   const handleOpenUpdateDrawer = async (id: number) => {
     const selectedData = await getAchievementById(id)
 
-    setSelectedDataById(selectedData.result)
+    setSelectedDataById(selectedData.result as any)
 
     setUpdateAchievementOpen(true)
   }

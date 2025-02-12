@@ -65,7 +65,7 @@ const AddContent = ({ handleClose }: { handleClose: () => void }) => {
         return
       }
 
-      toast.error(`Gagal menambah data! ${res.result.response.message[0]}`)
+      toast.error(`Gagal menambah data! ${res.result ? res.result.response.message[0] : ''}`)
     } catch (error) {
       setIsLoadingCreate(false)
 
@@ -132,7 +132,7 @@ const EditContent = ({ handleClose, data, id }: EditProps) => {
     setIsLoadingUpdate(true)
 
     try {
-      const res = await updatePermission({ name: data.name }, id)
+      const res = await updatePermission(id, { name: data.name })
 
       setIsLoadingUpdate(false)
 
@@ -143,7 +143,7 @@ const EditContent = ({ handleClose, data, id }: EditProps) => {
         return
       }
 
-      toast.error(`Gagal mengupdate data! ${res.result.response.message[0]}`)
+      toast.error(`Gagal mengupdate data! ${res.result ? res.result.response.message[0] : ''}`)
     } catch (error) {
       setIsLoadingUpdate(false)
 

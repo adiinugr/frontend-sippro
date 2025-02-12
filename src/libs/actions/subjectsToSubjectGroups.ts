@@ -8,7 +8,7 @@ import type { ApiResponse } from '@/libs/api/client'
 interface SubjectsToSubjectGroup {
   subjectOrder: number
   subjectId: number
-  subjectGroupId: number
+  subjectGroupId: number | undefined
 }
 
 interface UpdateSubjectsToSubjectGroup {
@@ -21,9 +21,7 @@ const SUBJECTS_TO_SUBJECT_GROUP_PATH = '/subjects-to-subject-group'
 const REVALIDATE_PATH = '/setting/subject-group/list'
 
 // Actions
-async function createSubjectsToSubjectGroup(
-  data: SubjectsToSubjectGroup
-): Promise<ApiResponse<SubjectsToSubjectGroup>> {
+async function createSubjectsToSubjectGroup(data: SubjectsToSubjectGroup): Promise<ApiResponse<any>> {
   return apiClient<SubjectsToSubjectGroup>(
     SUBJECTS_TO_SUBJECT_GROUP_PATH,
     {

@@ -165,7 +165,7 @@ const SubjectListTable = ({ tableData }: { tableData?: SubjectType[] }) => {
     setIsLoading(true)
 
     try {
-      const res = await updateSubject({ code: val.code, name: val.name }, id)
+      const res = await updateSubject(id, { code: val.code, name: val.name })
 
       setIsLoading(false)
       setOpenDialog(false)
@@ -188,7 +188,7 @@ const SubjectListTable = ({ tableData }: { tableData?: SubjectType[] }) => {
   const handleOpenUpdateDrawer = async (id: number) => {
     const selectedData = await getSubjectById(id)
 
-    setSelectedDataById(selectedData.result)
+    setSelectedDataById(selectedData.result as any)
 
     setUpdateStudyYearOpen(true)
   }

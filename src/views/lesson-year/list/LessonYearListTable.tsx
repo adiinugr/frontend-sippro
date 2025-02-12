@@ -33,13 +33,13 @@ import { rankItem, type RankingInfo } from '@tanstack/match-sorter-utils'
 
 // Component Imports
 import TablePaginationComponent from '@components/TablePaginationComponent'
-import AddStudyYearDrawer from './AddStudyYearDrawer'
+import AddStudyYearDrawer from './AddLessonYearDrawer'
 import CustomTextField from '@core/components/mui/TextField'
 import DeleteDialog from '@/components/other/DeleteDialog'
-import UpdateStudyYearDrawer from '@/views/study-year/list/UpdateStudyYearDrawer'
+import UpdateStudyYearDrawer from '@/views/lesson-year/list/UpdateLessonYearDrawer'
 
 // Type Imports
-import type { StudyYearType } from '@/types/lessonYearTypes'
+import type { LessonYearType } from '@/types/lessonYearTypes'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
@@ -56,7 +56,7 @@ declare module '@tanstack/table-core' {
   }
 }
 
-type StudyYearTypeWithAction = {
+type LessonYearTypeWithAction = {
   id: number
   name: string
   action?: string
@@ -105,9 +105,9 @@ const DebouncedInput = ({
 }
 
 // Column Definitions
-const columnHelper = createColumnHelper<StudyYearTypeWithAction>()
+const columnHelper = createColumnHelper<LessonYearTypeWithAction>()
 
-const StudyYearListTable = ({ tableData }: { tableData?: StudyYearType[] }) => {
+const StudyYearListTable = ({ tableData }: { tableData?: LessonYearType[] }) => {
   // States
   const [rowSelection, setRowSelection] = useState({})
   const [globalFilter, setGlobalFilter] = useState('')
@@ -157,11 +157,11 @@ const StudyYearListTable = ({ tableData }: { tableData?: StudyYearType[] }) => {
     }
   }
 
-  const handleUpdate = async (val: StudyYearType, id: number) => {
+  const handleUpdate = async (id: number, val: { name: string }) => {
     setIsLoading(true)
 
     try {
-      const res = await updateLessonYear({ name: val.name }, id)
+      const res = await updateLessonYear(id, { name: val.name })
 
       setIsLoading(false)
       setOpenDialog(false)
@@ -184,12 +184,12 @@ const StudyYearListTable = ({ tableData }: { tableData?: StudyYearType[] }) => {
   const handleOpenUpdateDrawer = async (id: number) => {
     const selectedData = await getLessonYearById(id)
 
-    setSelectedDataById(selectedData.result)
+    setSelectedDataById(selectedData.result as any)
 
     setUpdateStudyYearOpen(true)
   }
 
-  const handleCreate = async (val: StudyYearType) => {
+  const handleCreate = async (val: { name: string }) => {
     setIsLoading(true)
 
     try {
@@ -215,7 +215,7 @@ const StudyYearListTable = ({ tableData }: { tableData?: StudyYearType[] }) => {
 
   // End Crud
 
-  const columns = useMemo<ColumnDef<StudyYearTypeWithAction, any>[]>(
+  const columns = useMemo<ColumnDef<LessonYearTypeWithAction, any>[]>(
     () => [
       columnHelper.accessor('name', {
         header: 'Tahun Pelajaran',
@@ -246,7 +246,7 @@ const StudyYearListTable = ({ tableData }: { tableData?: StudyYearType[] }) => {
   )
 
   const table = useReactTable({
-    data: tableData as StudyYearType[],
+    data: tableData as LessonYearType[],
     columns,
     filterFns: {
       fuzzy: fuzzyFilter
@@ -382,7 +382,7 @@ const StudyYearListTable = ({ tableData }: { tableData?: StudyYearType[] }) => {
         selectedData={selectedDataById}
         isLoading={isLoading}
         handleClose={() => setUpdateStudyYearOpen(!updateStudyYearOpen)}
-        handleUpdate={(val, id) => handleUpdate(val, id)}
+        handleUpdate={(id, val) => handleUpdate(id, val)}
       />
       <DeleteDialog
         open={openDialog}

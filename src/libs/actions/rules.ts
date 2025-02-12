@@ -36,7 +36,7 @@ export async function fetchRules(): Promise<ApiResponse<Rule[]>> {
   })
 }
 
-export async function createRule(data: CreateRuleDto): Promise<ApiResponse<Rule>> {
+export async function createRule(data: CreateRuleDto): Promise<ApiResponse<any>> {
   return apiClient<Rule>(
     RULES_PATH,
     {
@@ -53,7 +53,7 @@ export async function getRuleById(id: number): Promise<ApiResponse<Rule>> {
   })
 }
 
-export async function updateRule(id: number, data: UpdateRuleDto): Promise<ApiResponse<Rule>> {
+export async function updateRule(id: number, data: UpdateRuleDto): Promise<ApiResponse<any>> {
   return apiClient<Rule>(
     `${RULES_PATH}/${id}`,
     {

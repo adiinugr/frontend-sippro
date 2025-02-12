@@ -53,10 +53,10 @@ const SubjectGroupAddList = () => {
       const subjectRes = await fetchSubjects()
       const classroomRes = await fetchClassrooms()
 
-      setLessonYearData(lessonYearRes.result)
-      setGradeData(gradeRes.result)
-      setSubjectData(subjectRes.result)
-      setClassroomData(classroomRes.result)
+      setLessonYearData(lessonYearRes.result as any)
+      setGradeData(gradeRes.result as any)
+      setSubjectData(subjectRes.result as any)
+      setClassroomData(classroomRes.result as any)
     }
 
     fetchData()
@@ -133,7 +133,7 @@ const SubjectGroupAddList = () => {
             await createSubjectsToSubjectGroup({
               subjectOrder: data.subjectOrder,
               subjectId: data.id,
-              subjectGroupId: subjectGroupRes.result.id
+              subjectGroupId: subjectGroupRes?.result?.id
             })
           })
         )
@@ -142,7 +142,7 @@ const SubjectGroupAddList = () => {
           mappedClassroomData.map(async data => {
             await createClasroomsToSubjectGroup({
               classroomId: data.id,
-              subjectGroupId: subjectGroupRes.result.id
+              subjectGroupId: subjectGroupRes?.result?.id
             })
           })
         )

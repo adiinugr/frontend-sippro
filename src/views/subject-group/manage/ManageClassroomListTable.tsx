@@ -182,7 +182,7 @@ const ManageClassroomListTable = ({
     async function fetchData() {
       const classroomRes = await fetchClassrooms()
 
-      setClasroomData(classroomRes.result)
+      setClasroomData(classroomRes.result as any)
     }
 
     fetchData()

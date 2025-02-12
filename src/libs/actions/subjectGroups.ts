@@ -53,10 +53,7 @@ export async function getSubjectGroupById(id: number): Promise<ApiResponse<Subje
   })
 }
 
-export async function updateSubjectGroupById(
-  id: number,
-  data: CreateSubjectGroupDto
-): Promise<ApiResponse<SubjectGroup>> {
+export async function updateSubjectGroupById(id: number, data: CreateSubjectGroupDto): Promise<ApiResponse<any>> {
   return apiClient<SubjectGroup>(
     `${SUBJECT_GROUPS_PATH}/${id}`,
     {

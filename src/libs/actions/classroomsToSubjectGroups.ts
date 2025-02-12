@@ -10,13 +10,11 @@ const REVALIDATE_PATH = '/setting/subject-group/list'
 // Types
 interface ClassroomToSubjectGroup {
   classroomId: number
-  subjectGroupId: number
+  subjectGroupId: number | undefined
 }
 
 // Actions
-export async function createClasroomsToSubjectGroup(
-  data: ClassroomToSubjectGroup
-): Promise<ApiResponse<ClassroomToSubjectGroup>> {
+export async function createClasroomsToSubjectGroup(data: ClassroomToSubjectGroup): Promise<ApiResponse<any>> {
   return apiClient<ClassroomToSubjectGroup>(
     CLASSROOMS_TO_SUBJECT_GROUP_PATH,
     {
@@ -27,9 +25,7 @@ export async function createClasroomsToSubjectGroup(
   )
 }
 
-export async function getClasroomsToSubjectGroup(
-  data: ClassroomToSubjectGroup
-): Promise<ApiResponse<ClassroomToSubjectGroup>> {
+export async function getClasroomsToSubjectGroup(data: ClassroomToSubjectGroup): Promise<ApiResponse<any>> {
   return apiClient<ClassroomToSubjectGroup>(
     `${CLASSROOMS_TO_SUBJECT_GROUP_PATH}/${data.classroomId}/${data.subjectGroupId}`,
     {

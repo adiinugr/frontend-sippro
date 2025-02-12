@@ -1,6 +1,4 @@
 // MUI Imports
-import { useEffect } from 'react'
-
 import Button from '@mui/material/Button'
 import Drawer from '@mui/material/Drawer'
 import IconButton from '@mui/material/IconButton'
@@ -10,27 +8,23 @@ import Divider from '@mui/material/Divider'
 // Third-party Imports
 import { useForm, Controller } from 'react-hook-form'
 
-// Types Imports
-import type { StudyYearType } from '@/types/lessonYearTypes'
-
 // Component Imports
 import CustomTextField from '@core/components/mui/TextField'
 
 type Props = {
   open: boolean
   isLoading: boolean
-  selectedData: { id: number | null; name: string }
   handleClose: () => void
-  handleUpdate: (data: StudyYearType, id: number) => void
+  handleCreate: (data: { name: string }) => void
 }
 
 type FormValidateType = {
   name: string
 }
 
-const UpdateStudyYearDrawer = (props: Props) => {
+const AddLessonYearDrawer = (props: Props) => {
   // Props
-  const { open, isLoading, selectedData, handleClose, handleUpdate } = props
+  const { open, isLoading, handleClose, handleCreate } = props
 
   // Hooks
   const {
@@ -40,17 +34,14 @@ const UpdateStudyYearDrawer = (props: Props) => {
     formState: { errors }
   } = useForm<FormValidateType>({
     defaultValues: {
-      name: selectedData.name
+      name: ''
     }
   })
 
-  useEffect(() => {
-    resetForm(selectedData)
-  }, [resetForm, selectedData])
-
-  const onSubmit = (data: StudyYearType) => {
-    handleUpdate(data, selectedData.id as number)
+  const onSubmit = (data: { name: string }) => {
+    handleCreate(data)
     handleClose()
+    resetForm({ name: '' })
   }
 
   const handleReset = () => {
@@ -67,7 +58,7 @@ const UpdateStudyYearDrawer = (props: Props) => {
       sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } } }}
     >
       <div className='flex items-center justify-between plb-5 pli-6'>
-        <Typography variant='h5'>Update Tahun Pelajaran</Typography>
+        <Typography variant='h5'>Tambah Tahun Pelajaran Baru</Typography>
         <IconButton size='small' onClick={handleReset}>
           <i className='tabler-x text-2xl text-textPrimary' />
         </IconButton>
@@ -103,4 +94,4 @@ const UpdateStudyYearDrawer = (props: Props) => {
   )
 }
 
-export default UpdateStudyYearDrawer
+export default AddLessonYearDrawer

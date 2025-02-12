@@ -43,7 +43,7 @@ const EditSubjectListDrawer = (props: Props) => {
     async function fetchData() {
       const subjectRes = await fetchSubjects()
 
-      setSubjectList(subjectRes.result)
+      setSubjectList(subjectRes.result as any)
     }
 
     fetchData()

@@ -11,9 +11,6 @@ import { FormHelperText, MenuItem } from '@mui/material'
 // Third-party Imports
 import { useForm, Controller } from 'react-hook-form'
 
-// Types Imports
-import type { ClassroomType } from '@/types/classroomTypes'
-
 // Component Imports
 import CustomTextField from '@core/components/mui/TextField'
 
@@ -24,7 +21,7 @@ type Props = {
   open: boolean
   isLoading: boolean
   handleClose: () => void
-  handleCreate: (data: ClassroomType) => void
+  handleCreate: (data: FormValidateType) => void
 }
 
 type FormValidateType = {
@@ -43,7 +40,7 @@ const AddClassroomDrawer = (props: Props) => {
     async function fetchData() {
       const gradeRes = await fetchGrades()
 
-      setGradeData(gradeRes.result)
+      setGradeData(gradeRes.result as any)
     }
 
     fetchData()
@@ -62,7 +59,7 @@ const AddClassroomDrawer = (props: Props) => {
     }
   })
 
-  const onSubmit = (data: ClassroomType) => {
+  const onSubmit = (data: FormValidateType) => {
     handleCreate(data)
     handleClose()
     resetForm({ name: '', gradeId: '' })

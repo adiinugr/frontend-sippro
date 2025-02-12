@@ -61,7 +61,7 @@ const ViolationAdd = () => {
     const fetchData = async () => {
       const ruleData = await fetchRules()
 
-      setViolationRuleData(ruleData.result)
+      setViolationRuleData(ruleData.result as any)
     }
 
     fetchData()

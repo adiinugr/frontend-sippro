@@ -167,7 +167,7 @@ const RuleCategoryListTable = ({ tableData }: { tableData?: RuleCategoryType[] }
     setIsLoading(true)
 
     try {
-      const res = await updateRuleCategory({ name: val.name }, id)
+      const res = await updateRuleCategory(id, { name: val.name })
 
       setIsLoading(false)
       setOpenDialog(false)
@@ -190,7 +190,7 @@ const RuleCategoryListTable = ({ tableData }: { tableData?: RuleCategoryType[] }
   const handleOpenUpdateDrawer = async (id: number) => {
     const selectedData = await getRuleCategoryById(id)
 
-    setSelectedDataById(selectedData.result)
+    setSelectedDataById(selectedData.result as any)
 
     setUpdateRuleCategoryOpen(true)
   }

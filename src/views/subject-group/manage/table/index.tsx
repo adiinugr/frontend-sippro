@@ -23,7 +23,7 @@ const UserStudentManageListTable = ({ rowSelection, setRowSelection }: Props) =>
     async function fetchData() {
       const studentRes = await fetchStudents()
 
-      setStudentData(studentRes.result)
+      setStudentData(studentRes.result as any)
     }
 
     fetchData()

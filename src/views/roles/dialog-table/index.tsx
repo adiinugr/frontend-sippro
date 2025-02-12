@@ -23,7 +23,7 @@ const TeacherDialog = ({ rowSelection, setRowSelection }: Props) => {
     async function fetchData() {
       const teacherRes = await fetchTeachers()
 
-      setTeacherData(teacherRes.result)
+      setTeacherData(teacherRes.result as any)
     }
 
     fetchData()

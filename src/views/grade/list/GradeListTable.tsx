@@ -165,7 +165,7 @@ const GradeListTable = ({ tableData }: { tableData?: GradeType[] }) => {
     setIsLoading(true)
 
     try {
-      const res = await updateGrade({ name: val.name }, id)
+      const res = await updateGrade(id, { name: val.name })
 
       setIsLoading(false)
       setOpenDialog(false)
@@ -188,7 +188,7 @@ const GradeListTable = ({ tableData }: { tableData?: GradeType[] }) => {
   const handleOpenUpdateDrawer = async (id: number) => {
     const selectedData = await getGradeById(id)
 
-    setSelectedDataById(selectedData.result)
+    setSelectedDataById(selectedData.result as any)
 
     setUpdateGradeOpen(true)
   }

@@ -147,7 +147,7 @@ const AddSubjectGroupForm = ({ lessonYearData, gradeData, classroomData, selecte
     setIsLoading(true)
 
     try {
-      const subjectGroupRes = await updateSubjectGroupById(data, selectedData.id)
+      const subjectGroupRes = await updateSubjectGroupById(selectedData.id, data)
 
       if (subjectGroupRes.statusCode === 200) {
         const classroomToSubjectGroupPromise = await Promise.all(

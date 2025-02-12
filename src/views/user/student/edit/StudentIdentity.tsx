@@ -92,7 +92,7 @@ const StudentIdentity = ({ studentData }: Props) => {
   const onSubmit = async (data: FormValues) => {
     const { email, name, nis, nisn, placeOfBirth, dateOfBirth } = data
 
-    const studentDataPayload = {
+    const studentDataPayload: any = {
       email,
       name,
       nis,
@@ -104,7 +104,7 @@ const StudentIdentity = ({ studentData }: Props) => {
     setIsLoading(true)
 
     try {
-      const studentRes = await updateStudentById(studentDataPayload, studentData.id)
+      const studentRes = await updateStudentById(studentData.id, studentDataPayload)
 
       if (studentRes.statusCode === 200) {
         toast.success(`Berhasil mengubah data!`)

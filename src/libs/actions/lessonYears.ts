@@ -25,7 +25,7 @@ export async function fetchLessonYears(): Promise<ApiResponse<LessonYear[]>> {
   })
 }
 
-export async function createLessonYear(data: CreateLessonYearDto): Promise<ApiResponse<LessonYear>> {
+export async function createLessonYear(data: CreateLessonYearDto): Promise<ApiResponse<any>> {
   return apiClient<LessonYear>(
     LESSON_YEARS_PATH,
     {
@@ -42,7 +42,7 @@ export async function getLessonYearById(id: number): Promise<ApiResponse<LessonY
   })
 }
 
-export async function updateLessonYear(id: number, data: CreateLessonYearDto): Promise<ApiResponse<LessonYear>> {
+export async function updateLessonYear(id: number, data: CreateLessonYearDto): Promise<ApiResponse<any>> {
   return apiClient<LessonYear>(
     `${LESSON_YEARS_PATH}/${id}`,
     {

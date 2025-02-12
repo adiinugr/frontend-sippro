@@ -17,7 +17,7 @@ export async function fetchGrades(): Promise<ApiResponse<GradeType[]>> {
   })
 }
 
-export async function createGrade(data: { name: string }): Promise<ApiResponse<GradeType>> {
+export async function createGrade(data: { name: string }): Promise<ApiResponse<any>> {
   return apiClient<GradeType>(
     GRADES_PATH,
     {
@@ -35,7 +35,7 @@ export async function getGradeById(id: number): Promise<ApiResponse<GradeType>> 
   })
 }
 
-export async function updateGrade(id: number, data: { name: string }): Promise<ApiResponse<GradeType>> {
+export async function updateGrade(id: number, data: { name: string }): Promise<ApiResponse<any>> {
   return apiClient<GradeType>(
     `${GRADES_PATH}/${id}`,
     {

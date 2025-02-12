@@ -34,7 +34,7 @@ const TableFilters = ({
     async function fetchData() {
       const classroomRes = await fetchClassrooms()
 
-      setClassroomData(classroomRes.result)
+      setClassroomData(classroomRes.result as any)
     }
 
     fetchData()

@@ -169,11 +169,11 @@ const ClassroomListTable = ({ tableData }: { tableData?: ClassroomType[] }) => {
     }
   }
 
-  const handleUpdate = async (val: ClassroomType, id: number) => {
+  const handleUpdate = async (val: { name: string }, id: number) => {
     setIsLoading(true)
 
     try {
-      const res = await updateClassroom(val, id)
+      const res = await updateClassroom(id, val)
 
       setIsLoading(false)
       setOpenDialog(false)
@@ -184,7 +184,7 @@ const ClassroomListTable = ({ tableData }: { tableData?: ClassroomType[] }) => {
         return
       }
 
-      toast.error(`Gagal mengupdate data! ${res.result.response.message[0]}`)
+      toast.error(`Gagal mengupdate data! ${res.result ? res.result?.response?.message[0] : ''}`)
     } catch (error) {
       setIsLoading(false)
       setOpenDialog(false)
@@ -196,12 +196,12 @@ const ClassroomListTable = ({ tableData }: { tableData?: ClassroomType[] }) => {
   const handleOpenUpdateDrawer = async (id: number) => {
     const selectedData = await getClassroomById(id)
 
-    setSelectedDataById(selectedData.result)
+    setSelectedDataById(selectedData.result as any)
 
     setUpdateClassroomOpen(true)
   }
 
-  const handleCreate = async (val: ClassroomType) => {
+  const handleCreate = async (val: { name: string; gradeId: number | string }) => {
     setIsLoading(true)
 
     try {
@@ -216,7 +216,7 @@ const ClassroomListTable = ({ tableData }: { tableData?: ClassroomType[] }) => {
         return
       }
 
-      toast.error(`Gagal menambah data! ${res.result.response.message[0]}`)
+      toast.error(`Gagal menambah data! ${res.result ? res.result?.response?.message[0] : ''}`)
     } catch (error) {
       setIsLoading(false)
       setOpenDialog(false)
@@ -402,7 +402,7 @@ const ClassroomListTable = ({ tableData }: { tableData?: ClassroomType[] }) => {
         selectedData={selectedDataById}
         isLoading={isLoading}
         handleClose={() => setUpdateClassroomOpen(!updateClassroomOpen)}
-        handleUpdate={(val, id) => handleUpdate(val, id)}
+        handleUpdate={(val, id) => handleUpdate(id, val)}
       />
       <DeleteDialog
         open={openDialog}

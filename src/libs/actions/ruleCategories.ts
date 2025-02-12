@@ -26,7 +26,7 @@ export async function fetchRuleCategories(): Promise<ApiResponse<RuleCategory[]>
   })
 }
 
-export async function createRuleCategory(data: CreateRuleCategoryDto): Promise<ApiResponse<RuleCategory>> {
+export async function createRuleCategory(data: CreateRuleCategoryDto): Promise<ApiResponse<any>> {
   return apiClient<RuleCategory>(
     RULE_CATEGORIES_PATH,
     {
@@ -43,7 +43,7 @@ export async function getRuleCategoryById(id: number): Promise<ApiResponse<RuleC
   })
 }
 
-export async function updateRuleCategory(id: number, data: CreateRuleCategoryDto): Promise<ApiResponse<RuleCategory>> {
+export async function updateRuleCategory(id: number, data: CreateRuleCategoryDto): Promise<ApiResponse<any>> {
   return apiClient<RuleCategory>(
     `${RULE_CATEGORIES_PATH}/${id}`,
     {

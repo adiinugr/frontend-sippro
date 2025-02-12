@@ -58,7 +58,7 @@ export async function getTeacherById(id: number): Promise<ApiResponse<Teacher>> 
   })
 }
 
-export async function createTeacher(data: CreateTeacherDto): Promise<ApiResponse<Teacher>> {
+export async function createTeacher(data: CreateTeacherDto): Promise<ApiResponse<any>> {
   return apiClient<Teacher>(
     TEACHERS_PATH,
     {
@@ -69,7 +69,7 @@ export async function createTeacher(data: CreateTeacherDto): Promise<ApiResponse
   )
 }
 
-export async function updateTeacher(id: number, data: UpdateTeacherDto): Promise<ApiResponse<Teacher>> {
+export async function updateTeacherById(id: number, data: UpdateTeacherDto): Promise<ApiResponse<any>> {
   return apiClient<Teacher>(
     `${TEACHERS_PATH}/${id}`,
     {

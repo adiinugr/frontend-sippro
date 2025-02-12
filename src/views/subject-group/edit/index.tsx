@@ -64,7 +64,7 @@ const SubjectGroupEditList = ({ selectedData }: { selectedData: SubjectGroupType
         }
       })
 
-      setSelectedClassrooms(mappedFilteredClassroom)
+      setSelectedClassrooms(mappedFilteredClassroom as any)
     }
 
     fetchClassroomData()

@@ -20,7 +20,5 @@ export default async function GradePage() {
 
   const { result: grades } = await fetchGrades()
 
-  console.log(grades)
-
   return <GradeList gradeData={grades} />
 }

@@ -32,7 +32,7 @@ export async function fetchSubjects(): Promise<ApiResponse<Subject[]>> {
   })
 }
 
-export async function createSubject(data: CreateSubjectDto): Promise<ApiResponse<Subject>> {
+export async function createSubject(data: CreateSubjectDto): Promise<ApiResponse<any>> {
   return apiClient<Subject>(
     SUBJECTS_PATH,
     {
@@ -49,7 +49,7 @@ export async function getSubjectById(id: number): Promise<ApiResponse<Subject>> 
   })
 }
 
-export async function updateSubject(id: number, data: UpdateSubjectDto): Promise<ApiResponse<Subject>> {
+export async function updateSubject(id: number, data: UpdateSubjectDto): Promise<ApiResponse<any>> {
   return apiClient<Subject>(
     `${SUBJECTS_PATH}/${id}`,
     {

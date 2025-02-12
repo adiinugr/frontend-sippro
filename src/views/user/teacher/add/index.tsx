@@ -78,7 +78,7 @@ const UserTeacherAdd = () => {
       name,
       placeOfBirth,
       status: 'teacher',
-      dateOfBirth: dateOfBirth?.toISOString()
+      dateOfBirth: dateOfBirth?.toISOString() as string
     }
 
     setIsLoading(true)

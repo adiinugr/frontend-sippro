@@ -22,9 +22,9 @@ import CustomTextField from '@core/components/mui/TextField'
 
 // Styled Component Imports
 import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
+import { updateTeacherById } from '@/libs/actions/teachers'
 
 // Actions
-import { updateTeacherById } from '@/libs/actions/teachers'
 
 type FormValues = {
   id?: number
@@ -76,7 +76,7 @@ const TeacherIdentity = ({ teacherData }: Props) => {
   const onSubmit = async (data: FormValues) => {
     const { email, name, placeOfBirth, dateOfBirth } = data
 
-    const teacherDataPayload = {
+    const teacherDataPayload: any = {
       email,
       name,
       placeOfBirth,
@@ -87,7 +87,7 @@ const TeacherIdentity = ({ teacherData }: Props) => {
     setIsLoading(true)
 
     try {
-      const teacherRes = await updateTeacherById(teacherDataPayload, teacherData.id)
+      const teacherRes = await updateTeacherById(teacherData.id, teacherDataPayload)
 
       if (teacherRes.statusCode === 200) {
         toast.success(`Berhasil mengubah data!`)

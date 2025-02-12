@@ -62,7 +62,7 @@ const ViolationEdit = ({ violationId, selectedData }: Props) => {
     const fetchData = async () => {
       const ruleData = await fetchRules()
 
-      setViolationRuleData(ruleData.result)
+      setViolationRuleData(ruleData.result as any)
     }
 
     fetchData()
@@ -117,7 +117,7 @@ const ViolationEdit = ({ violationId, selectedData }: Props) => {
     setIsLoading(true)
 
     try {
-      const updateViolationRes = await updateViolation(violationData, violationId)
+      const updateViolationRes = await updateViolation(violationId, violationData)
 
       if (updateViolationRes.statusCode !== 200) {
         toast.error(`Gagal mengubah data pelanggaran! Silakan hubungi Admin!`)
