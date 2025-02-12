@@ -106,7 +106,7 @@ function ChatAi({ studentData }: ChatAiProps) {
   }
 
   return (
-    <Grid container spacing={6} className='h-full place-content-center'>
+    <Grid container spacing={6} className='h-full place-content-center '>
       <Grid item xs={12} lg={11} xl={8} className='mx-auto '>
         <div>
           {messages.length > 0 ? (
@@ -117,7 +117,7 @@ function ChatAi({ studentData }: ChatAiProps) {
                   className={classnames('flex gap-4 p-6', { 'flex-row-reverse': message?.role === 'user' })}
                 >
                   {message.role === 'user' ? (
-                    <CustomAvatar color='success' skin='light' size={32}>
+                    <CustomAvatar color='primary' skin='light' size={32}>
                       <i className='tabler-user-circle' />
                     </CustomAvatar>
                   ) : (
