@@ -5,7 +5,7 @@ import { useTheme } from '@mui/material/styles'
 import PerfectScrollbar from 'react-perfect-scrollbar'
 
 // Type Imports
-import { useSession } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 
 import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Menu'
 
@@ -21,6 +21,18 @@ import StyledVerticalNavExpandIcon from '@menu/styles/vertical/StyledVerticalNav
 // Style Imports
 import menuItemStyles from '@core/styles/vertical/menuItemStyles'
 import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
+
+// Utils
+import { canAccessFeature } from '@/utils/permissions'
+import {
+  viewCampusFeatureConfig,
+  viewLessonSettingConfig,
+  viewRoleAndPermissionConfig,
+  viewSchoolAdmConfig,
+  viewStudentAchievementConfig,
+  viewStudentManagementConfig,
+  viewTeacherManagementConfig
+} from '@/utils/permissions/featureConfig'
 
 type RenderExpandIconProps = {
   open?: boolean
@@ -49,6 +61,15 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
 
   const ScrollWrapper = isBreakpointReached ? 'div' : PerfectScrollbar
 
+  const handleUserLogout = async () => {
+    try {
+      // Sign out from the app
+      await signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   return (
     // eslint-disable-next-line lines-around-comment
     /* Custom scrollbar instead of browser scroll, remove if you want browser scroll only */
@@ -73,12 +94,43 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
       >
         {/* Teacher Menu */}
-        {session?.user.status === 'teacher' && (
-          <MenuSection label='Teacher'>
-            <MenuItem icon={<i className='tabler-layout-dashboard' />} href='/dashboard'>
-              Dashboard
-            </MenuItem>
-            <SubMenu label='Setting' icon={<i className='tabler-file-settings' />}>
+
+        <MenuItem icon={<i className='tabler-layout-dashboard' />} href='/dashboard'>
+          Dashboard
+        </MenuItem>
+        <MenuSection label='Administrasi'>
+          {canAccessFeature(session?.user, viewSchoolAdmConfig) && (
+            <>
+              <MenuItem icon={<i className='tabler-clipboard-list' />} href='/teacher/school-identity'>
+                Identitas Sekolah
+              </MenuItem>
+              <MenuItem icon={<i className='tabler-clipboard-text' />} href='/teacher/transcript'>
+                Transkrip
+              </MenuItem>
+              <MenuItem icon={<i className='tabler-book-2' />} href='/teacher/data-book'>
+                Buku Induk
+              </MenuItem>
+            </>
+          )}
+
+          <SubMenu label='User Management' icon={<i className='tabler-users' />}>
+            {canAccessFeature(session?.user, viewStudentManagementConfig) && (
+              <SubMenu label='Siswa'>
+                <MenuItem href='/teacher/user/student/list'>List</MenuItem>
+                <MenuItem href='/teacher/user/student/add'>Tambah</MenuItem>
+              </SubMenu>
+            )}
+            {canAccessFeature(session?.user, viewTeacherManagementConfig) && (
+              <SubMenu label='Guru'>
+                <MenuItem href='/teacher/user/teacher/list'>List</MenuItem>
+                <MenuItem href='/teacher/user/teacher/add'>Tambah</MenuItem>
+              </SubMenu>
+            )}
+          </SubMenu>
+        </MenuSection>
+        <MenuSection label='Kurikulum'>
+          {canAccessFeature(session?.user, viewLessonSettingConfig) && (
+            <SubMenu label='Pembelajaran' icon={<i className='tabler-file-settings' />}>
               <MenuItem href='/teacher/setting/lesson-year'>Tahun Pelajaran</MenuItem>
               <MenuItem href='/teacher/setting/grade'>Jenjang</MenuItem>
               <MenuItem href='/teacher/setting/classroom'>Kelas</MenuItem>
@@ -88,42 +140,48 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
                 <MenuItem href='/teacher/setting/subject-group/add'>Tambah</MenuItem>
               </SubMenu>
             </SubMenu>
+          )}
+          {canAccessFeature(session?.user, viewCampusFeatureConfig) && (
             <SubMenu label='Info Kampus' icon={<i className='tabler-school' />}>
               <MenuItem href='/teacher/campus/passing-grade'>Passing Grade & Kuota</MenuItem>
               <MenuItem href='/teacher/campus/linear-subject'>Mapel Pendukung</MenuItem>
               <MenuItem href='/teacher/campus/graduate-info'>Info Lulusan</MenuItem>
             </SubMenu>
-
-            {session?.user?.roles?.includes('Super Admin') && (
-              <>
-                <SubMenu label='Tata Tertib' icon={<i className='tabler-alert-triangle' />}>
-                  <MenuItem href='/teacher/violation/category'>Kategori</MenuItem>
-                  <MenuItem href='/teacher/violation/rules'>Peraturan</MenuItem>
-                  <SubMenu label='Pelanggaran'>
-                    <MenuItem href='/teacher/violation/list'>List Data</MenuItem>
-                    <MenuItem href='/teacher/violation/add'>Tambah</MenuItem>
-                  </SubMenu>
-                </SubMenu>
-                <SubMenu label='Roles & Permissions' icon={<i className='tabler-lock' />}>
-                  <MenuItem href={`/teacher/roles`}>Roles</MenuItem>
-                  <MenuItem href={`/teacher/permissions`}>Permissions</MenuItem>
-                </SubMenu>{' '}
-              </>
-            )}
-            <SubMenu label='User' icon={<i className='tabler-users' />}>
-              <SubMenu label='Siswa'>
-                <MenuItem href='/teacher/user/student/list'>List</MenuItem>
-                <MenuItem href='/teacher/user/student/add'>Tambah</MenuItem>
+          )}
+        </MenuSection>
+        <MenuSection label='Kesiswaan'>
+          {canAccessFeature(session?.user, viewCampusFeatureConfig) && (
+            <SubMenu label='Tata Tertib' icon={<i className='tabler-alert-triangle' />}>
+              <MenuItem href='/teacher/violation/category'>Kategori</MenuItem>
+              <MenuItem href='/teacher/violation/rules'>Peraturan</MenuItem>
+              <SubMenu label='Pelanggaran'>
+                <MenuItem href='/teacher/violation/list'>List Data</MenuItem>
+                <MenuItem href='/teacher/violation/add'>Tambah</MenuItem>
               </SubMenu>
-              {session?.user?.roles?.includes('Super Admin') && (
-                <SubMenu label='Guru'>
-                  <MenuItem href='/teacher/user/teacher/list'>List</MenuItem>
-                  <MenuItem href='/teacher/user/teacher/add'>Tambah</MenuItem>
-                </SubMenu>
-              )}
+            </SubMenu>
+          )}
+          {canAccessFeature(session?.user, viewStudentAchievementConfig) && (
+            <MenuItem icon={<i className='tabler-trophy' />} href='/teacher/achievement'>
+              Prestasi
+            </MenuItem>
+          )}
+        </MenuSection>
+        {canAccessFeature(session?.user, viewRoleAndPermissionConfig) && (
+          <MenuSection label='Super Admin'>
+            <SubMenu label='Roles & Permissions' icon={<i className='tabler-lock' />}>
+              <MenuItem href={`/teacher/roles`}>Roles</MenuItem>
+              <MenuItem href={`/teacher/permissions`}>Permissions</MenuItem>
             </SubMenu>
           </MenuSection>
         )}
+        <MenuSection label='Akun'>
+          <MenuItem icon={<i className='tabler-user' />} href='/profile'>
+            Profile Setting
+          </MenuItem>
+          <MenuItem icon={<i className='tabler-outbound' />} onClick={handleUserLogout}>
+            Logout
+          </MenuItem>
+        </MenuSection>
 
         {session?.user.status === 'student' && (
           <MenuSection label='Siswa'>

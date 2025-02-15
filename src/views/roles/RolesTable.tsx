@@ -45,7 +45,6 @@ import OptionMenu from '@core/components/option-menu'
 import CustomTextField from '@core/components/mui/TextField'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 import DeleteDialog from '@/components/other/DeleteDialog'
-import { deleteRoleById } from '@/libs/actions/roles'
 
 // Util Imports
 import { getInitials } from '@/utils/getInitials'
@@ -54,6 +53,9 @@ import { getInitials } from '@/utils/getInitials'
 import tableStyles from '@core/styles/table.module.css'
 import type { RoleType, TeacherWithRolesType } from '@/types/roleTypes'
 import type { ThemeColor } from '@/@core/types'
+
+// Actions
+import { deleteTeacherToRole } from '@/libs/actions/teachersToRoles'
 
 declare module '@tanstack/table-core' {
   interface FilterFns {
@@ -126,8 +128,10 @@ const RolesTable = ({ tableData, roles }: { tableData?: TeacherWithRolesType[]; 
   const data = useMemo(() => tableData, [tableData])
   const [filteredData, setFilteredData] = useState(data)
   const [globalFilter, setGlobalFilter] = useState('')
+
   const [openDialog, setOpenDialog] = useState<boolean>(false)
-  const [selectedId, setSelectedId] = useState<number>(0)
+  const [selectedTeacherId, setSelectedTeacherId] = useState<number>(0)
+  const [selectedRoleId, setSelectedRoleId] = useState<number>(0)
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const userRoleObj: UserRoleType =
@@ -194,6 +198,7 @@ const RolesTable = ({ tableData, roles }: { tableData?: TeacherWithRolesType[]; 
                 label={item.name}
                 size='small'
                 color={userRoleObj[item.name]?.color as ThemeColor}
+                onDelete={() => handleOpenDialog(Number(row.original.id), Number(item.id))}
               />
             ))}
           </div>
@@ -201,11 +206,8 @@ const RolesTable = ({ tableData, roles }: { tableData?: TeacherWithRolesType[]; 
       }),
       columnHelper.accessor('action', {
         header: 'Actions',
-        cell: ({ row }) => (
+        cell: () => (
           <div className='flex items-center'>
-            <IconButton onClick={() => handleOpenDialog(Number(row.original.id))}>
-              <i className='tabler-trash text-textSecondary' />
-            </IconButton>
             <IconButton>
               <Link href={'/apps/user/view'} className='flex'>
                 <i className='tabler-eye text-textSecondary' />
@@ -289,8 +291,10 @@ const RolesTable = ({ tableData, roles }: { tableData?: TeacherWithRolesType[]; 
     setFilteredData(filteredData)
   }, [role, data, setFilteredData])
 
-  const handleOpenDialog = (id: number) => {
-    setSelectedId(id)
+  const handleOpenDialog = (teacherId: number, roleId: number) => {
+    setSelectedTeacherId(teacherId)
+    setSelectedRoleId(roleId)
+
     setOpenDialog(true)
   }
 
@@ -298,22 +302,22 @@ const RolesTable = ({ tableData, roles }: { tableData?: TeacherWithRolesType[]; 
     setIsLoading(true)
 
     try {
-      const res = await deleteRoleById(selectedId)
+      const res = await deleteTeacherToRole(selectedTeacherId, selectedRoleId)
 
       setIsLoading(false)
       setOpenDialog(false)
 
       if (res.statusCode === 200) {
-        toast.success('Role deleted successfully')
+        toast.success('Berhasil menghapus user dari role!')
 
         return
       }
 
-      toast.error('Failed to delete role')
+      toast.error('Berhasil menghapus user dari role!')
     } catch (error) {
       setIsLoading(false)
       setOpenDialog(false)
-      toast.error('Failed to delete role')
+      toast.error('Berhasil menghapus user dari role!')
     }
   }
 

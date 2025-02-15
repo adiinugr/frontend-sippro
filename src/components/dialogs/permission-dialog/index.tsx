@@ -171,7 +171,6 @@ const EditContent = ({ handleClose, data, id }: EditProps) => {
                 label='Nama Permission'
                 variant='outlined'
                 placeholder='Basis Data'
-                className='mbe-2'
                 {...(errors.name && { error: true, helperText: 'This field is required.' })}
               />
             )}

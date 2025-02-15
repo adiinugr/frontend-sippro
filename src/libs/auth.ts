@@ -33,7 +33,7 @@ export const config: NextAuthConfig = {
           throw new Error(resJson.message)
         }
 
-        const { id, email, name, status, accessToken, roles } = resJson.result
+        const { id, email, name, status, accessToken, teachersToRoles } = resJson.result
 
         return {
           id,
@@ -41,7 +41,7 @@ export const config: NextAuthConfig = {
           name,
           status,
           accessToken,
-          roles
+          teachersToRoles
         }
       }
     })

@@ -143,8 +143,10 @@ const RoleDialog = ({ open, setOpen, title, id }: RoleDialogProps) => {
     try {
       // Update or create role first
       const roleId = id
-        ? (await updateRole(Number(id), { name: roleName }))?.result?.id
-        : (await createRole({ name: roleName }))?.result?.id
+        ? (await updateRole(Number(id), { name: roleName })).result.id
+        : await (
+            await createRole({ name: roleName })
+          ).result.id
 
       // Handle permissions
       await deleteRolePermissions(Number(roleId))

@@ -28,7 +28,7 @@ async function fetchRoles(): Promise<ApiResponse<Role[]>> {
   })
 }
 
-async function createRole(data: CreateRoleDto): Promise<ApiResponse<Role>> {
+async function createRole(data: CreateRoleDto): Promise<ApiResponse<any>> {
   return apiClient<Role>(
     ROLES_PATH,
     {
@@ -45,7 +45,7 @@ async function getRoleById(id: number): Promise<ApiResponse<Role>> {
   })
 }
 
-async function updateRole(id: number, data: CreateRoleDto): Promise<ApiResponse<Role>> {
+async function updateRole(id: number, data: CreateRoleDto): Promise<ApiResponse<any>> {
   return apiClient<Role>(
     `${ROLES_PATH}/${id}`,
     {
