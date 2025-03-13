@@ -34,6 +34,10 @@ const viewRoleAndPermissionConfig: FeatureConfig = {
   requiredPermissions: [{ name: PERMISSIONS.ROLES_PERMISSIONS, actions: ['read'] }]
 }
 
+const viewStudentViolationConfig: FeatureConfig = {
+  requiredPermissions: [{ name: PERMISSIONS.STUDENT_VIOLATION, actions: ['read'] }]
+}
+
 export {
   viewCampusFeatureConfig,
   viewLessonSettingConfig,
@@ -42,5 +46,6 @@ export {
   viewSchoolRuleConfig,
   viewStudentAchievementConfig,
   viewStudentManagementConfig,
+  viewStudentViolationConfig,
   viewTeacherManagementConfig
 }

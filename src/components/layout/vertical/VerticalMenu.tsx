@@ -31,6 +31,7 @@ import {
   viewSchoolAdmConfig,
   viewStudentAchievementConfig,
   viewStudentManagementConfig,
+  viewStudentViolationConfig,
   viewTeacherManagementConfig
 } from '@/utils/permissions/featureConfig'
 
@@ -98,7 +99,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
         <MenuItem icon={<i className='tabler-layout-dashboard' />} href='/dashboard'>
           Dashboard
         </MenuItem>
-        <MenuSection label='Administrasi'>
+        <MenuSection label='Fitur'>
           {canAccessFeature(session?.user, viewSchoolAdmConfig) && (
             <>
               <MenuItem icon={<i className='tabler-clipboard-list' />} href='/teacher/school-identity'>
@@ -128,44 +129,43 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             )}
           </SubMenu>
         </MenuSection>
-        <MenuSection label='Kurikulum'>
-          {canAccessFeature(session?.user, viewLessonSettingConfig) && (
-            <SubMenu label='Pembelajaran' icon={<i className='tabler-file-settings' />}>
-              <MenuItem href='/teacher/setting/lesson-year'>Tahun Pelajaran</MenuItem>
-              <MenuItem href='/teacher/setting/grade'>Jenjang</MenuItem>
-              <MenuItem href='/teacher/setting/classroom'>Kelas</MenuItem>
-              <MenuItem href='/teacher/setting/subject'>Mata Pelajaran</MenuItem>
-              <SubMenu label='Kelompok Mapel'>
-                <MenuItem href='/teacher/setting/subject-group/list'>List</MenuItem>
-                <MenuItem href='/teacher/setting/subject-group/add'>Tambah</MenuItem>
-              </SubMenu>
+
+        {canAccessFeature(session?.user, viewLessonSettingConfig) && (
+          <SubMenu label='Pembelajaran' icon={<i className='tabler-file-settings' />}>
+            <MenuItem href='/teacher/setting/lesson-year'>Tahun Pelajaran</MenuItem>
+            <MenuItem href='/teacher/setting/grade'>Jenjang</MenuItem>
+            <MenuItem href='/teacher/setting/classroom'>Kelas</MenuItem>
+            <MenuItem href='/teacher/setting/subject'>Mata Pelajaran</MenuItem>
+            <SubMenu label='Kelompok Mapel'>
+              <MenuItem href='/teacher/setting/subject-group/list'>List</MenuItem>
+              <MenuItem href='/teacher/setting/subject-group/add'>Tambah</MenuItem>
             </SubMenu>
-          )}
-          {canAccessFeature(session?.user, viewCampusFeatureConfig) && (
-            <SubMenu label='Info Kampus' icon={<i className='tabler-school' />}>
-              <MenuItem href='/teacher/campus/passing-grade'>Passing Grade & Kuota</MenuItem>
-              <MenuItem href='/teacher/campus/linear-subject'>Mapel Pendukung</MenuItem>
-              <MenuItem href='/teacher/campus/graduate-info'>Info Lulusan</MenuItem>
+          </SubMenu>
+        )}
+        {canAccessFeature(session?.user, viewCampusFeatureConfig) && (
+          <SubMenu label='Info Kampus' icon={<i className='tabler-school' />}>
+            <MenuItem href='/teacher/campus/passing-grade'>Passing Grade & Kuota</MenuItem>
+            <MenuItem href='/teacher/campus/linear-subject'>Mapel Pendukung</MenuItem>
+            <MenuItem href='/teacher/campus/graduate-info'>Info Lulusan</MenuItem>
+          </SubMenu>
+        )}
+
+        {canAccessFeature(session?.user, viewStudentViolationConfig) && (
+          <SubMenu label='Tata Tertib' icon={<i className='tabler-alert-triangle' />}>
+            <MenuItem href='/teacher/violation/category'>Kategori</MenuItem>
+            <MenuItem href='/teacher/violation/rules'>Peraturan</MenuItem>
+            <SubMenu label='Pelanggaran'>
+              <MenuItem href='/teacher/violation/list'>List Data</MenuItem>
+              <MenuItem href='/teacher/violation/add'>Tambah</MenuItem>
             </SubMenu>
-          )}
-        </MenuSection>
-        <MenuSection label='Kesiswaan'>
-          {canAccessFeature(session?.user, viewCampusFeatureConfig) && (
-            <SubMenu label='Tata Tertib' icon={<i className='tabler-alert-triangle' />}>
-              <MenuItem href='/teacher/violation/category'>Kategori</MenuItem>
-              <MenuItem href='/teacher/violation/rules'>Peraturan</MenuItem>
-              <SubMenu label='Pelanggaran'>
-                <MenuItem href='/teacher/violation/list'>List Data</MenuItem>
-                <MenuItem href='/teacher/violation/add'>Tambah</MenuItem>
-              </SubMenu>
-            </SubMenu>
-          )}
-          {canAccessFeature(session?.user, viewStudentAchievementConfig) && (
-            <MenuItem icon={<i className='tabler-trophy' />} href='/teacher/achievement'>
-              Prestasi
-            </MenuItem>
-          )}
-        </MenuSection>
+          </SubMenu>
+        )}
+        {canAccessFeature(session?.user, viewStudentAchievementConfig) && (
+          <MenuItem icon={<i className='tabler-trophy' />} href='/teacher/achievement'>
+            Prestasi
+          </MenuItem>
+        )}
+
         {canAccessFeature(session?.user, viewRoleAndPermissionConfig) && (
           <MenuSection label='Super Admin'>
             <SubMenu label='Roles & Permissions' icon={<i className='tabler-lock' />}>

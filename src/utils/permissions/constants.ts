@@ -7,7 +7,8 @@ export const PERMISSIONS = {
   STUDENT_MANAGEMENT: 'Student Management',
   TEACHER_MANAGEMENT: 'Teacher Management',
   LESSON_SETTING: 'Lesson Setting',
-  STUDENT_ACHIEVEMENT: 'Student Achievement'
+  STUDENT_ACHIEVEMENT: 'Student Achievement',
+  STUDENT_VIOLATION: 'Student Violation'
 } as const
 
 // Create type from permissions constant
