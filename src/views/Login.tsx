@@ -167,8 +167,9 @@ const LoginPage = ({ mode }: { mode: SystemMode }) => {
 
       toast.success('Berhasil login.')
       const redirectURL = searchParams.get('redirectTo') ?? '/'
+      const basePath = process.env.BASEPATH || ''
 
-      router.push(redirectURL)
+      router.push(`${basePath}${redirectURL}`)
       setIsLoading(false)
     } catch (error) {
       toast.error('Terjadi kesalahan. Silakan coba lagi.')

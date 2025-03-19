@@ -132,16 +132,27 @@ const pathMatchesRoute = (path: string, routePath: string): boolean => {
   })
 }
 
+// Helper function to check if user is Super Admin
+const isSuperAdmin = (user: any): boolean => {
+  return user?.teachersToRoles?.some((role: any) => role.roles.name === 'Super Admin')
+}
+
 // Enhanced middleware
 export default auth(req => {
   const user = req.auth?.user
+  const basePath = process.env.BASEPATH || ''
 
   // If no user is logged in, redirect to login
   if (!user) {
-    return NextResponse.redirect(new URL('/login', req.url))
+    return NextResponse.redirect(new URL(`${basePath}/login`, req.url))
   }
 
-  const currentPath = req.nextUrl.pathname
+  const currentPath = req.nextUrl.pathname.replace(basePath, '')
+
+  // Super Admin has access to all routes
+  if (isSuperAdmin(user)) {
+    return NextResponse.next()
+  }
 
   // Find matching route configuration
   const matchingRoute = routePermissions.find(route => pathMatchesRoute(currentPath, route.path))
@@ -151,7 +162,7 @@ export default auth(req => {
     const hasPermission = checkTeacherPermissions(user as any, matchingRoute.permissions, matchingRoute.matchType)
 
     if (!hasPermission) {
-      return NextResponse.redirect(new URL('/pages/401-not-authorized', req.url))
+      return NextResponse.redirect(new URL(`${basePath}/pages/401-not-authorized`, req.url))
     }
   }
 
