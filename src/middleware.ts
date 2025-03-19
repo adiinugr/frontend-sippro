@@ -142,14 +142,41 @@ export default auth(req => {
   const user = req.auth?.user
   const basePath = process.env.BASEPATH || ''
 
+  // Get the full URL and pathname
+  const url = new URL(req.url)
+  const pathname = url.pathname
+
+  // Skip middleware for static files and API routes
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/static') ||
+    pathname.includes('.')
+  ) {
+    return NextResponse.next()
+  }
+
   // If no user is logged in, redirect to login
   if (!user) {
-    return NextResponse.redirect(new URL(`${basePath}/login`, req.url))
+    const loginUrl = new URL(`${basePath}/login`, req.url)
+
+    return NextResponse.redirect(loginUrl)
   }
 
   // Get the path without the base path
-  const pathname = req.nextUrl.pathname
   const currentPath = basePath ? pathname.replace(basePath, '') : pathname
+
+  // Handle root path
+  if (currentPath === '/') {
+    // Redirect to dashboard based on user status
+    if (user.status === 'teacher') {
+      return NextResponse.redirect(new URL(`${basePath}/teacher/dashboard`, req.url))
+    } else if (user.status === 'student') {
+      return NextResponse.redirect(new URL(`${basePath}/student/dashboard`, req.url))
+    }
+
+    return NextResponse.next()
+  }
 
   // Super Admin has access to all routes
   if (isSuperAdmin(user)) {
@@ -164,7 +191,9 @@ export default auth(req => {
     const hasPermission = checkTeacherPermissions(user as any, matchingRoute.permissions, matchingRoute.matchType)
 
     if (!hasPermission) {
-      return NextResponse.redirect(new URL(`${basePath}/pages/401-not-authorized`, req.url))
+      const unauthorizedUrl = new URL(`${basePath}/pages/401-not-authorized`, req.url)
+
+      return NextResponse.redirect(unauthorizedUrl)
     }
   }
 
@@ -173,11 +202,16 @@ export default auth(req => {
 
 export const config = {
   matcher: [
-    // Match all paths except static files, api routes, and auth routes
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
     '/((?!api|_next/static|_next/image|favicon.ico).*)',
 
-    // Explicitly match student and teacher routes
-    '/student/:path*',
-    '/teacher/:path*'
+    // Explicitly match root path
+    '/'
   ]
 }
