@@ -4,14 +4,10 @@ import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 
 const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
-const BASEPATH = process.env.BASEPATH || ''
 
 export const config: NextAuthConfig = {
   trustHost: true,
-  pages: {
-    signIn: `${BASEPATH}/login`,
-    error: `${BASEPATH}/login`
-  },
+  pages: { signIn: '/login' },
   session: {
     strategy: 'jwt'
   },
@@ -63,14 +59,6 @@ export const config: NextAuthConfig = {
       session.user = token.user
 
       return session
-    },
-    async redirect({ url, baseUrl }) {
-      // Handle the base path in production
-      if (url.startsWith('/')) {
-        return `${baseUrl}${BASEPATH}${url}`
-      }
-
-      return url
     }
   },
   secret: process.env.AUTH_SECRET,

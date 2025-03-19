@@ -132,56 +132,16 @@ const pathMatchesRoute = (path: string, routePath: string): boolean => {
   })
 }
 
-// Helper function to check if user is Super Admin
-const isSuperAdmin = (user: any): boolean => {
-  return user?.teachersToRoles?.some((role: any) => role.roles.name === 'Super Admin')
-}
-
 // Enhanced middleware
 export default auth(req => {
   const user = req.auth?.user
-  const basePath = process.env.BASEPATH || ''
-
-  // Get the full URL and pathname
-  const url = new URL(req.url)
-  const pathname = url.pathname
-
-  // Skip middleware for static files and API routes
-  if (
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/api') ||
-    pathname.startsWith('/static') ||
-    pathname.includes('.')
-  ) {
-    return NextResponse.next()
-  }
 
   // If no user is logged in, redirect to login
   if (!user) {
-    const loginUrl = new URL(`${basePath}/login`, req.url)
-
-    return NextResponse.redirect(loginUrl)
+    return NextResponse.redirect(new URL('/login', req.url))
   }
 
-  // Get the path without the base path
-  const currentPath = basePath ? pathname.replace(basePath, '') : pathname
-
-  // Handle root path
-  if (currentPath === '/') {
-    // Redirect to dashboard based on user status
-    if (user.status === 'teacher') {
-      return NextResponse.redirect(new URL(`${basePath}/teacher/dashboard`, req.url))
-    } else if (user.status === 'student') {
-      return NextResponse.redirect(new URL(`${basePath}/student/dashboard`, req.url))
-    }
-
-    return NextResponse.next()
-  }
-
-  // Super Admin has access to all routes
-  if (isSuperAdmin(user)) {
-    return NextResponse.next()
-  }
+  const currentPath = req.nextUrl.pathname
 
   // Find matching route configuration
   const matchingRoute = routePermissions.find(route => pathMatchesRoute(currentPath, route.path))
@@ -191,9 +151,7 @@ export default auth(req => {
     const hasPermission = checkTeacherPermissions(user as any, matchingRoute.permissions, matchingRoute.matchType)
 
     if (!hasPermission) {
-      const unauthorizedUrl = new URL(`${basePath}/pages/401-not-authorized`, req.url)
-
-      return NextResponse.redirect(unauthorizedUrl)
+      return NextResponse.redirect(new URL('/pages/401-not-authorized', req.url))
     }
   }
 
@@ -201,17 +159,5 @@ export default auth(req => {
 })
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
-
-    // Explicitly match root path
-    '/'
-  ]
+  matcher: ['/student/:path*', '/teacher/:path*']
 }
