@@ -11,16 +11,10 @@ import '@/app/globals.css'
 // Generated Icon CSS Imports
 import '@assets/iconify-icons/generated-icons.css'
 
-// export const metadata = {
-//   title: 'Academix - Transformasi Pendidikan Tanpa Batas',
-//   description:
-//     'AcademiX adalah platform LMS inovatif yang mengubah cara sekolah dan siswa belajar, dengan pembelajaran interaktif dan efisien untuk mencapai potensi terbaik.'
-// }
-
 export const metadata = {
   title: 'SIPPRO - Sistem Informasi Pemilihan Prodi',
   description:
-    'SIPPRO membantu siswa untuk menentukan prodi atau jurusan yang cocok dengan nilai raport dan prestasi yang diraih.'
+    'Membantu siswa untuk menentukan prodi atau jurusan yang cocok dengan nilai raport dan prestasi yang diraih.'
 }
 
 const cakra = Chakra_Petch({
