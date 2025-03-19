@@ -147,7 +147,9 @@ export default auth(req => {
     return NextResponse.redirect(new URL(`${basePath}/login`, req.url))
   }
 
-  const currentPath = req.nextUrl.pathname.replace(basePath, '')
+  // Get the path without the base path
+  const pathname = req.nextUrl.pathname
+  const currentPath = basePath ? pathname.replace(basePath, '') : pathname
 
   // Super Admin has access to all routes
   if (isSuperAdmin(user)) {
@@ -170,5 +172,12 @@ export default auth(req => {
 })
 
 export const config = {
-  matcher: ['/student/:path*', '/teacher/:path*']
+  matcher: [
+    // Match all paths except static files, api routes, and auth routes
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+
+    // Explicitly match student and teacher routes
+    '/student/:path*',
+    '/teacher/:path*'
+  ]
 }
