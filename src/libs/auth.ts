@@ -50,7 +50,14 @@ export const config: NextAuthConfig = {
   callbacks: {
     async jwt({ user, token }) {
       if (user) {
-        token.user = user
+        if (user.status === 'teacher' && 'teachersToRoles' in user) {
+          token.user = {
+            ...user,
+            teachersToRoles: user.teachersToRoles
+          }
+        } else {
+          token.user = user
+        }
       }
 
       return token

@@ -143,6 +143,18 @@ export default auth(req => {
 
   const currentPath = req.nextUrl.pathname
 
+  // Special handling for Super Admin role
+  if (user.status === 'teacher' && 'teachersToRoles' in user && Array.isArray(user.teachersToRoles)) {
+    const isSuperAdmin = user.teachersToRoles.some(
+      (role: { roles: { name: string } }) => role.roles.name === 'Super Admin'
+    )
+
+    if (isSuperAdmin) {
+      // Super Admin has access to all routes
+      return NextResponse.next()
+    }
+  }
+
   // Find matching route configuration
   const matchingRoute = routePermissions.find(route => pathMatchesRoute(currentPath, route.path))
 
